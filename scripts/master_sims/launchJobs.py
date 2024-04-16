@@ -51,15 +51,16 @@ sweep_param_name = "sd_nu_ext_e_pert"
 #sweep_param_name = "mean_nu_ext_e_offset"
 #sweep_param_name = "JplusEE"
 
-#sweep_param_name2 = "mean_nu_ext_i_offset"
 sweep_param_name2 = ''
+#sweep_param_name2 = "mean_nu_ext_i_offset"
 
-#param_vals = np.arange(0.0, 0.45, 0.05)
-param_vals =  np.arange(0.0, 0.45, 0.05)
+param_vals = np.arange(0.0, 0.45, 0.05)
+#param_vals =  np.arange(0.0, 0.45, 0.05)
 #param_vals = np.arange(1.05, 1.3, 0.15)
 
-#param_vals2 = np.arange(1.05, 1.3, 0.15)
 param_vals2 = np.array([])
+#param_vals2 = np.arange(1.05, 1.3, 0.15)
+
 
 #-------------------- other quantities -----------------------------------------#
 sd_nu_ext_e_type = 'same_eachCluster'

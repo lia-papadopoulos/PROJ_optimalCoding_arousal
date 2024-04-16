@@ -1,11 +1,7 @@
 """
-
 notes:
     could compute baseline external and perturbation external currents
     separately, and then feed those into fcn_simulation.py
-    
-    not sure if its better to set more dependent variables here or
-    in the simulation code itself
 
 """
 
@@ -37,9 +33,9 @@ class sim_params:
         self.writeSimulation_to_file = True     # write simulation to file?
         self.save_voltage = False               # whether or not to save membrane potential, input current 
                     
-        self.T0 = 0.                        # simulation start time
-        self.TF = 2.7                      # simulation end time
-        self.dt = 0.05e-3                   # time step
+        self.T0 = 0.                            # simulation start time
+        self.TF = 1.5                           # simulation end time
+        self.dt = 0.05e-3                       # time step
         
         self.N = 2000                       # total number of neurons
         self.ne = 0.8                       # total fraction of excitatory neurons
@@ -86,7 +82,7 @@ class sim_params:
         self.sd_nu_ext_e_pert = 0.0 
         self.sd_nu_ext_i_pert = 0.0 
         
-        self.sd_nu_ext_e_type = ''
+        self.sd_nu_ext_e_type = 'same_eachCluster' # 'same_eachCluster' or ''
         self.sd_nu_ext_i_type = ''
         
         # white noise variance of external inputs
@@ -154,7 +150,7 @@ class sim_params:
         # STIMULUS PROPERTIES
         #-----------------------------------------------------------------------------    
         # for stimuli, specify:
-        self.stim_type = 'noStim'                 # type of stimulus ['' or 'noStim']
+        self.stim_type = ''                 # type of stimulus ['' or 'noStim']
         self.nStim = 5                      # number of different stimuli to run
         self.mixed_selectivity = True       # allow different stimuli to target same clusters
         self.stim_shape = 'diff2exp'        # type of stimulus
@@ -253,7 +249,14 @@ class sim_params:
     def set_external_inputs(self, random_seed):
         
         # set random number generator using the specified seed
-        rng = np.random.default_rng(random_seed)
+        if random_seed == 'random':
+            
+            seed = np.random.choice(10000,1)[0]
+            rng = np.random.default_rng(seed)
+            
+        else:
+            
+            rng = np.random.default_rng(random_seed)
                     
         
         # input to excitatory
