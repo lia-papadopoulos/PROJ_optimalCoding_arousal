@@ -187,3 +187,6 @@ plt.clim([-np.max(np.abs(W)),np.max(np.abs(W))])
 plt.tight_layout()
 
 
+#%% show plots
+
+plt.show()
