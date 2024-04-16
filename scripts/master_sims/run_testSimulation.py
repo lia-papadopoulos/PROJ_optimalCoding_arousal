@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 # unpack paths
 sim_params_path = paths_file.sim_params_path
 functions_path1 = paths_file.functions_path1
-fig_path = paths_file.fig_path
 
 # import sim params  
 sys.path.append(sim_params_path)     
