@@ -7,10 +7,7 @@ set paths for running simulations
 # path to simulation parameters
 sim_params_path = '/Users/liapapadopoulos/Dropbox/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/'
 
-# path to functions
+# path to simulation and network generation functions
 functions_path1 = '/Users/liapapadopoulos/Dropbox/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/'
-
-# path to figures
-fig_path = '/Users/liapapadopoulos/Dropbox/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/output/localSims/'
 
 
