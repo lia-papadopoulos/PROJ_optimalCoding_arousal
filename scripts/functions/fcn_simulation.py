@@ -681,9 +681,9 @@ def fcn_simulate_exact_poisson(sim_params, J, rand_seed='random'):
             # note that with this definition, if t_delay = dt, then a spike at time 
             # t will affect psc at time t+1 and voltage at time t+2
             
-            
-            tDelay = timePts[tInd + 1 - round(t_delay/dt)]
-            if tDelay < 0:
+            indDelay = tInd + 1 - round(t_delay/dt)
+            tDelay = timePts[indDelay]
+            if indDelay < 0:
                 spikes_for_input = np.zeros(N)
             else:
                 spikes_for_input = np.zeros(N)
@@ -785,9 +785,9 @@ def fcn_simulate_exact_poisson(sim_params, J, rand_seed='random'):
             # note that with this definition, if t_delay = dt, then a spike at time 
             # t will affect psc at time t+1 and voltage at time t+2
             
-            
-            tDelay = timePts[tInd + 1 - round(t_delay/dt)]
-            if tDelay < 0:
+            indDelay = tInd + 1 - round(t_delay/dt)
+            tDelay = timePts[indDelay]
+            if indDelay < 0:
                 spikes_for_input = np.zeros(N)
             else:
                 spikes_for_input = np.zeros(N)
