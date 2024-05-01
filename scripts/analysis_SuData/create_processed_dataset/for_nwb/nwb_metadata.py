@@ -2,14 +2,24 @@
 metadata for each session
 """
 
+# constants
+experimenter = 'Suhyun Jo'
+lab = 'McCormick'
+institution = 'University of Oregon'
+path_to_data = '/mnt/ion-nas2/Brain_Initiative/Neuropixels/Su_NP/processed_data_LP/'
+session_description = 'Recordings from mouse auditory cortex during passive exposure to sounds'
+
+
+# dictionary for metadata
 metadata = {}
 
 
 # LA3_SESSION3
 metadata['LA3_session3'] = {}
 metadata['LA3_session3']['identifier'] = 'LA3_session3'
-metadata['LA3_session3']['path_processedData'] = '/mnt/ion-nas2/Brain_Initiative/Neuropixels/Su_NP/processed_data_LP/LA3_session3_processed_data.h5'
-metadata['LA3_session3']['session_description'] = 'Recordings from mouse auditory cortex during passive exposure to sounds'
+metadata['LA3_session3']['filename'] = 'LA3_session3_processed_data.h5'
+metadata['LA3_session3']['path_to_data'] = path_to_data
+metadata['LA3_session3']['session_description'] = session_description
 metadata['LA3_session3']['session_start_time'] = ''
 metadata['LA3_session3']['subject_id'] = 'LA3'
 metadata['LA3_session3']['subject_age'] = ''
@@ -17,9 +27,9 @@ metadata['LA3_session3']['subject_description'] = ''
 metadata['LA3_session3']['subject_species'] = ''
 metadata['LA3_session3']['subject_sex'] = ''
 metadata['LA3_session3']['session_id'] = 'session3'
-metadata['LA3_session3']['experimenter'] = 'Suhyun Jo'
-metadata['LA3_session3']['lab'] = 'McCormick'
-metadata['LA3_session3']['institution'] = 'University of Oregon'                   
+metadata['LA3_session3']['experimenter'] = experimenter
+metadata['LA3_session3']['lab'] = lab
+metadata['LA3_session3']['institution'] = institution              
 metadata['LA3_session3']['related_publications'] = ''   
 
 
