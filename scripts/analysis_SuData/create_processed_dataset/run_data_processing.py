@@ -17,7 +17,7 @@ import behavioral_preprocessing_info
 
 
 # session information
-all_sessions_to_run = [#'LA12_session1', \
+all_sessions_to_run = [
                        'LA3_session3', \
                        'LA8_session1', 'LA8_session2', \
                        'LA9_session1', \
