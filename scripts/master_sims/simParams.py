@@ -34,7 +34,7 @@ class sim_params:
         self.save_voltage = False               # whether or not to save membrane potential, input current 
                     
         self.T0 = 0.                            # simulation start time
-        self.TF = 1.5                           # simulation end time
+        self.TF = 1.5                         # simulation end time
         self.dt = 0.05e-3                       # time step
         
         self.N = 2000                       # total number of neurons
@@ -50,18 +50,15 @@ class sim_params:
         self.tau_s_e = 5e-3
         self.tau_s_i = 5e-3         
         self.tau_r = 5e-3                   # refractory period
-        self.t_delay = self.dt              # delay
+        self.t_delay = 0.             # delay
         
         self.synType = 'exp'                # synapse type
         
-        
-        # catch for t_delay = 0
-        if self.t_delay == 0:
-            sys.exit('ERROR: TIME DELAY MUST BE >= dt !')
-            
             
         # whether or not external inputs are poisson
-        self.extCurrent_poisson = True
+        self.base_extCurrent_poisson = True
+        self.pert_extCurrent_poisson = True
+        self.pert_toVoltage = False
         
     
         #-----------------------------------------------------------------------------
@@ -69,25 +66,22 @@ class sim_params:
         #----------------------------------------------------------------------------- 
         
         # external input mean and spatial standard dev 
-        self.mean_nu_ext_e = 7.
-        self.mean_nu_ext_i = 7.
+        self.mean_nu_ext_ee = 7.0
+        self.mean_nu_ext_ie = 7.0
+        self.mean_nu_ext_ei = 0.
+        self.mean_nu_ext_ii = 0.
         
         # perturbations
+        self.Jee_reduction = 0.
+        self.Jie_reduction = 0.
         
-        # avg input
-        self.mean_nu_ext_e_offset = 0.                    
-        self.mean_nu_ext_i_offset = 0.
         
-        # spatial variance of external inputs
-        self.sd_nu_ext_e_pert = 0.0 
-        self.sd_nu_ext_i_pert = 0.0 
+        self.pert_mean_nu_ext_ee = 0.
+        self.pert_mean_nu_ext_ie = 0.
+        self.pert_mean_nu_ext_ei = 0.
+        self.pert_mean_nu_ext_ii = 0.
         
-        self.sd_nu_ext_e_type = 'same_eachCluster' # 'same_eachCluster' or ''
-        self.sd_nu_ext_i_type = ''
-        
-        # white noise variance of external inputs
-        self.sd_nu_ext_e_white_pert = 0.0
-        self.sd_nu_ext_i_white_pert = 0.0
+
         
         #-----------------------------------------------------------------------------
         # NETWORK PROPERTIES
@@ -102,18 +96,25 @@ class sim_params:
         # whether or not to depress inter-cluster connections
         self.depress_interCluster = True
                
-        self.pext = 0.2
         self.pee = 0.2
         self.pei = 0.5
         self.pii = 0.5
         self.pie = 0.5
         
-        self.Jee = 0.63/np.sqrt(self.N)
-        self.Jie = 0.63/np.sqrt(self.N)
-        self.Jei = 1.9/np.sqrt(self.N)
-        self.Jii = 3.8/np.sqrt(self.N)
-        self.Jie_ext = 2.3/np.sqrt(self.N)
-        self.Jee_ext = 2.3/np.sqrt(self.N)
+        self.pext_ee = 0.2
+        self.pext_ie = 0.2
+        self.pext_ei = 0.8
+        self.pext_ii = 0.8
+        
+        self.jee = 0.63
+        self.jie = 0.63
+        self.jei = 1.9
+        self.jii = 3.8
+        
+        self.jie_ext = 2.3
+        self.jee_ext = 2.3
+        self.jii_ext = 2.3
+        self.jei_ext = 2.3
         
         # clusters
         self.p = 18
@@ -135,7 +136,6 @@ class sim_params:
             self.clust_std = 1.0
             
         # cluster depression & potentiation
-        #self.JplusEE = 14.5                 # EE intra-cluster potentiation factor (no poisson)
         self.JplusEE = 15.75                 # EE intra-cluster potentiation factor (poisson)
         self.JplusII = 5.0                   # II intra-cluster potentiation factor
         self.JplusEI = 6.25                  # EI intra-cluster potentiation factor
@@ -150,7 +150,7 @@ class sim_params:
         # STIMULUS PROPERTIES
         #-----------------------------------------------------------------------------    
         # for stimuli, specify:
-        self.stim_type = ''                 # type of stimulus ['' or 'noStim']
+        self.stim_type = ''           # type of stimulus ['' or 'noStim']
         self.nStim = 5                      # number of different stimuli to run
         self.mixed_selectivity = True       # allow different stimuli to target same clusters
         self.stim_shape = 'diff2exp'        # type of stimulus
@@ -190,20 +190,40 @@ class sim_params:
         # get any values from argparser
         
         # perturbations
-        self.mean_nu_ext_e_offset = args.mean_nu_ext_e_offset
-        self.sd_nu_ext_e_pert = args.sd_nu_ext_e_pert
-        self.sd_nu_ext_e_type = args.sd_nu_ext_e_type
-        self.sd_nu_ext_e_white_pert = args.sd_nu_ext_e_white_pert
-        
+        self.pert_mean_nu_ext_ee = args.pert_mean_nu_ext_ee
+        self.pert_mean_nu_ext_ie = args.pert_mean_nu_ext_ie
+        self.pert_mean_nu_ext_ii = args.pert_mean_nu_ext_ii
+        self.pert_mean_nu_ext_ei = args.pert_mean_nu_ext_ei
+
         # network type
         self.net_type = args.net_type
 
-        # stimulation
-        self.stim_rel_amp = args.stim_rel_amp
+        self.Jee_reduction = args.Jee_reduction
+        self.Jie_reduction = args.Jie_reduction
         
-        # JplusEE
-        self.JplusEE = args.JplusEE
- 
+        
+    #---------------------------------------------------------------------------------
+    # SET Js
+    #---------------------------------------------------------------------------------   
+    def set_Je_reduction(self):
+        
+        self.jee = self.jee - self.jee*self.Jee_reduction
+        self.jie = self.jie - self.jie*self.Jie_reduction
+
+        
+
+    #---------------------------------------------------------------------------------
+    # SET JplusAB BASED ON NETWORK TYPE
+    #--------------------------------------------------------------------------------- 
+    def update_JplusAB(self):
+        
+        if self.net_type == 'hom':
+            
+            self.JplusEE = 1.0       # EE intra-cluster potentiation factor
+            self.JplusII = 1.0       # II intra-cluster potentiation factor
+            self.JplusEI = 1.0       # EI intra-cluster potentiation factor
+            self.JplusIE = 1.0       # IE intra-cluster potentiation factor
+            
     #---------------------------------------------------------------------------------
     # SET ANY VARIABLES THAT ARE COMPLETELY DETERMINED BY MAIN INPUTS
     #---------------------------------------------------------------------------------       
@@ -220,124 +240,64 @@ class sim_params:
         self.Cei = self.pei*self.N_i
         self.Cii = self.pii*self.N_i
         self.Cie = self.pie*self.N_e
-        self.Cext = self.N_e*self.pext 
-
-
-    #---------------------------------------------------------------------------------
-    # SET JplusAB BASED ON NETWORK TYPE
-    #--------------------------------------------------------------------------------- 
-    def update_JplusAB(self):
         
-        if self.net_type == 'hom':
+        self.Jee = self.jee/np.sqrt(self.N)
+        self.Jie = self.jie/np.sqrt(self.N)
+        self.Jei = self.jei/np.sqrt(self.N)
+        self.Jii = self.jii/np.sqrt(self.N)
+        
+        self.Jie_ext = self.jie_ext/np.sqrt(self.N) 
+        self.Jee_ext = self.jee_ext/np.sqrt(self.N) 
+        self.Jii_ext = self.jii_ext/np.sqrt(self.N) 
+        self.Jei_ext = self.jei_ext/np.sqrt(self.N)        
+        
+        if ((self.stim_shape == 'diff2exp')):
             
-            self.JplusEE = 1.0       # EE intra-cluster potentiation factor
-            self.JplusII = 1.0       # II intra-cluster potentiation factor
-            self.JplusEI = 1.0       # EI intra-cluster potentiation factor
-            self.JplusIE = 1.0       # IE intra-cluster potentiation factor
+            self.stim_duration = []
+
  
     #---------------------------------------------------------------------------------
     # ADD CLUSTER SIZES
     #--------------------------------------------------------------------------------- 
     def set_popSizes(self, popSize_E, popSize_I):
         
-        self.popSize_E = popSize_E
-        self.popSize_I = popSize_I
+        self.popSize_E = popSize_E.copy()
+        self.popSize_I = popSize_I.copy()
+
+    
+
+    def set_external_inputs_ei(self, random_seed):
         
-    #---------------------------------------------------------------------------------
-    # SET EXTERNAL INPUTS
-    #---------------------------------------------------------------------------------    
-    def set_external_inputs(self, random_seed):
+        print('currently no randomness in external inputs; seed not used')
         
-        # set random number generator using the specified seed
-        if random_seed == 'random':
-            
-            seed = np.random.choice(10000,1)[0]
-            rng = np.random.default_rng(seed)
-            
-        else:
-            
-            rng = np.random.default_rng(random_seed)
-                    
+        nu_ext_ee_base = self.mean_nu_ext_ee*self.pext_ee*self.N_e
+        nu_ext_ee_pert = self.pert_mean_nu_ext_ee*self.pext_ee*self.N_e
         
-        # input to excitatory
-        ze = rng.normal(loc = self.mean_nu_ext_e_offset, \
-                            scale = self.sd_nu_ext_e_pert, \
-                            size = self.N_e)
-            
-        
-        if self.sd_nu_ext_e_type == 'same_eachCluster':
-            
-            cluSize = self.popSize_E[0]
-            cluBoundaries = np.append(0, np.cumsum(self.popSize_E))
-            ze_new = np.zeros(self.N_e)
-            
-            # clusters
-            for indClu in range(0,self.p):
-                ze_new[cluBoundaries[indClu]:cluBoundaries[indClu+1]] = ze[:cluSize]
-            
-            # background
-            indClu = self.p
-            ze_new[cluBoundaries[indClu]:cluBoundaries[indClu+1]] = ze[cluBoundaries[indClu]:cluBoundaries[indClu+1]]
-            
-            ze = ze_new.copy()
-            
-        self.nu_ext_e = self.mean_nu_ext_e + ze*self.mean_nu_ext_e
-        
-        
-        # find inputs that become negative and set to zero
-        neg_input_inds = np.where(self.nu_ext_e < 0)[0]
-        self.nu_ext_e[neg_input_inds] = 0
-        
-        
-        
-        # input to inhibitory
-        zi = rng.normal(loc = self.mean_nu_ext_i_offset, \
-                        scale = self.sd_nu_ext_i_pert, \
-                        size = self.N_i)
-            
-        if self.sd_nu_ext_i_type == 'same_eachCluster':
-            
-            cluSize = self.popSize_I[0]
-            cluBoundaries = np.append(0, np.cumsum(self.popSize_I))
-            zi_new = np.zeros(self.N_i)
-            
-            # clusters
-            for indClu in range(0,self.p):
-                zi_new[cluBoundaries[indClu]:cluBoundaries[indClu+1]] = zi[:cluSize]
-            
-            # background
-            indClu = self.p
-            zi_new[cluBoundaries[indClu]:cluBoundaries[indClu+1]] = zi[cluBoundaries[indClu]:cluBoundaries[indClu+1]]
-            
-            zi = zi_new.copy()
-            
-            
-        self.nu_ext_i = self.mean_nu_ext_i + zi*self.mean_nu_ext_i
-        
-        
-        # find inputs that become negative and set to zero
-        neg_input_inds = np.where(self.nu_ext_i < 0)[0]
-        self.nu_ext_i[neg_input_inds] = 0        
+        self.nu_ext_ee = nu_ext_ee_base*np.ones(self.N_e)
+        self.pert_nu_ext_ee = nu_ext_ee_pert*np.ones(self.N_e)
         
 
-    #---------------------------------------------------------------------------------
-    # ONLY KEEP STIMULUS PARAMETERS RELEVANT FOR PARTICULAR SHAPE
-    #---------------------------------------------------------------------------------     
-    def update_stim_params(self):    
-    
-        if ((self.stim_shape == 'diff2exp')):
-            
-            self.stim_duration = []
-                            
-    
-    #---------------------------------------------------------------------------------
-    # COMPUTE MAX STIMULUS STRENGTH
-    # SET TO BE SOME FRACTION OF THE BASELINE EXTERNAL RATE mean_nu_ext
-    #--------------------------------------------------------------------------------- 
-    def set_max_stim_rate(self):
+        nu_ext_ie_base = self.mean_nu_ext_ie*self.pext_ie*self.N_e
+        nu_ext_ie_pert = self.pert_mean_nu_ext_ie*self.pext_ie*self.N_e
         
-        self.stimRate_E = self.stim_rel_amp*self.mean_nu_ext_e
-        self.stimRate_I = self.stim_rel_amp*self.mean_nu_ext_i
+        self.nu_ext_ie = (nu_ext_ie_base)*np.ones(self.N_i)
+        self.pert_nu_ext_ie = (nu_ext_ie_pert)*np.ones(self.N_i)
+        
+        
+        nu_ext_ei_base = self.mean_nu_ext_ei*self.pext_ei*self.N_i
+        nu_ext_ei_pert = self.pert_mean_nu_ext_ei*self.pext_ei*self.N_i
+        
+        self.nu_ext_ei = (nu_ext_ei_base)*np.ones(self.N_e)
+        self.pert_nu_ext_ei = (nu_ext_ei_pert)*np.ones(self.N_e)
+        
+        
+        nu_ext_ii_base = self.mean_nu_ext_ii*self.pext_ii*self.N_i
+        nu_ext_ii_pert = self.pert_mean_nu_ext_ii*self.pext_ii*self.N_i
+        
+        self.nu_ext_ii = (nu_ext_ii_base)**np.ones(self.N_i)
+        self.pert_nu_ext_ii = (nu_ext_ii_pert)**np.ones(self.N_i)
+   
+              
         
     #---------------------------------------------------------------------------------
     # COMPUTE WHICH NEURONS ARE STIMULATED 
@@ -398,4 +358,22 @@ class sim_params:
             self.stim_Icells[stim_cells] = True       
            
 
+    #---------------------------------------------------------------------------------
+    # COMPUTE MAX STIMULUS STRENGTH
+    # SET TO BE SOME FRACTION OF THE BASELINE EXTERNAL RATE mean_nu_ext
+    #--------------------------------------------------------------------------------- 
+    def set_max_stim_rate(self):
         
+        self.stimRate_E = self.stim_rel_amp*self.mean_nu_ext_ee
+        self.stimRate_I = self.stim_rel_amp*self.mean_nu_ext_ie
+        
+        
+    #---------------------------------------------------------------------------------
+    # SET INITIAL VOLTAGE
+    #---------------------------------------------------------------------------------       
+    def fcn_set_initialVoltage(self):
+        
+        print('initial voltages uniformly distributed between reset and threshold; could add rng seed as input here')
+        iVe = np.random.uniform(self.Vr_e, self.Vth_e, self.N_e)
+        iVi = np.random.uniform(self.Vr_i, self.Vth_i, self.N_i)
+        self.iV = np.append(iVe, iVi)

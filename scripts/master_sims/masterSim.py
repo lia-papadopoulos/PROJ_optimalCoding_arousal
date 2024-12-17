@@ -16,13 +16,12 @@ import scipy as sp
 from scipy.io import savemat
 
 # IMPORT CONFIG FILE FOR SETTING PARAMETERS
-from simParams import sim_params
+from simParams_01 import sim_params
 
 # IMPORTS FROM FUNCTIONS FOLDER: SPECIFY PATH
 sys.path.append('../functions/')    
 import fcn_make_network_cluster
-from fcn_simulation import fcn_simulate_whitenoise
-from fcn_simulation import fcn_simulate_exact_poisson
+from fcn_simulation_EIextInput import fcn_simulate_expSyn
 from fcn_stimulation import get_stimulated_clusters
 
 #%%
@@ -39,29 +38,22 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser() 
     
     # perturbations
-    parser.add_argument('-mean_nu_ext_e_offset', '--mean_nu_ext_e_offset', \
-                        type=float, default = s_params.mean_nu_ext_e_offset)   
+    parser.add_argument('-pert_mean_nu_ext_ee', '--pert_mean_nu_ext_ee', \
+                        type=float, default = s_params.pert_mean_nu_ext_ee)   
 
-    parser.add_argument('-mean_nu_ext_i_offset', '--mean_nu_ext_i_offset', \
-                        type=float, default = s_params.mean_nu_ext_i_offset)  
-    
-    parser.add_argument('-sd_nu_ext_e_pert', '--sd_nu_ext_e_pert', \
-                        type=float, default = s_params.sd_nu_ext_e_pert)
+    parser.add_argument('-pert_mean_nu_ext_ie', '--pert_mean_nu_ext_ie', \
+                        type=float, default = s_params.pert_mean_nu_ext_ie)   
+       
+    parser.add_argument('-pert_mean_nu_ext_ei', '--pert_mean_nu_ext_ei', \
+                        type=float, default = s_params.pert_mean_nu_ext_ei)   
+        
+    parser.add_argument('-pert_mean_nu_ext_ii', '--pert_mean_nu_ext_ii', \
+                        type=float, default = s_params.pert_mean_nu_ext_ii)   
+        
+    parser.add_argument('-Jee_reduction', '--Jee_reduction', type=float, default = s_params.Jee_reduction)
+    parser.add_argument('-Jie_reduction', '--Jie_reduction', type=float, default = s_params.Jie_reduction)
 
-    parser.add_argument('-sd_nu_ext_e_type', '--sd_nu_ext_e_type', \
-                        type=str, default = '')
-        
-    parser.add_argument('-sd_nu_ext_e_white_pert', '--sd_nu_ext_e_white_pert', \
-                        type=float, default = s_params.sd_nu_ext_e_white_pert)
-        
-    # stimulation
-    parser.add_argument('-stim_rel_amp', '--stim_rel_amp', \
-                        type=float, default = s_params.stim_rel_amp)
-        
-    # Jee+
-    parser.add_argument('-JplusEE', '--JplusEE', \
-                        type=float, default = s_params.JplusEE)
-        
+
     # network type    
     parser.add_argument('-net_type', '--net_type', type=str, default=s_params.net_type)
 
@@ -76,6 +68,7 @@ if __name__=='__main__':
     #%% UPDATE SIM PARAMS
     
     s_params.get_argparse_vals(args)
+    s_params.set_Je_reduction()
     s_params.update_JplusAB()
     s_params.set_dependent_vars()
     
@@ -100,16 +93,11 @@ if __name__=='__main__':
     # which clusters to stimulate [use network index as random seed so all ICs have same stimuli]
     get_stimulated_clusters_seed = ind_network
     
-    # seed for initial conditions ['random' or int]
-    IC_seed = 'random'
     
     # seed for setting external inputs
-    # setting to ind_network means that the same realization will be used for all trials [this is what we want!]
+    # setting to ind_network means that the same realization will be used for all trials [this is what we want]
     extInput_seed = ind_network
-        
-    # whitenoise seed
-    whiteNoise_seed = ind_network
-    
+
     
     #%% MAKE NETWORK
 
@@ -119,7 +107,6 @@ if __name__=='__main__':
     print('network constructed')
     
     s_params.set_popSizes(popSize_E, popSize_I)
-    
     
     #%% GET STIMULUS SELECTIVE CLUSTERS
     
@@ -133,15 +120,21 @@ if __name__=='__main__':
             
         #---------------------- TIMING ------------------------------- #
         t0 = time.time()
+        
+        
+        #---------------------- INITIAL CONDITIONS ---------------------#
+        # random
+        s_params.fcn_set_initialVoltage()
+
                 
         #---------------------- EXTERNAL INPUTS ---------------------- #
         # set external inputs
-        s_params.set_external_inputs(extInput_seed)
+        s_params.set_external_inputs_ei(extInput_seed)
         
         #---------------------- STIMULATION -------------------------- #
         
         # set selective clusters
-        s_params.selectiveClusters = selectiveClusters[stim_ind]
+        s_params.selectiveClusters = selectiveClusters[stim_ind].copy()
         
         # determine which neurons are stimulated [using stim_ind as random seed]
         s_params.get_stimulated_neurons(stim_ind, popSize_E, popSize_I)
@@ -149,25 +142,14 @@ if __name__=='__main__':
         # determine maximum stimulus strength
         s_params.set_max_stim_rate()
         
-        # if we are doing stim vs no stim set stim strength to zero for stim_ind=0
-        if s_params.stim_type == 'stim_noStim':
-            if s_params.nStim != 2:
-                sys.exit('error: only 2 stimulus conditions possible for stim_type = stim_noStim')
-            else:           
-                s_params.stimRate_E = s_params.stimRate_E*stim_ind
-                s_params.stimRate_I = s_params.stimRate_I*stim_ind
-        
-    
+
         #---------------------- RUN SIMULATION ----------------------- #
             
         # run simulation
         if s_params.save_voltage == 0:
-            if s_params.sd_nu_ext_e_white_pert != 0:
-                spikes = fcn_simulate_whitenoise(s_params, W, IC_seed, whiteNoise_seed)
-                s_params.simulator = 'fcn_simulate_whitenoise'
-            else:
-                spikes = fcn_simulate_exact_poisson(s_params, W, IC_seed)
-                s_params.simulator = 'fcn_simulate_exact_poisson'
+            spikes = fcn_simulate_expSyn(s_params, W)
+            s_params.simulator = 'fcn_simulate_expSyn'
+            
         else:
             sys.exit('do not save voltage for each simulation')
             
@@ -185,8 +167,6 @@ if __name__=='__main__':
                               'popSize_E':                    popSize_E, \
                               'popSize_I':                    popSize_I, \
                               'network_seed':                   ind_network, \
-                              'IC_seed':                        IC_seed, \
-                              'whitenoiseSeed':                 whiteNoise_seed, \
                               'set_external_inputs_seed':       extInput_seed, \
                               'get_stimulated_clusters_seed':   get_stimulated_clusters_seed,\
                               'get_stimulated_neurons_seed':    stim_ind}

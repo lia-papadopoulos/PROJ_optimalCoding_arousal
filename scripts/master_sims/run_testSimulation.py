@@ -1,9 +1,5 @@
 
-#%% USER INPUTS
 
-externalInput_seed = 'random'
-selectiveClusters_seed = 'random'
-stimNeurons_seed = 'random'
 
 #%% STANDARD IMPORTS
 
@@ -25,7 +21,7 @@ from simParams import sim_params
 # import helper functions
 sys.path.append(functions_path1)     
 from fcn_make_network_cluster import fcn_make_network_cluster
-from fcn_simulation import fcn_simulate_exact_poisson
+from fcn_simulation_EIextInput import fcn_simulate_expSyn
 from fcn_stimulation import get_stimulated_clusters
 
 
@@ -35,6 +31,13 @@ mpl.rcParams['font.family'] = 'sans-serif'
 mpl.rcParams['font.sans-serif'] = 'Helvetica'
 mpl.rcParams['font.size'] = 14
 
+
+#%% USER INPUTS
+
+externalInput_seed = np.random.choice(10000)
+stimClusters_seed = np.random.choice(10000)
+stimNeurons_seed = np.random.choice(1000)
+networkSeed = np.random.choice(10000)
 
 
 #%%   MAIN FUNCTION
@@ -46,25 +49,29 @@ s_params = sim_params()
 s_params.save_voltage = True
 
 # synaptic weights
+s_params.set_Je_reduction()
 s_params.update_JplusAB()
-
+    
 # set dependent variables
 s_params.set_dependent_vars()
 
 # make network
-W, popsizeE, popsizeI = fcn_make_network_cluster(s_params)  
+W, popsizeE, popsizeI = fcn_make_network_cluster(s_params, networkSeed)  
 
 # set popsizes
 s_params.set_popSizes(popsizeE, popsizeI)   
 
-# set external inputs (random seed)
-s_params.set_external_inputs(externalInput_seed) 
-
 # set selective clusters (random seed)
-selectiveClusters = get_stimulated_clusters(s_params,selectiveClusters_seed)
+selectiveClusters = get_stimulated_clusters(s_params,stimClusters_seed)
+
+# set initial voltage
+s_params.fcn_set_initialVoltage()
+
+# set external inputs (random seed)
+s_params.set_external_inputs_ei(externalInput_seed) 
   
 # set selective clusters for one stimulus
-s_params.selectiveClusters = selectiveClusters[0]
+s_params.selectiveClusters = selectiveClusters[0].copy()
     
 # determine which neurons are stimulated (random seed)
 s_params.get_stimulated_neurons(stimNeurons_seed, popsizeE, popsizeI)
@@ -83,7 +90,7 @@ clus=np.cumsum(popsizeE)
 t0 = time.time()
 
 # save voltage
-timePts, spikes, v, I_exc, I_inh, I_o = fcn_simulate_exact_poisson(s_params, W)
+timePts, spikes, v, I_exc, I_inh, I_o = fcn_simulate_expSyn(s_params, W)
 
 # end timing
 tf = time.time()
@@ -154,26 +161,6 @@ if s_params.stim_type != 'noStim':
     plt.xlabel('time [s]')
     plt.ylabel('neuron ID')
     plt.tight_layout() 
-
-
-
-#%% plot currents into one neuron
-
-plt.figure(figsize=(6.0,3))
-
-pltNode = np.random.choice(s_params.N_e, 1)[0]
-
-plt.plot(timePts, I_exc[pltNode,:]*s_params.tau_m_e, label='rec E current', color='royalblue',linewidth=0.5)
-plt.plot(timePts, I_inh[pltNode,:]*s_params.tau_m_e, label='rec I current', color='firebrick',linewidth=0.5)
-plt.plot(timePts, (I_o[pltNode,:] + I_exc[pltNode,:])*s_params.tau_m_e, '-', label='total E current', color='darkblue',linewidth=0.5)
-plt.plot(timePts, (I_exc[pltNode,:] + I_inh[pltNode,:] + I_o[pltNode, :])*s_params.tau_m_e, label='total current', color='gray',linewidth=1)
-plt.plot(timePts, v[pltNode,:], label ='mem pot', color='purple',linewidth=2)
-plt.plot(timePts, s_params.Vth_e*np.ones(len(timePts)), label='threshold', color='black',linewidth=2)
-
-plt.xlabel('time [s]')
-plt.ylabel('currents to E cell')
-plt.legend(fontsize=6)
-plt.tight_layout()
 
 
 #%% network
