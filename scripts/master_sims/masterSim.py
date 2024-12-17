@@ -16,7 +16,7 @@ import scipy as sp
 from scipy.io import savemat
 
 # IMPORT CONFIG FILE FOR SETTING PARAMETERS
-from simParams_01 import sim_params
+from simParams import sim_params
 
 # IMPORTS FROM FUNCTIONS FOLDER: SPECIFY PATH
 sys.path.append('../functions/')    
