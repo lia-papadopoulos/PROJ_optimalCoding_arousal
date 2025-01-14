@@ -6,7 +6,7 @@ sim_params = {}
 # SIMULATION PROPERTIES
 #----------------------------------------------------------------------------- 
 
-sim_params['simID'] = '121900002024_a' 
+sim_params['simID'] = '00000000' 
 
 sim_params['parameters_fileName'] = ('simulationData')
 sim_params['network_name'] = 'network'

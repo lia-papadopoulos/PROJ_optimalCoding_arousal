@@ -306,7 +306,7 @@ def fcn_repeated_stratified_kFold_crossVal(X, classLabels, classifier, \
 # done for each fold
 def fcn_decode(X, classLabels, classifier, trainInds, testInds, \
                lda_solver, \
-               penalty_linSVC = 'l2', C_linSVC=0.1, loss_linSVC='squared_hinge', dual_linSVC=False, standardize=True, tol_lda=1e-8, \
+               penalty_linSVC = 'l2', C_linSVC=0.1, loss_linSVC='squared_hinge', dual_linSVC=False, standardize=False, tol_lda=1e-8, \
                tol_linSVC=1e-4, maxiter_linSVC=1000):
     
     
@@ -361,14 +361,13 @@ def fcn_decode(X, classLabels, classifier, trainInds, testInds, \
 
 
 #%% DECODING WRAPPER FUNCTION
-# ****** NEED TO MAKE standardize, dual_linSVC, tol_lda inputs to cross-val functions [perhaps as dictionary] ******
+# ****** NEED TO MAKE lda and svc keyword args inputs to cross val functions [perhaps as dictionary] ******
+# ****** currently they aren't used here; only values defined in fcn_decode matter ****
 
 def fcn_decode_master(X, classLabels, classifier, crossVal_type, \
                      compute_shuffleDist, nShuffles, shuffle_percentile, \
                      lda_solver, \
-                     nKFolds=5, nReps=10, shuffle_type='per_split', \
-                     standardize=True, dual_linSVC=False, tol_lda=1e-8, \
-                     tol_linsvc=1e-8, maxiter_svc=2000):
+                     nKFolds=5, nReps=10, shuffle_type='per_split'):
     
     
     if crossVal_type == 'fcn_repeated_stratified_kFold_crossVal':
@@ -397,8 +396,7 @@ def fcn_decode_master(X, classLabels, classifier, crossVal_type, \
         lowPercentile_accuracy_shuffle, highPercentile_accuracy_shuffle, \
         p_accuracy, confusionMat = \
             fcn_stratified_kFold_crossVal(X, classLabels, classifier, nKFolds, \
-                                          compute_shuffleDist, nShuffles, shuffle_percentile, lda_solver, \
-                                          shuffle_type='per_split')
+                                          compute_shuffleDist, nShuffles, shuffle_percentile, lda_solver)
                 
     else:
         
@@ -476,9 +474,9 @@ def fcn_maxAccuracy_duringStim(time, accuracy_vs_time, stimOn, stimOff):
 
 
 
-#%% DRAW STIMULATED NEURONS
+#%% DRAW NEURONS
 
-def fcn_draw_stim_neurons(stimCells, clusterIDs, ensembleSize, seed):
+def fcn_draw_neurons(cellIDs, clusterIDs, ensembleSize, seed, draw_equalPerCluster):
 
     # seed
     if seed == 'random':
@@ -492,97 +490,53 @@ def fcn_draw_stim_neurons(stimCells, clusterIDs, ensembleSize, seed):
     # cells per pop
     cells_per_pop = int(np.floor(ensembleSize/nPops))
     
-
-    # ensemble inds
-    ensembleInds = np.array([])
+    # leftovers
+    n_leftover_cells = np.mod(ensembleSize, nPops)
     
-    for indPop in range(0,nPops):
+    # if we want to draw neurons randomly, rather than equally per cluster
+    if draw_equalPerCluster == False:
+        ensembleInds = rng.choice(cellIDs, ensembleSize, replace=False)
         
-        cells_inPop = np.nonzero(clusterIDs == indPop)[0]
-        cells_inPop_andStim = np.intersect1d(cells_inPop, stimCells)
+    else:
+
+        # ensemble inds
+        ensembleInds = np.array([])
         
-        if np.size(cells_inPop_andStim) == 0:
-            drawnCell = rng.choice(cells_inPop, cells_per_pop, replace=False)
-        else:
-            drawnCell = rng.choice(cells_inPop_andStim, cells_per_pop, replace=False)
+        for indPop in range(0,nPops):
             
-        ensembleInds = np.append(ensembleInds, drawnCell)
+            cells_inPop = np.nonzero(clusterIDs == indPop)[0]
+            cells_inPop_andStim = np.intersect1d(cells_inPop, cellIDs)
+            
+            if np.size(cells_inPop_andStim) < cells_per_pop:
+                drawnCell = rng.choice(cells_inPop, cells_per_pop, replace=False)
+            else:
+                drawnCell = rng.choice(cells_inPop_andStim, cells_per_pop, replace=False)
+                
+            ensembleInds = np.append(ensembleInds, drawnCell)
+            
+        # randomly select populations to draw more cells from
+        pops_for_leftovers = np.random.choice(nPops, n_leftover_cells, replace=False)
         
+        for indPop in pops_for_leftovers:
+            
+            cells_inPop = np.nonzero(clusterIDs == indPop)[0]
+            cells_inPop_andStim = np.intersect1d(cells_inPop, cellIDs)
+            
+            cells_inPop = np.setdiff1d(cells_inPop, ensembleInds)
+            cells_inPop_andStim = np.setdiff1d(cells_inPop_andStim, ensembleInds)
+            
+            if np.size(cells_inPop_andStim) == 0:
+                drawnCell = rng.choice(cells_inPop, 1, replace=False)
+            else:
+                drawnCell = rng.choice(cells_inPop_andStim, 1, replace=False)
+            
+            ensembleInds = np.append(ensembleInds, drawnCell)
+        
+            
     ensembleInds = ensembleInds.astype(int)
     
     return ensembleInds
-        
-    
-#%% DRAW ANY NEURONS
 
-# draw_type: 'random', 'equal_per_cluster'
-
-def fcn_draw_neurons(sim_params, clustSize_E, clustSize_I, ensembleSize, draw_cellType, draw_type, seed):
-    
-    # get data from sim_params
-    Ne = sim_params.N_e
-    nClu = sim_params.p
-    
-    # cluster ID array
-    clusID_E = np.append([0], np.cumsum(clustSize_E))
-        
-    # seed
-    if seed == 'random':
-        rng = np.random.default_rng()
-    else:
-        rng = np.random.default_rng(seed)
-    
-    # draw excitatory cells only
-    if draw_cellType == ['E']:
-        
-        if draw_type == 'random':
-            
-            ensembleInds = rng.choice(Ne,ensembleSize,replace=False)
-        
-        elif draw_type == 'equal_per_cluster':
-            
-            nPops = nClu + 1
-            cells_per_pop = int(np.floor(ensembleSize/nPops))
-            
-            if cells_per_pop < 1:
-                
-                sys.exit('number of clusters is larger than ensemble size')
-            
-            n_leftovers = int(ensembleSize - cells_per_pop*nPops)
-            
-            ensembleInds = []
-            
-            for i in range(0, nPops, 1):
-                
-                clusterCells = np.arange(clusID_E[i],clusID_E[i+1],1)
-                                
-                drawnCells = rng.choice(clusterCells, cells_per_pop, replace=False)
-                
-                ensembleInds = np.append(ensembleInds, drawnCells)   
-                
-            # draw leftovers at random
-            clusterCells = np.arange(0,Ne,1)
-            clusterCells = np.delete(clusterCells, ensembleInds.astype(int))
-            drawnCells = rng.choice(clusterCells, n_leftovers, replace=False)
-            ensembleInds = np.append(ensembleInds, drawnCells) 
-            
-            
-        else:
-            
-            sys.exit('invalid draw_type specified')
-      
-    else:
-        sys.exit('this function only supports drawing excitatory cells for now.')
-        
-    
-    ensembleInds = ensembleInds.astype(int)
-        
-
-    return ensembleInds
-        
-
-
-    
     
     
     

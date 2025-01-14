@@ -18,7 +18,7 @@ functions_path1 = paths_file.functions_path1
 sys.path.append(sim_params_path)     
 from simParams import sim_params as s_params
 from fcn_simulation_setup import fcn_basic_setup, fcn_set_popSizes, fcn_set_initialVoltage, fcn_set_arousal, fcn_setup_one_stimulus
-from fcn_compute_firing_stats import fcn_compute_firingRates, Dict2Class
+#from fcn_compute_firing_stats import fcn_compute_firingRates
 
 # import helper functions
 sys.path.append(functions_path1)     
@@ -171,7 +171,8 @@ plt.show()
 
 
 #%% RATES
-
+'''
 params_class = Dict2Class(s_params)
 Erates_sim, Irates_sim = fcn_compute_firingRates(params_class, spikes, 0)
 print(np.mean(Erates_sim), np.mean(Irates_sim))
+'''
