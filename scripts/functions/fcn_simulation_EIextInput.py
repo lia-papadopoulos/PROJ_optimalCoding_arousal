@@ -30,6 +30,7 @@ def fcn_simulate_expSyn(params, J):
         sim_params = Dict2Class(params)
     else:
         sim_params = params
+        
 #------------------------------------------------------------------------------
 # GET PARAMETERS
 #------------------------------------------------------------------------------
@@ -64,8 +65,8 @@ def fcn_simulate_expSyn(params, J):
     
     pext_ee = sim_params.pext_ee              # external connection probability
     pext_ie = sim_params.pext_ie              # external connection probability
-    #pext_ei = sim_params.pext_ei              # external connection probability
-    #pext_ii = sim_params.pext_ii              # external connection probability
+    pext_ei = sim_params.pext_ei              # external connection probability
+    pext_ii = sim_params.pext_ii              # external connection probability
 
     Jee_ext = sim_params.Jee_ext        # external E to E weight
     Jie_ext = sim_params.Jie_ext        # external E to I weight
@@ -163,12 +164,12 @@ def fcn_simulate_expSyn(params, J):
         base_extPoisson_ei_vec = np.zeros((Ne, nSteps+1))
         base_extPoisson_ii_vec = np.zeros((Ni, nSteps+1))
         for i in range(0, Ne):
-           base_extPoisson_ee_vec[i,:] = rng.poisson(nu_ext_ee[i]*dt, nSteps+1)
-           base_extPoisson_ei_vec[i,:] = rng.poisson(nu_ext_ei[i]*dt, nSteps+1)
+           base_extPoisson_ee_vec[i,:] = rng.poisson(nu_ext_ee[i]*pext_ee*Ne*dt, nSteps+1)
+           base_extPoisson_ei_vec[i,:] = rng.poisson(nu_ext_ei[i]*pext_ei*Ni*dt, nSteps+1)
 
         for i in range(0, Ni):
-           base_extPoisson_ie_vec[i,:] = rng.poisson(nu_ext_ie[i]*dt, nSteps+1)
-           base_extPoisson_ii_vec[i,:] = rng.poisson(nu_ext_ii[i]*dt, nSteps+1)
+           base_extPoisson_ie_vec[i,:] = rng.poisson(nu_ext_ie[i]*pext_ie*Ne*dt, nSteps+1)
+           base_extPoisson_ii_vec[i,:] = rng.poisson(nu_ext_ii[i]*pext_ii*Ni*dt, nSteps+1)
         
         # poisson spike trains for all cells
         base_extPoisson_vec_xe = np.vstack((base_extPoisson_ee_vec, base_extPoisson_ie_vec))
@@ -190,12 +191,12 @@ def fcn_simulate_expSyn(params, J):
         pert_extPoisson_ei_vec = np.zeros((Ne, nSteps+1))
         pert_extPoisson_ii_vec = np.zeros((Ni, nSteps+1))
         for i in range(0, Ne):
-           pert_extPoisson_ee_vec[i,:] = rng.poisson(pert_nu_ext_ee[i]*dt, nSteps+1)
-           pert_extPoisson_ei_vec[i,:] = rng.poisson(pert_nu_ext_ei[i]*dt, nSteps+1)
+           pert_extPoisson_ee_vec[i,:] = rng.poisson(pert_nu_ext_ee[i]*pext_ee*Ne*dt, nSteps+1)
+           pert_extPoisson_ei_vec[i,:] = rng.poisson(pert_nu_ext_ei[i]*pext_ei*Ni*dt, nSteps+1)
 
         for i in range(0, Ni):
-           pert_extPoisson_ie_vec[i,:] = rng.poisson(pert_nu_ext_ie[i]*dt, nSteps+1)
-           pert_extPoisson_ii_vec[i,:] = rng.poisson(pert_nu_ext_ii[i]*dt, nSteps+1)
+           pert_extPoisson_ie_vec[i,:] = rng.poisson(pert_nu_ext_ie[i]*pext_ie*Ne*dt, nSteps+1)
+           pert_extPoisson_ii_vec[i,:] = rng.poisson(pert_nu_ext_ii[i]*pext_ii*Ni*dt, nSteps+1)
         
         # poisson spike trains for all cells
         pert_extPoisson_vec_xe = np.vstack((pert_extPoisson_ee_vec, pert_extPoisson_ie_vec))
@@ -317,8 +318,8 @@ def fcn_simulate_expSyn(params, J):
             I_o = Istim.copy()
         else:
             I_const = np.zeros(N)
-            I_const[:Ne] = nu_ext_ee*Jee_ext + nu_ext_ei*Jei_ext
-            I_const[Ne:] = nu_ext_ie*Jie_ext + nu_ext_ii*Jii_ext
+            I_const[:Ne] = nu_ext_ee*pext_ee*Ne*Jee_ext + nu_ext_ei*pext_ei*Ni*Jei_ext
+            I_const[Ne:] = nu_ext_ie*pext_ie*Ne*Jie_ext + nu_ext_ii*pext_ii*Ni*Jii_ext
 
             for i in range(0,N):
                 I_o[i, :] = Istim[i, :] + I_const[i]
@@ -335,8 +336,8 @@ def fcn_simulate_expSyn(params, J):
             I_o = Istim.copy()
         else:
             I_const = np.zeros(N)
-            I_const[:Ne] = nu_ext_ee*Jee_ext + nu_ext_ei*Jei_ext
-            I_const[Ne:] = nu_ext_ie*Jie_ext + nu_ext_ii*Jii_ext
+            I_const[:Ne] = nu_ext_ee*pext_ee*Ne*Jee_ext + nu_ext_ei*pext_ei*Ni*Jei_ext
+            I_const[Ne:] = nu_ext_ie*pext_ie*Ne*Jie_ext + nu_ext_ii*pext_ii*Ni*Jii_ext
             for i in range(0,N):
                 I_o[i, :] = Istim[i, :] + I_const[i]
                 

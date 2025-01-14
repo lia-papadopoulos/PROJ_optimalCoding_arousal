@@ -1,6 +1,4 @@
 import numpy as np
-import sys
-
 
 
 #---------- FUNCTION FOR SETTING STIMULATED CLUSTERS + NEURONS -----------#
@@ -12,7 +10,21 @@ import sys
 #                       clusters that will be stimulated for the given 
 #                       stimulation number
 
-def get_stimulated_clusters(sim_params, random_seed):
+
+class Dict2Class:
+      
+    def __init__(self, my_dict):
+          
+        for key in my_dict:
+            setattr(self, key, my_dict[key])
+            
+
+def get_stimulated_clusters(params, random_seed):
+    
+    if isinstance(params, dict):
+        sim_params = Dict2Class(params)
+    else:
+        sim_params = params
     
     # unpack sim_params
     p = sim_params.p

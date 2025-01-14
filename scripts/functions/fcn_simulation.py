@@ -1255,8 +1255,8 @@ def fcn_simulate_whitenoise(sim_params, J, rand_seed='random', whitenoiseSeed = 
        
         # multiply currents by tau_m to get into right units 
         for i in range(0,N,1):
-            I_ext = I_ext*tau_m
-            Iext_e = Iext_e
+            I_ext[i] = I_ext[i]*tau_m[i]
+            Istim[i,:] = Istim[i,:]*tau_m[i]
             Irec[i,:]=Irec[i,:]*tau_m[i]
             Irec_e[i,:]=Irec_e[i,:]*tau_m[i]
             Irec_i[i,:]=Irec_i[i,:]*tau_m[i]

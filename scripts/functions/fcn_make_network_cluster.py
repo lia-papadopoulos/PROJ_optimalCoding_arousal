@@ -19,8 +19,19 @@ import numpy as np
 # 2) AMIT AND BRUNEL, CEREBRAL CORTEX, 1997
 
 
-
-def fcn_compute_depressFactors(sim_params):
+class Dict2Class:
+      
+    def __init__(self, my_dict):
+          
+        for key in my_dict:
+            setattr(self, key, my_dict[key])
+            
+def fcn_compute_depressFactors(params):
+    
+    if isinstance(params, dict):
+        sim_params = Dict2Class(params)
+    else:
+        sim_params = params
     
     if sim_params.depress_interCluster == False:
         
@@ -69,8 +80,13 @@ def fcn_compute_depressFactors(sim_params):
 
 
 
-def fcn_make_network_cluster(sim_params, rand_seed=-1):
-    
+def fcn_make_network_cluster(params, rand_seed=-1):
+
+    if isinstance(params, dict):
+        sim_params = Dict2Class(params)
+    else:
+        sim_params = params
+        
     #-----------------------------------------------------------------------------
     # SEED FOR NETWORK RANDOMNESS
     #-----------------------------------------------------------------------------
