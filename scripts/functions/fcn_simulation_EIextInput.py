@@ -85,7 +85,6 @@ def fcn_simulate_expSyn(params, J):
 
     pert_extCurrent_poisson = sim_params.pert_extCurrent_poisson # whether or not external current is Poisson
     base_extCurrent_poisson = sim_params.base_extCurrent_poisson
-    pert_toVoltage = sim_params.pert_toVoltage
     
 #------------------------------------------------------------------------------
 # SETUP
@@ -155,78 +154,75 @@ def fcn_simulate_expSyn(params, J):
 # EXTERNAL CURRENTS [POISSON WITH RATE C_ext*nu_ext]
 #------------------------------------------------------------------------------
 
-    if base_extCurrent_poisson == True:
+    if ( (base_extCurrent_poisson == True) and (pert_extCurrent_poisson == True) ):
         
         rng = np.random.default_rng()
         
-        base_extPoisson_ee_vec = np.zeros((Ne, nSteps+1))
-        base_extPoisson_ie_vec = np.zeros((Ni, nSteps+1))
-        base_extPoisson_ei_vec = np.zeros((Ne, nSteps+1))
-        base_extPoisson_ii_vec = np.zeros((Ni, nSteps+1))
+        # poisson
+        extPoisson_ee_vec = np.zeros((Ne, nSteps+1))
+        extPoisson_ie_vec = np.zeros((Ni, nSteps+1))
+        extPoisson_ei_vec = np.zeros((Ne, nSteps+1))
+        extPoisson_ii_vec = np.zeros((Ni, nSteps+1))
+        
+        # no deterministic inputs
+        extDetermin_vec = np.zeros((N, nSteps+1))
+        
+        
         for i in range(0, Ne):
-           base_extPoisson_ee_vec[i,:] = rng.poisson(nu_ext_ee[i]*pext_ee*Ne*dt, nSteps+1)
-           base_extPoisson_ei_vec[i,:] = rng.poisson(nu_ext_ei[i]*pext_ei*Ni*dt, nSteps+1)
-
-        for i in range(0, Ni):
-           base_extPoisson_ie_vec[i,:] = rng.poisson(nu_ext_ie[i]*pext_ie*Ne*dt, nSteps+1)
-           base_extPoisson_ii_vec[i,:] = rng.poisson(nu_ext_ii[i]*pext_ii*Ni*dt, nSteps+1)
-        
-        # poisson spike trains for all cells
-        base_extPoisson_vec_xe = np.vstack((base_extPoisson_ee_vec, base_extPoisson_ie_vec))
-        base_extPoisson_vec_xi = np.vstack((base_extPoisson_ei_vec, base_extPoisson_ii_vec))
-        
-    else:
-        
-        # no external poisson
-        base_extPoisson_vec_xe = np.zeros((N, nSteps+1))
-        base_extPoisson_vec_xi = np.zeros((N, nSteps+1))
-
-
-    if pert_extCurrent_poisson == True:
-        
-        rng = np.random.default_rng()
-        
-        pert_extPoisson_ee_vec = np.zeros((Ne, nSteps+1))
-        pert_extPoisson_ie_vec = np.zeros((Ni, nSteps+1))
-        pert_extPoisson_ei_vec = np.zeros((Ne, nSteps+1))
-        pert_extPoisson_ii_vec = np.zeros((Ni, nSteps+1))
-        for i in range(0, Ne):
-           pert_extPoisson_ee_vec[i,:] = rng.poisson(pert_nu_ext_ee[i]*pext_ee*Ne*dt, nSteps+1)
-           pert_extPoisson_ei_vec[i,:] = rng.poisson(pert_nu_ext_ei[i]*pext_ei*Ni*dt, nSteps+1)
-
-        for i in range(0, Ni):
-           pert_extPoisson_ie_vec[i,:] = rng.poisson(pert_nu_ext_ie[i]*pext_ie*Ne*dt, nSteps+1)
-           pert_extPoisson_ii_vec[i,:] = rng.poisson(pert_nu_ext_ii[i]*pext_ii*Ni*dt, nSteps+1)
-        
-        # poisson spike trains for all cells
-        pert_extPoisson_vec_xe = np.vstack((pert_extPoisson_ee_vec, pert_extPoisson_ie_vec))
-        pert_extPoisson_vec_xi = np.vstack((pert_extPoisson_ei_vec, pert_extPoisson_ii_vec))
            
+           totalRate_ee = nu_ext_ee[i] + pert_nu_ext_ee[i]
+           extPoisson_ee_vec[i,:] = rng.poisson(totalRate_ee*pext_ee*Ne*dt, nSteps+1)
+           
+           totalRate_ei = nu_ext_ei[i] + pert_nu_ext_ei[i]
+           extPoisson_ei_vec[i,:] = rng.poisson(totalRate_ei*pext_ei*Ni*dt, nSteps+1)
+
+        for i in range(0, Ni):
+            
+           totalRate_ie = nu_ext_ie[i] + pert_nu_ext_ie[i]
+           extPoisson_ie_vec[i,:] = rng.poisson(totalRate_ie*pext_ie*Ne*dt, nSteps+1)
+           
+           totalRate_ii = nu_ext_ii[i] + pert_nu_ext_ii[i]           
+           extPoisson_ii_vec[i,:] = rng.poisson(totalRate_ii*pext_ii*Ni*dt, nSteps+1)
         
-    else:
+        # poisson spike trains for all cells
+        extPoisson_vec_xe = np.vstack((extPoisson_ee_vec, extPoisson_ie_vec))
+        extPoisson_vec_xi = np.vstack((extPoisson_ei_vec, extPoisson_ii_vec))
+        
+        
+    elif ( (base_extCurrent_poisson == False) and (pert_extCurrent_poisson == False) ):
         
         # no external poisson
-        pert_extPoisson_vec_xe = np.zeros((N, nSteps+1))
-        pert_extPoisson_vec_xi = np.zeros((N, nSteps+1))    
-     
+        extPoisson_vec_xe = np.zeros((N, nSteps+1))
+        extPoisson_vec_xi = np.zeros((N, nSteps+1))
+        
+        # deterministic inputs
+        extDetermin_toE_vec = np.zeros((Ne, nSteps+1))
+        extDetermin_toI_vec = np.zeros((Ni, nSteps+1))
 
-    extPoisson_vec_xe_toVoltage = np.zeros((N, nSteps+1))
-    extPoisson_vec_xi_toVoltage = np.zeros((N, nSteps+1))
-        
-    if pert_toVoltage == False:
-        
-        extPoisson_vec_xe = base_extPoisson_vec_xe + pert_extPoisson_vec_xe
-        extPoisson_vec_xi = base_extPoisson_vec_xi + pert_extPoisson_vec_xi
-        
+        for i in range(0, Ne):
+           
+           totalRate_ee = nu_ext_ee[i] + pert_nu_ext_ee[i]
+           totalRate_ei = nu_ext_ei[i] + pert_nu_ext_ei[i]
+
+           extDetermin_toE_vec[i,:] = totalRate_ee*pext_ee*Ne*Jee_ext + totalRate_ei*pext_ei*Ni*Jei_ext
+           
+
+        for i in range(0, Ni):
+            
+           totalRate_ie = nu_ext_ie[i] + pert_nu_ext_ie[i]
+           totalRate_ii = nu_ext_ii[i] + pert_nu_ext_ii[i]           
+
+           extDetermin_toI_vec[i,:] = totalRate_ie*pext_ie*Ne*Jie_ext + totalRate_ii*pext_ii*Ni*Jii_ext
+           
+        # stack inputs to E and I
+        extDetermin_vec = np.vstack((extDetermin_toE_vec, extDetermin_toI_vec))
+
     else:
-
-        extPoisson_vec_xe = base_extPoisson_vec_xe.copy()
-        extPoisson_vec_xi = base_extPoisson_vec_xi.copy()
         
-        extPoisson_vec_xe_toVoltage[:Ne,:] = Jee_ext*pert_extPoisson_vec_xe[:Ne, :]
-        extPoisson_vec_xe_toVoltage[Ne:,:] = Jie_ext*pert_extPoisson_vec_xe[Ne:, :]
-        extPoisson_vec_xi_toVoltage[:Ne,:] = Jei_ext*pert_extPoisson_vec_xi[:Ne, :]
-        extPoisson_vec_xi_toVoltage[Ne:,:] = Jii_ext*pert_extPoisson_vec_xi[Ne:, :]
+        sys.exit('both baseline and external rates must either be poisson or not')
+    
+    
+
                
 #------------------------------------------------------------------------------
 # STIMULATION SETUP [THIS COULD GO INTO A FUNCTION WITH SIM_PARAMS AS INPUT]
@@ -306,7 +302,6 @@ def fcn_simulate_expSyn(params, J):
         V = np.zeros((N, nSteps+1))
         I_exc = np.zeros((N, nSteps+1))
         I_inh = np.zeros((N, nSteps+1))
-        I_o = np.zeros((N, nSteps+1))
     
         # initial conditions
         V[:, 0] = iV
@@ -317,32 +312,21 @@ def fcn_simulate_expSyn(params, J):
         if base_extCurrent_poisson == True:
             I_o = Istim.copy()
         else:
-            I_const = np.zeros(N)
-            I_const[:Ne] = nu_ext_ee*pext_ee*Ne*Jee_ext + nu_ext_ei*pext_ei*Ni*Jei_ext
-            I_const[Ne:] = nu_ext_ie*pext_ie*Ne*Jie_ext + nu_ext_ii*pext_ii*Ni*Jii_ext
-
-            for i in range(0,N):
-                I_o[i, :] = Istim[i, :] + I_const[i]
+            I_o = Istim + extDetermin_vec
                 
     else:
         
         V = iV
         I_exc = np.zeros(N)
         I_inh = np.zeros(N)
-        I_o = np.zeros((N, nSteps+1))
 
         # external current for straight to voltage equation
         if base_extCurrent_poisson == True:
             I_o = Istim.copy()
         else:
-            I_const = np.zeros(N)
-            I_const[:Ne] = nu_ext_ee*pext_ee*Ne*Jee_ext + nu_ext_ei*pext_ei*Ni*Jei_ext
-            I_const[Ne:] = nu_ext_ie*pext_ie*Ne*Jie_ext + nu_ext_ii*pext_ii*Ni*Jii_ext
-            for i in range(0,N):
-                I_o[i, :] = Istim[i, :] + I_const[i]
-                
+            I_o = Istim + extDetermin_vec
 
-    
+                
 #------------------------------------------------------------------------------
 # PRINT
 #------------------------------------------------------------------------------ 
@@ -444,8 +428,6 @@ def fcn_simulate_expSyn(params, J):
 
             # propagate spikes
             
-            # direct to voltage
-            V[:, tInd + 1] = V[:, tInd + 1] + extPoisson_vec_xe_toVoltage[:, indDelay] + extPoisson_vec_xi_toVoltage[:, indDelay]
 
             # total excitatory input to each cell
             I_exc[:, tInd + 1] = I_exc[:, tInd + 1] + dI_ext_xe + dI_exc_rec
@@ -546,9 +528,6 @@ def fcn_simulate_expSyn(params, J):
         
             # propagate spikes
             
-            # direct to voltage
-            V = V + extPoisson_vec_xe_toVoltage[:, indDelay] + extPoisson_vec_xi_toVoltage[:, indDelay]
-
             # total excitatory input to each cell
             I_exc = I_exc + dI_ext_xe + dI_exc_rec
             
