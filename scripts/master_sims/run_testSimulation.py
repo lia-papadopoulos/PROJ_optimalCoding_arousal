@@ -6,26 +6,48 @@
 import paths_file
 import sys
 import time
+import importlib
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 # unpack paths
-sim_params_path = paths_file.sim_params_path
-functions_path1 = paths_file.functions_path1
+sim_params_name = paths_file.sim_params_name_local
+sim_params_path = paths_file.sim_params_path_local
+functions_path1 = paths_file.functions_path1_local
 
-# import sim params  
-sys.path.append(sim_params_path)     
-from simParams import sim_params as s_params
-from fcn_simulation_setup import fcn_basic_setup, fcn_set_popSizes, fcn_set_initialVoltage, fcn_set_arousal, fcn_setup_one_stimulus
-#from fcn_compute_firing_stats import fcn_compute_firingRates
+# IMPORT CONFIG FILE FOR SETTING PARAMETERS
+sys.path.append(sim_params_path) 
+params = importlib.import_module(sim_params_name) 
+s_params = params.sim_params
+del params
 
-# import helper functions
-sys.path.append(functions_path1)     
+# FROM WORKING DIRECTORY
+from fcn_simulation_setup import fcn_define_arousalSweep, fcn_basic_setup, fcn_set_popSizes, fcn_set_initialVoltage, fcn_updateParams_givenArousal, fcn_setup_one_stimulus
+
+# IMPORTS FROM FUNCTIONS FOLDER: SPECIFY PATH
+sys.path.append(functions_path1)         
 from fcn_make_network_cluster import fcn_make_network_cluster
 from fcn_simulation_EIextInput import fcn_simulate_expSyn
 from fcn_stimulation import get_stimulated_clusters
+from fcn_compute_firing_stats import fcn_compute_firingRates, Dict2Class
 
+
+#%% function that sets arousal parameters given arousal index
+
+def fcn_set_arousalParameters(s_params, arousal_indx):
+
+    nParams_sweep = s_params['nParams_sweep']
+    swept_param_name_dict = s_params['swept_param_name_dict']
+    swept_params_dict = s_params['swept_params_dict']
+    
+    for i in range(1, nParams_sweep+1):
+        
+        key_name = 'param_vals%d' % i
+        param_name =  swept_param_name_dict[key_name]
+        s_params[param_name] = swept_params_dict[key_name][arousal_indx]
+        
+    return s_params
 
 
 #%% PLOTTING
@@ -41,41 +63,50 @@ externalInput_seed = np.random.choice(10000)
 stimClusters_seed = np.random.choice(10000)
 stimNeurons_seed = np.random.choice(1000)
 networkSeed = np.random.choice(10000)
+arousalLevel = 0.0
 
 
-#%%   MAIN FUNCTION
+#%% SIMULATION RUN
 
+# arousal indx
+arousal_indx = np.argmin(np.abs(s_params['arousal_levels'] - arousalLevel))
 
 # saving of voltage
 s_params['save_voltage'] = True
 
+# get arousal parameters for sweeping over
+s_params = fcn_define_arousalSweep(s_params)
+
+# set arousal parameters
+s_params = fcn_set_arousalParameters(s_params, arousal_indx)
+
 # basic setup
 s_params = fcn_basic_setup(s_params)
 
-# set arousal
-s_params = fcn_set_arousal(s_params, externalInput_seed)
+# pop sizes
+_, popsizeE, popsizeI = fcn_make_network_cluster(s_params, networkSeed)  
+s_params = fcn_set_popSizes(s_params, popsizeE, popsizeI)
+
+# update sim params given arousal parameters
+s_params = fcn_updateParams_givenArousal(s_params, externalInput_seed)
 
 # make network
-W, popsizeE, popsizeI = fcn_make_network_cluster(s_params, networkSeed)  
-
-# set popsizes
-s_params = fcn_set_popSizes(s_params, popsizeE, popsizeI)
+W, _, _ = fcn_make_network_cluster(s_params, networkSeed)  
 
 # set selective clusters (random seed)    
 selectiveClusters = get_stimulated_clusters(s_params, stimClusters_seed)
 
-# setup stimulus
-s_params = fcn_setup_one_stimulus(s_params, selectiveClusters, 0, stimNeurons_seed)
-
 # set initial voltage
 s_params = fcn_set_initialVoltage(s_params)
+
+# setup stimulus
+s_params = fcn_setup_one_stimulus(s_params, selectiveClusters, 0, stimNeurons_seed)
     
 # cluster boundaries
 clus=np.cumsum(popsizeE)
 
 
 #%% RUN SIMULATION    
-
 
 # start timing
 t0 = time.time()
@@ -86,6 +117,13 @@ timePts, spikes, v, I_exc, I_inh, I_o = fcn_simulate_expSyn(s_params, W)
 # end timing
 tf = time.time()
 print('sim time = %0.3f seconds' %(tf-t0))
+
+
+#%% RATES
+
+params_class = Dict2Class(s_params)
+Erates_sim, Irates_sim = fcn_compute_firingRates(params_class, spikes, 0)
+print(np.mean(Erates_sim), np.mean(Irates_sim))
 
     
 #%% PLOTTING
@@ -169,10 +207,3 @@ plt.tight_layout()
 
 plt.show()
 
-
-#%% RATES
-'''
-params_class = Dict2Class(s_params)
-Erates_sim, Irates_sim = fcn_compute_firingRates(params_class, spikes, 0)
-print(np.mean(Erates_sim), np.mean(Irates_sim))
-'''

@@ -1,4 +1,3 @@
-#%% MASTER SCRIPT FOR RUNNING SIMULATIONS WHERE NUeo IS VARIED
 
 
 #%% BASIC IMPORTS
@@ -7,13 +6,26 @@ import argparse
 import sys
 import scipy as sp
 from scipy.io import savemat
+import importlib
+
+import paths_file
+
+# UNPACK PATHS
+sim_params_path = paths_file.sim_params_path
+sim_params_name = paths_file.sim_params_name
+functions_path1 = paths_file.functions_path1
 
 # IMPORT CONFIG FILE FOR SETTING PARAMETERS
-from simParams import sim_params as s_params
-from fcn_simulation_setup import fcn_basic_setup, fcn_set_popSizes, fcn_set_initialVoltage, fcn_set_arousal, fcn_setup_one_stimulus
+sys.path.append(sim_params_path) 
+params = importlib.import_module(sim_params_name) 
+s_params = params.sim_params
+del params
+
+# FROM WORKING DIRECTORY
+from fcn_simulation_setup import fcn_basic_setup, fcn_set_popSizes, fcn_set_initialVoltage, fcn_updateParams_givenArousal, fcn_setup_one_stimulus
 
 # IMPORTS FROM FUNCTIONS FOLDER: SPECIFY PATH
-sys.path.append('../functions/')    
+sys.path.append(functions_path1)         
 import fcn_make_network_cluster
 from fcn_simulation_EIextInput import fcn_simulate_expSyn
 from fcn_stimulation import get_stimulated_clusters
@@ -28,49 +40,55 @@ if __name__=='__main__':
     # initialize arg parser
     parser = argparse.ArgumentParser() 
     
-    # perturbations
+    # external input perturbations
     parser.add_argument('-pert_mean_nu_ext_ee', '--pert_mean_nu_ext_ee', \
-                        type=float, default = s_params['pert_mean_nu_ext_ee'])   
+                        type=float, default = 0.)   
         
     parser.add_argument('-pert_mean_nu_ext_ie', '--pert_mean_nu_ext_ie', \
-                        type=float, default = s_params['pert_mean_nu_ext_ie'])   
+                        type=float, default = 0.)   
        
     parser.add_argument('-pert_mean_nu_ext_ei', '--pert_mean_nu_ext_ei', \
-                        type=float, default = s_params['pert_mean_nu_ext_ei'])   
+                        type=float, default = 0.)   
         
     parser.add_argument('-pert_mean_nu_ext_ii', '--pert_mean_nu_ext_ii', \
-                        type=float, default = s_params['pert_mean_nu_ext_ii'])   
+                        type=float, default = 0.)   
 
 
     parser.add_argument('-nu_ext_ee_uniform_spread', '--nu_ext_ee_uniform_spread', \
-                        type=float, default = s_params['nu_ext_ee_uniform_spread'])   
+                        type=float, default = 0.)   
         
     parser.add_argument('-nu_ext_ie_uniform_spread', '--nu_ext_ie_uniform_spread', \
-                        type=float, default = s_params['nu_ext_ie_uniform_spread'])   
+                        type=float, default = 0.)   
 
     parser.add_argument('-nu_ext_ei_uniform_spread', '--nu_ext_ei_uniform_spread', \
-                        type=float, default = s_params['nu_ext_ei_uniform_spread'])   
+                        type=float, default = 0.)   
 
     parser.add_argument('-nu_ext_ii_uniform_spread', '--nu_ext_ii_uniform_spread', \
-                        type=float, default = s_params['nu_ext_ii_uniform_spread'])   
+                        type=float, default = 0.)   
 
 
     parser.add_argument('-nu_ext_ee_beta_spread', '--nu_ext_ee_beta_spread', \
-                        type=float, default = s_params['nu_ext_ee_beta_spread'])   
+                        type=float, default = 0.)   
         
     parser.add_argument('-nu_ext_ie_beta_spread', '--nu_ext_ie_beta_spread', \
-                        type=float, default = s_params['nu_ext_ie_beta_spread'])   
+                        type=float, default = 0.)   
 
     parser.add_argument('-nu_ext_ei_beta_spread', '--nu_ext_ei_beta_spread', \
-                        type=float, default = s_params['nu_ext_ei_beta_spread'])   
+                        type=float, default = 0.)   
 
     parser.add_argument('-nu_ext_ii_beta_spread', '--nu_ext_ii_beta_spread', \
-                        type=float, default = s_params['nu_ext_ii_beta_spread'])   
+                        type=float, default = 0.)   
         
-        
-    parser.add_argument('-Jee_reduction', '--Jee_reduction', type=float, default = s_params['Jee_reduction'])
-    parser.add_argument('-Jie_reduction', '--Jie_reduction', type=float, default = s_params['Jie_reduction'])
+    # synaptic strength reductions    
+    parser.add_argument('-Jee_reduction', '--Jee_reduction', type=float, default = 0.)
+    parser.add_argument('-Jie_reduction', '--Jie_reduction', type=float, default = 0.)
 
+    # JplusEE
+    parser.add_argument('-JplusEE_sweep', '--JplusEE_sweep', type=float, default = 1.)
+    
+    # zero mean sd_nu_ext
+    parser.add_argument('-zeroMean_sd_nu_ext_ee', '--zeroMean_sd_nu_ext_ee', type=float, default = 0.)
+    
 
     # network type    
     parser.add_argument('-net_type', '--net_type', type=str, default=s_params['net_type'])
@@ -113,19 +131,23 @@ if __name__=='__main__':
     # setting to ind_network means that the same realization will be used for all trials [this is what we want]
     extInput_seed = ind_network
 
+
+    #%% GET POPULATION SIZES
+    
+    _, popSize_E, popSize_I = fcn_make_network_cluster.fcn_make_network_cluster(s_params, ind_network)   
+    s_params = fcn_set_popSizes(s_params, popSize_E, popSize_I)
+
     
     #%% AROUSAL PARAMETERS
     
-    s_params = fcn_set_arousal(s_params, extInput_seed)
-    
+    s_params = fcn_updateParams_givenArousal(s_params, extInput_seed)
+
 
     #%% MAKE NETWORK
 
     # make network using network index as random seed
-    W, popSize_E, popSize_I = fcn_make_network_cluster.fcn_make_network_cluster(s_params, ind_network)   
+    W, _, _ = fcn_make_network_cluster.fcn_make_network_cluster(s_params, ind_network)   
     print('network constructed')
-    
-    s_params = fcn_set_popSizes(s_params, popSize_E, popSize_I)
     
     
     #%% GET STIMULUS SELECTIVE CLUSTERS
@@ -142,13 +164,12 @@ if __name__=='__main__':
         
         #---------------------- INITIAL CONDITIONS ---------------------#
         s_params = fcn_set_initialVoltage(s_params)
-
+        
         #---------------------- STIMULATION -------------------------- #
         # set selective clusters
         # determine which neurons are stimulated [using stim_ind as random seed]
         stimNeurons_seed = stim_ind
         s_params = fcn_setup_one_stimulus(s_params, selectiveClusters, stim_ind, stimNeurons_seed)
-        
         
         #---------------------- RUN SIMULATION ----------------------- #
             
@@ -180,21 +201,10 @@ if __name__=='__main__':
             
         if s_params['writeSimulation_to_file']==True:
             results_dictionary['spikes'] = spikes
-        
-        # filename              
-        if s_params['stim_type'] == 'stim_noStim':
+  
             
-            filename = ('%s%s_stim%d_stimType_%s_stim_rel_amp%0.3f_stim_noStim_%s.mat' % \
-                       (path_data, ID, stim_ind, s_params['stim_shape'], \
-                       s_params['stim_rel_amp'], s_params['parameters_fileName']))
-                
-        elif s_params['stim_type'] == 'noStim':
-            
-            filename = ('%s%s_noStim_%s.mat' % (path_data, ID, s_params['parameters_fileName']))      
-                
-        else:
-            
-            filename = ('%s%s_stim%d_stimType_%s_stim_rel_amp%0.3f_%s.mat' % \
+        # filename
+        filename = ('%s%s_stim%d_stimType_%s_stim_rel_amp%0.3f_%s.mat' % \
                        (path_data, ID, stim_ind, s_params['stim_shape'], \
                        s_params['stim_rel_amp'], s_params['parameters_fileName']))
                 

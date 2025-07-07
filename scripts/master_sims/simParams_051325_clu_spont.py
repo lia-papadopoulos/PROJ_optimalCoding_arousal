@@ -1,12 +1,14 @@
+
 import numpy as np
 
 sim_params = {}
+
 
 #-----------------------------------------------------------------------------
 # SIMULATION PROPERTIES
 #----------------------------------------------------------------------------- 
 
-sim_params['simID'] = '00000000' 
+sim_params['simID'] = '051300002025_clu_spont' 
 
 sim_params['parameters_fileName'] = ('simulationData')
 sim_params['network_name'] = 'network'
@@ -16,7 +18,7 @@ sim_params['writeNetwork_to_file'] = False       # write network to file?
 sim_params['writeSimulation_to_file'] = True     # write simulation to file?
 
 sim_params['T0'] = 0.                           # simulation start time
-sim_params['TF'] = 2.5                          # simulation end time
+sim_params['TF'] = 2.7                          # simulation end time
 sim_params['dt'] = 0.05e-3                      # time step
 
 
@@ -127,14 +129,14 @@ sim_params['deltaII'] = 0
 #----------------------------------------------------------------------------- 
 
 sim_params['stim_type'] = ''           # type of stimulus ['' or 'noStim']
-sim_params['nStim'] = 5                      # number of different stimuli to run
+sim_params['nStim'] = 1                      # number of different stimuli to run
 sim_params['mixed_selectivity'] = True       # allow different stimuli to target same clusters
 sim_params['stim_shape'] = 'diff2exp'        # type of stimulus
 sim_params['stim_onset'] = sim_params['T0'] + 1.0     # stimulus onset
 sim_params['f_selectiveClus'] = 0.5          # fraction of clusters that are selective to each stimulus
 sim_params['f_Ecells_target'] = 0.5          # fraction E cells targeted in selective clusters
 sim_params['f_Icells_target'] = 0.0          # fraction of I cells targeted in selective clsuters
-sim_params['stim_rel_amp'] = 0.05            # relative strength (fraction above baseline)
+sim_params['stim_rel_amp'] = 0.0            # relative strength (fraction above baseline)
 
         
 # for box and linear
@@ -176,25 +178,39 @@ sim_params['nu_ext_ii_uniform_spread'] = 0.0
 sim_params['Jee_reduction'] = 0.0
 sim_params['Jie_reduction'] = 0.0
 
+# external variance
+sim_params['zeroMean_sd_nu_ext_ee'] = 0.0
+
+
 
 #-----------------------------------------------------------------------------
 # PERTURBATION SWEEP
 #----------------------------------------------------------------------------- 
 
+# number of parameters in arousal model
 sim_params['nParams_sweep'] = 3
 
+# names of parameters in arousal model
 swept_param_name_dict = {}
 swept_param_name_dict['param_vals1'] = 'Jee_reduction'
 swept_param_name_dict['param_vals2'] = 'nu_ext_ee_beta_spread'
 swept_param_name_dict['param_vals3'] = 'nu_ext_ie_beta_spread'
 sim_params['swept_param_name_dict'] = swept_param_name_dict
 
-swept_params_dict = {}
-swept_params_dict['param_vals1'] = np.append(np.linspace(0., 0.0875, 4), np.linspace(0.175, 0.75, 9)) 
-swept_params_dict['param_vals2']= np.append(np.linspace(0, 1.25, 4), np.linspace(2.5, 13, 9))
-swept_params_dict['param_vals3']= np.append(np.linspace(0, 1.25, 4), np.linspace(2.5, 13, 9))
-sim_params['swept_params_dict'] = swept_params_dict
+# parameters for arousal variation
+sim_params['arousal_variation'] = 'bounded_sigmoid'
+sim_params['arousal_levels'] = np.linspace(0,1,11)
 
+
+sigmoid_arousal_dict = {}
+sigmoid_arousal_dict['xrange'] = (0,1)
+sigmoid_arousal_dict['param_vals1'] = (0.75, 1.25, 0.2)
+sigmoid_arousal_dict['param_vals2'] = (13.125, 1.25, 0.2)
+sigmoid_arousal_dict['param_vals3'] = (13.125, 1.25, 0.2)
+sim_params['sigmoid_arousal_dict'] = sigmoid_arousal_dict
+
+
+#%% ONLY CHANGE THESE
 
 #-----------------------------------------------------------------------------
 # COMPUTING STUFF
@@ -203,11 +219,11 @@ sim_params['path_data'] = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
                            'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
     
 # number of cores to use
-sim_params['maxCores'] = 48
+sim_params['maxCores'] = 64
 sim_params['cores_per_job'] = 4 # needs to be set ahead of time using OMP_NUM_THREADS
 
 # network index at which to start simulations
-sim_params['indNet_start'] = 3
+sim_params['indNet_start'] = 0
 # number of networks to run
 sim_params['n_networks'] = 2
 # number of initial conditions per network

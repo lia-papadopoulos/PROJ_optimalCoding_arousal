@@ -3,15 +3,31 @@
 import os
 import numpy as np
 import sys
+import importlib
 
-from simParams import sim_params as s_params
+import paths_file
+from fcn_simulation_setup import fcn_define_arousalSweep
 
-sys.path.append('/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/')       
+# unpack paths
+sim_params_path = paths_file.sim_params_path
+sim_params_name = paths_file.sim_params_name
+functions_path1 = paths_file.functions_path1
+
+sys.path.append(sim_params_path) 
+params = importlib.import_module(sim_params_name) 
+s_params = params.sim_params
+del params
+
+sys.path.append(functions_path1)       
 from fcn_simulation_loading import fcn_set_sweepParam_string
 
-#-------------------- cluster usage -------------------------------------------#
+#-------------------- parameters -------------------------------------------#
 
 
+# get arousal parameters for sweeping over
+s_params = fcn_define_arousalSweep(s_params)
+
+# unpack parameters
 simID = s_params['simID']
 net_type = s_params['net_type']
 path_data = s_params['path_data']
