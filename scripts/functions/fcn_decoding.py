@@ -92,7 +92,7 @@ def fcn_stratified_kFold_crossVal(X, classLabels, classifier, nKFolds, \
             p_accuracy[splitInd], \
             mean_accuracy_shuffle, \
             lowPercentile_accuracy_shuffle, \
-            highPercentile_accuracy_shuffle = \
+            highPercentile_accuracy_shuffle, sd_accuracy_shuffle = \
             fcn_decodeAccuracy_significance(accuracy[splitInd], \
                                             accuracy_shuf, \
                                             shuffle_percentile)  
@@ -109,11 +109,12 @@ def fcn_stratified_kFold_crossVal(X, classLabels, classifier, nKFolds, \
         mean_accuracy_shuffle = np.nan
         lowPercentile_accuracy_shuffle = np.nan
         highPercentile_accuracy_shuffle = np.nan
+        sd_accuracy_shuffle = np.nan
         
                  
            
     # return
-    return splitAvg_accuracy, mean_accuracy_shuffle, \
+    return splitAvg_accuracy, mean_accuracy_shuffle, sd_accuracy_shuffle, \
            lowPercentile_accuracy_shuffle, highPercentile_accuracy_shuffle, \
            splitAvg_p_accuracy, splitAvg_confusionMat
 
@@ -185,7 +186,7 @@ def fcn_LeaveOneOut_crossVal(X, classLabels, classifier, \
         p_foldAvg_accuracy, \
         mean_foldAvg_accuracy_shuffle, \
         lowPercentile_foldAvg_accuracy_shuffle, \
-        highPercentile_foldAvg_accuracy_shuffle = \
+        highPercentile_foldAvg_accuracy_shuffle, sd_accuracy_shuffle = \
             fcn_decodeAccuracy_significance(foldAvg_accuracy, \
                                             foldAvg_accuracy_shuf, \
                                             shuffle_percentile)
@@ -196,10 +197,10 @@ def fcn_LeaveOneOut_crossVal(X, classLabels, classifier, \
         mean_foldAvg_accuracy_shuffle = np.nan
         lowPercentile_foldAvg_accuracy_shuffle = np.nan
         highPercentile_foldAvg_accuracy_shuffle = np.nan  
-           
+        sd_accuracy_shuffle = np.nan
            
     # return
-    return foldAvg_accuracy, mean_foldAvg_accuracy_shuffle, \
+    return foldAvg_accuracy, mean_foldAvg_accuracy_shuffle, sd_accuracy_shuffle, \
            lowPercentile_foldAvg_accuracy_shuffle, \
            highPercentile_foldAvg_accuracy_shuffle, p_foldAvg_accuracy, \
            foldAvg_confusionMat
@@ -276,7 +277,7 @@ def fcn_repeated_stratified_kFold_crossVal(X, classLabels, classifier, \
             p_accuracy[splitInd], \
             mean_accuracy_shuffle, \
             lowPercentile_accuracy_shuffle, \
-            highPercentile_accuracy_shuffle = \
+            highPercentile_accuracy_shuffle, sd_accuracy_shuffle = \
             fcn_decodeAccuracy_significance(accuracy[splitInd], \
                                             accuracy_shuf, \
                                             shuffle_percentile)  
@@ -293,10 +294,11 @@ def fcn_repeated_stratified_kFold_crossVal(X, classLabels, classifier, \
         mean_accuracy_shuffle = np.nan
         lowPercentile_accuracy_shuffle = np.nan
         highPercentile_accuracy_shuffle = np.nan
+        sd_accuracy_shuffle = np.nan
         
         
     # return
-    return splitAvg_accuracy, mean_accuracy_shuffle, \
+    return splitAvg_accuracy, mean_accuracy_shuffle, sd_accuracy_shuffle, \
            lowPercentile_accuracy_shuffle, highPercentile_accuracy_shuffle, \
            splitAvg_p_accuracy, foldAvg_confusionMat
     
@@ -372,7 +374,7 @@ def fcn_decode_master(X, classLabels, classifier, crossVal_type, \
     
     if crossVal_type == 'fcn_repeated_stratified_kFold_crossVal':
         
-        accuracy, mean_accuracy_shuffle, \
+        accuracy, mean_accuracy_shuffle, sd_accuracy_shuffle, \
         lowPercentile_accuracy_shuffle, highPercentile_accuracy_shuffle, \
         p_accuracy, confusionMat = \
             fcn_repeated_stratified_kFold_crossVal(X, classLabels, classifier, \
@@ -383,7 +385,7 @@ def fcn_decode_master(X, classLabels, classifier, crossVal_type, \
         
     elif crossVal_type == 'fcn_LeaveOneOut_crossVal':
         
-        accuracy, mean_accuracy_shuffle, \
+        accuracy, mean_accuracy_shuffle, sd_accuracy_shuffle, \
         lowPercentile_accuracy_shuffle, highPercentile_accuracy_shuffle, \
         p_accuracy, confusionMat = \
             fcn_LeaveOneOut_crossVal(X, classLabels, classifier, \
@@ -392,7 +394,7 @@ def fcn_decode_master(X, classLabels, classifier, crossVal_type, \
         
     elif crossVal_type == 'fcn_stratified_kFold_crossVal':
         
-        accuracy, mean_accuracy_shuffle, \
+        accuracy, mean_accuracy_shuffle, sd_accuracy_shuffle, \
         lowPercentile_accuracy_shuffle, highPercentile_accuracy_shuffle, \
         p_accuracy, confusionMat = \
             fcn_stratified_kFold_crossVal(X, classLabels, classifier, nKFolds, \
@@ -420,6 +422,9 @@ def fcn_decodeAccuracy_significance(accuracy_true, accuracy_shuffle, prctile):
     # average shuffle accuracy
     mean_accuracy_shuffle = np.mean(accuracy_shuffle)
     
+    # sd shuffle accuracy
+    sd_accuracy_shuffle = np.std(accuracy_shuffle)
+    
     # lower and upper percentiles of shuffle accuracy
     lowPercentile_accuracy_shuffle = np.percentile(accuracy_shuffle,100-prctile)
     highPercentile_accuracy_shuffle = np.percentile(accuracy_shuffle,prctile)
@@ -430,7 +435,7 @@ def fcn_decodeAccuracy_significance(accuracy_true, accuracy_shuffle, prctile):
    
     # return
     return p_accuracy, mean_accuracy_shuffle, \
-           lowPercentile_accuracy_shuffle, highPercentile_accuracy_shuffle
+           lowPercentile_accuracy_shuffle, highPercentile_accuracy_shuffle, sd_accuracy_shuffle
 
 
 
