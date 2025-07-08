@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 """
 singleCell_tuning_to_perturbation_settings
 """
