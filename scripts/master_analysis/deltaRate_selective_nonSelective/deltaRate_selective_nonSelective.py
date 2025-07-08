@@ -44,7 +44,7 @@ window_std = 25e-3
 
 # decoding stuff
 decoding_path = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/decoding_analysis/'   
-decode_ensembleSize = 19
+decode_ensembleSize = 160
 decode_windowSize = 100e-3
 decode_type = 'LinearSVC'
 rate_thresh = 0.
