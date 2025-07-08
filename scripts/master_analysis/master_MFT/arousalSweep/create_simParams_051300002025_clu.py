@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
 """
 get simulation parameters necessary for mft from a set of simulations
 in this case, the background inputs to e and i cells were drawn from a beta

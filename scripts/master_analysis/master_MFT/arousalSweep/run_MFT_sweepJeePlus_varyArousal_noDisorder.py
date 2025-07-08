@@ -143,7 +143,6 @@ JeePlus_forSweep_results['nu_i_forSweep'] = JeePlus_forSweep_results_full['nu_i_
 
 #%% AROUSAL LEVEL AS PERCENTAGE
 
-#arousal_level = indParamSweep/(simParams_mft['n_paramVals_mft']-1) 
 arousal_level = s_params.arousal_levels[indParamSweep]*100
 
 print(arousal_level)
