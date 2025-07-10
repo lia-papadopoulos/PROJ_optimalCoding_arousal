@@ -1,9 +1,9 @@
 
 
 
-#%% STANDARD IMPORTS
+#%% IMPORTS
 
-import paths_file
+# standard
 import sys
 import time
 import importlib
@@ -11,10 +11,13 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+# paths file
+import paths_file
+
 # unpack paths
-sim_params_name = paths_file.sim_params_name_local
-sim_params_path = paths_file.sim_params_path_local
-functions_path1 = paths_file.functions_path1_local
+sim_params_name = paths_file.sim_params_name
+sim_params_path = paths_file.sim_params_path
+functions_path1 = paths_file.functions_path1
 
 # IMPORT CONFIG FILE FOR SETTING PARAMETERS
 sys.path.append(sim_params_path) 
