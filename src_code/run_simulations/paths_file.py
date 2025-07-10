@@ -16,4 +16,7 @@ sim_params_name = 'simParams_051325_clu'
 # path to simulation and network generation functions
 functions_path1 = global_settings.path_to_src_code + 'functions/'
 
+# save path
+save_path = global_settings.path_to_sim_output + ''
+
 

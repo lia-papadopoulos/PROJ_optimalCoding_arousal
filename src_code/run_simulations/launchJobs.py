@@ -12,6 +12,7 @@ from fcn_simulation_setup import fcn_define_arousalSweep
 sim_params_path = paths_file.sim_params_path
 sim_params_name = paths_file.sim_params_name
 functions_path1 = paths_file.functions_path1
+path_data = paths_file.save_path
 
 sys.path.append(sim_params_path) 
 params = importlib.import_module(sim_params_name) 
@@ -30,7 +31,6 @@ s_params = fcn_define_arousalSweep(s_params)
 # unpack parameters
 simID = s_params['simID']
 net_type = s_params['net_type']
-path_data = s_params['path_data']
 nParams_sweep = s_params['nParams_sweep']
 swept_param_name_dict = s_params['swept_param_name_dict']
 swept_params_dict = s_params['swept_params_dict']

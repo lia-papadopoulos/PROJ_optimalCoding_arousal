@@ -215,9 +215,7 @@ sim_params['sigmoid_arousal_dict'] = sigmoid_arousal_dict
 #-----------------------------------------------------------------------------
 # COMPUTING STUFF
 #----------------------------------------------------------------------------- 
-sim_params['path_data'] = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-                           'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
-    
+
 # number of cores to use
 sim_params['maxCores'] = 64
 sim_params['cores_per_job'] = 4 # needs to be set ahead of time using OMP_NUM_THREADS
