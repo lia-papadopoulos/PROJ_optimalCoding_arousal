@@ -4,28 +4,21 @@ settings for clusterTimescale
 """
 
 #-------------------- basic imports ----------------------------#
+import sys
 import numpy as np
+
+sys.path.append('../../')
+import global_settings
+
 
 #-------------------- path for loading/saving data ----------------------------#
 
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
-
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/clusterTimescale/')
-    
-fig_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/' \
-            'data_files/Figures/test_stim_expSyn/clusterTimescale/')
-    
-func_path = '/home/liap/PostdocWork_Oregon/'\
-            'My_Projects/PROJ_VariabilityGainMod/'\
-            'scripts/functions/'
-
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-
-
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
+func_path = global_settings.path_to_src_code + 'functions/'
+func_path0 = global_settings.path_to_src_code + 'run_simulations/'
+load_path = global_settings.path_to_sim_output + ''
+save_path = global_settings.path_to_sim_output + 'clusterTimescale/'   
+fig_path = global_settings.path_to_sim_figures + 'clusterTimescale/'
 
 #%% load from sim params or not
 load_from_simParams = True

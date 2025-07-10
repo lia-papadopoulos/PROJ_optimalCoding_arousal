@@ -2,8 +2,12 @@
 
 #-------------------- basic imports -------------------------------------------#
 
+import sys
 import os
 from scipy.io import loadmat
+
+sys.path.append('../../../')
+import global_settings
 
 #-------------------- cluster usage -------------------------------------------#
 
@@ -29,7 +33,7 @@ stim_rel_amp = 0.05
 sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
 
 # path for loading data
-simParams_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/simParams_mft/')
+simParams_path =  global_settings.path_to_sim_output + 'simParams_mft/'
 
 
 # load in mft parameter values

@@ -12,10 +12,14 @@ from scipy.io import loadmat
 from scipy.io import savemat
 import importlib
 
+
 #%% imports from functions folder
 
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/'
-func_path1 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
+sys.path.append('../../')
+import global_settings
+
+func_path0 = global_settings.path_to_src_code + 'functions/'
+func_path1 = global_settings.path_to_src_code + 'run_simulations/'
                  
 sys.path.append(func_path0) 
 from fcn_compute_firing_stats import Dict2Class
@@ -29,9 +33,12 @@ from fcn_simulation_setup import fcn_define_arousalSweep
 
 #%% settings
 
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-load_path = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/'
-outpath = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/deltaRate_selective_nonselective/'
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
+load_path = global_settings.path_to_sim_output + ''
+outpath = global_settings.path_to_sim_output + 'deltaRate_selective_nonselective/'
+decoding_path = global_settings.path_to_sim_output + 'decoding_analysis/'   
+
+
 simParams_fname = 'simParams_051325_clu'
 sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
 net_type = 'baseEIclu'
@@ -43,7 +50,6 @@ window_step = 1e-3
 window_std = 25e-3
 
 # decoding stuff
-decoding_path = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/decoding_analysis/'   
 decode_ensembleSize = 160
 decode_windowSize = 100e-3
 decode_type = 'LinearSVC'

@@ -5,6 +5,10 @@ mftParams_2cluster_effective
 """
 
 import numpy as np
+import sys
+
+sys.path.append('../../../../')
+import global_settings
 
 class mft_params:
 
@@ -34,11 +38,11 @@ class mft_params:
         self.JplusEE_array = np.arange(15, 22.05, 0.05)
 
         # paths to functions
-        self.func_path1 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/'
-        self.func_path2 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/MFT/funcs_MFT/basicEI_networks/'
+        self.func_path1 = global_settings.path_to_src_code + 'functions/'
+        self.func_path2 = global_settings.path_to_src_code + 'MFT/funcs_MFT/basicEI_networks/'
         
         # path to simParams (used when newRun = True)
-        self.simParams_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_analysis/master_MFT/reduced_2cluster_nets/arousalSweep_noDisorder/'
+        self.simParams_path = global_settings.path_to_src_code + 'simulations_analysis/master_MFT/reduced_2cluster_nets/arousalSweep_noDisorder/'
 
         # filenames
         self.fName_begin = '051300002025_clu'
@@ -46,10 +50,10 @@ class mft_params:
         # path and filenames when we want to load parameters from file
         self.fName_begin_paramData = '051300002025_clu'
         self.pathName_end_paramData = 'effectiveMFT_sweep_%s_2Ecluster' % self.fName_begin_paramData
-        self.pathName_paramData = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/MFT_2Ecluster/%s/' % (self.pathName_end_paramData))
+        self.pathName_paramData = (global_settings.path_to_2clusterMFT_output + '%s/' % (self.pathName_end_paramData))
 
         # paths        
-        self.fig_outpath = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/Figures/MFT_2Ecluster/MFT_sweep_JeePlus_2Ecluster/'
-        self.data_outpath = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/MFT_2Ecluster/MFT_sweep_JeePlus_2Ecluster/'
+        self.fig_outpath = global_settings.path_to_2clusterMFT_figures + 'MFT_sweep_JeePlus_2Ecluster/'
+        self.data_outpath = global_settings.path_to_2clusterMFT_output + 'MFT_sweep_JeePlus_2Ecluster/'
         
         

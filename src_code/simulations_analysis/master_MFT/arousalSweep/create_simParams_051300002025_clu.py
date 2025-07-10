@@ -12,12 +12,15 @@ import numpy as np
 from scipy.io import savemat
 import importlib
 import copy
+
+sys.path.append('../../../')
+import global_settings
     
 # paths for loading and saving data
-func_path1 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-load_path = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/'
-save_path = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/simParams_mft/'
+func_path1 = global_settings.path_to_src_code + 'run_simulations/'
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
+load_path = global_settings.path_to_sim_output + ''
+save_path = global_settings.path_to_sim_output + 'simParams_mft/'
     
 # simulation params
 simParams_fname = 'simParams_051325_clu'

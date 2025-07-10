@@ -9,16 +9,20 @@ from scipy.io import loadmat
 from scipy.io import savemat
 import argparse
 
+sys.path.append('../../../')
+import global_settings
 
-sys.path.append('/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/')    
-sys.path.append('/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/')  
-sys.path.append('/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/MFT/funcs_MFT/clusteredNets_fullTheory/') 
+sys.path.append(global_settings.path_to_src_code)    
+sys.path.append(global_settings.path_to_src_code + 'functions/')  
+sys.path.append(global_settings.path_to_src_code + 'MFT/funcs_MFT/clusteredNets_fullTheory/') 
  
-
 from fcn_compute_firing_stats import Dict2Class
 import master_MFT_fixedInDeg_EIclusters    
 
+#%% SET PATHS
 
+# path for saving data
+save_path = global_settings.path_to_sim_output + 'MFT_sweep_JeePlus_arousalSweep/'
 
 #%% ARGPARSER    
 
@@ -49,13 +53,6 @@ stim_rel_amp = args.stim_rel_amp
 simParams_path = args.simParams_path
 sweep_param_name = args.sweep_param_name
 indParamSweep = args.indParamSweep
-
-
-#%% SET PATHS
-
-
-# path for saving data
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/MFT_sweep_JeePlus_arousalSweep/')
 
 
 #%% MFT PARAMETERS

@@ -1,22 +1,29 @@
 
-# params_JeePlus_sweep_MFT_baseline_pEIclusters
 
 # basic imports
 import numpy as np
+import sys
+
+sys.path.append('../../../')
+import global_settings
 
 # sim params path
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
 
 # path for loading data
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
+load_path = global_settings.path_to_sim_output + ''
 
 # path for saving data
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/MFT_sweep_JeePlus_baseline/')
+save_path = global_settings.path_to_sim_output + 'MFT_sweep_JeePlus_baseline/'
 
 # function paths
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-func_path1 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/' 
-func_path2 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/MFT/funcs_MFT/clusteredNets_fullTheory/' 
+func_path0 = global_settings.path_to_src_code + 'run_simulations/'
+func_path1 = global_settings.path_to_src_code + 'functions/'
+func_path2 = global_settings.path_to_src_code + '/MFT/funcs_MFT/clusteredNets_fullTheory/' 
+
+# plotting
+loadMFT_path = global_settings.path_to_sim_output + 'MFT_sweep_JeePlus_baseline/'
+fig_path = global_settings.path_to_sim_figures + 'MFT_sweep_JeePlus_baseline/'
 
 # simulation params
 simParams_fname = 'simParams_041725_clu_varyJEEplus'
@@ -47,7 +54,4 @@ mft_params_dict['stability_tau_e'] = 20e-3
 mft_params_dict['stability_tau_i'] = 20e-3 
 mft_params_dict['n_active_clusters_sweep'] = np.arange(1,12,1)
 
-##### PLOTTING
-loadMFT_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/MFT_sweep_JeePlus_baseline/')
-fig_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/Figures/test_stim_expSyn/MFT_sweep_JeePlus_baseline/')
 mft_reduced = True

@@ -3,30 +3,26 @@
 singleCell_tuning_to_perturbation_settings
 """
 
+import sys
 import numpy as np
+
+sys.path.append('../../')
+import global_settings
 
 #-------------------- path for loading/saving data ----------------------------#
 
 
-func_path = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-            'PROJ_VariabilityGainMod/scripts/functions/'
+func_path = global_settings.path_to_src_code + 'functions/'
             
-func_path2 = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-            'PROJ_VariabilityGainMod/scripts/master_sims/'
+func_path2 = global_settings.path_to_src_code + 'run_simulations/'
             
-simParams_path = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-            'PROJ_VariabilityGainMod/scripts/master_sims/'
+simParams_path = global_settings.path_to_src_code + 'run_simulations/'
             
+load_path = global_settings.path_to_sim_output + ''
 
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
-
-
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/singleCell_tuning_to_perturbation/')
+save_path = global_settings.path_to_sim_output + 'singleCell_tuning_to_perturbation/'
     
-fig_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/' \
-            'data_files/Figures/test_stim_expSyn/singleCell_tuning_to_perturbation/')
+fig_path = global_settings.path_to_sim_figures + 'singleCell_tuning_to_perturbation/'
     
 #-------------------- parameters ----------------------------------------------#
    

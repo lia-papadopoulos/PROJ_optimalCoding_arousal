@@ -5,21 +5,26 @@ settings file for singleCell_dPrime
 
 # imports for setting params
 import numpy as np
+import sys
+
+sys.path.append('../../')
+import global_settings
 
 #%% paths
 
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-func_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/'
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/') 
-save_path = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/singleCell_dPrime/'
-load_path_plotting = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/singleCell_dPrime/'
-save_path_plotting = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/Figures/test_stim_expSyn/singleCell_dPrime/')
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
+func_path = global_settings.path_to_src_code + 'functions/'
+func_path0 = global_settings.path_to_src_code + 'run_simulations/'
+load_path = global_settings.path_to_sim_output + ''
+save_path = global_settings.path_to_sim_output + 'singleCell_dPrime/'
+load_path_plotting = global_settings.path_to_sim_output + 'singleCell_dPrime/'
+save_path_plotting = global_settings.path_to_sim_figures + 'singleCell_dPrime/'
 
-save_path_multivariate = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/multivariate_dPrime/'
-load_path_plotting_multvariate = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/multivariate_dPrime/'
-save_path_plotting_multvariate = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/Figures/test_stim_expSyn/multivariate_dPrime/')
+save_path_multivariate = global_settings.path_to_sim_output + 'multivariate_dPrime/'
+load_path_plotting_multvariate = global_settings.path_to_sim_output + 'multivariate_dPrime/'
+save_path_plotting_multvariate = global_settings.path_to_sim_figures + 'multivariate_dPrime/'
     
+
 #%% simulations params
 #simParams_fname = 'simParams_040425_hom'
 #simParams_fname = 'simParams_051325_clu'

@@ -9,7 +9,10 @@ import sys
 import numpy as np
 from scipy.io import loadmat
 
-sys.path.append('/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/analysis_SuData/')     
+sys.path.append('../../')
+import global_settings
+
+sys.path.append(global_settings.path_to_src_code + 'data_analysis/')     
 from fcn_SuData_analysis import fcn_significant_cells
 from fcn_SuData_analysis import fcn_significant_cells_responseSign
 

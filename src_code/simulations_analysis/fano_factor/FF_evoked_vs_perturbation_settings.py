@@ -5,18 +5,21 @@ settings file for FF
 
 #%% paths
 
+import sys
 import numpy as np
 
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-func_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/'
-func_path2 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_analysis/fano_factor/'
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
-decode_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/decoding_analysis/')
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/fanofactor/')
-fig_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/Figures/test_stim_expSyn/fano_factor_pre_evoked/raw_timecourse/')
+sys.path.append('../../')
+import global_settings
 
 
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
+func_path = global_settings.path_to_src_code + 'functions/'
+func_path0 = global_settings.path_to_src_code + 'run_simulations/'
+func_path2 = global_settings.path_to_src_code + 'simulations_analysis/fano_factor'
+load_path = global_settings.path_to_sim_output + ''
+decode_path = global_settings.path_to_sim_output + 'decoding_analysis/'
+save_path = global_settings.path_to_sim_output + 'fanofactor/'   
+fig_path = global_settings.path_to_sim_figures + 'fano_factor_pre_evoked/raw_timecourse/'
 
 #%% simulations params
 

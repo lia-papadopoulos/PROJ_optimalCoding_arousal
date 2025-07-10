@@ -1,23 +1,25 @@
 
+import sys
 import numpy as np
+
+sys.path.append('../../')
+import global_settings
 
 
 #%% paths
 
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
 
-func_path1 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/'
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
 
-func_path2 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
+func_path1 = global_settings.path_to_src_code + 'functions/'
 
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
+func_path2 = global_settings.path_to_src_code + 'run_simulations/'
 
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/clusterRates_numActiveClusters_sweepJeePlus/')
+load_path = global_settings.path_to_sim_output + ''
+
+save_path = global_settings.path_to_sim_output + 'clusterRates_numActiveClusters_sweepJeePlus/'
     
-fig_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/' \
-            'data_files/Figures/test_stim_expSyn/clusterRates_numActiveClusters_sweepJeePlus/')
+fig_path = global_settings.path_to_sim_figures + 'clusterRates_numActiveClusters_sweepJeePlus/'
     
 
 #%% simulation params
