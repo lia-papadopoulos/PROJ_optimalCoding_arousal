@@ -5,14 +5,14 @@ function for saving processed data as hd5f file
 import h5py
 import numpy as np
 
-def fcn_save_processed_data(session_name, outpath, \
+def fcn_save_processed_data(session_name, outpath, fname_end, \
                             cellSelection_params, cellSelection_results, \
                             behavioralPreprocessing_params, behavioralData, \
                             stimulusInfo):
 
     
     # create hdf5 file
-    filename = outpath + session_name + '_processed_data.h5'
+    filename = outpath + session_name + fname_end + '_processed_data.h5'
     hf = h5py.File(filename, 'w')
 
     # group for cell selection parameters

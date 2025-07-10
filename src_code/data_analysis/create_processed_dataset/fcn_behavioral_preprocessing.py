@@ -32,6 +32,28 @@ def fcn_normalize_percentMax(behavioral_trace):
     return norm_behavioral_trace
 
 
+'''
+Normalize an Nx1 array of a behavioral variable vs time
+Noramlization is done by dividing by a predetermined factor, such that the output corresponds to the % of that factor
+
+INPUTS
+    behavioral_trace:           Nx1 array holding behavioral state values at sampled time points
+    norm_factor:                value by which to divide entire trace
+    
+OUTPUTS
+    norm_behavioral_trace:      Nx1 array holding normalized behavioral state values at sampled time points
+
+'''
+
+def fcn_normalize_byValue(behavioral_trace, norm_factor):
+    
+    norm_behavioral_trace = behavioral_trace/norm_factor
+    
+    return norm_behavioral_trace
+
+
+
+
 #%% REMOVE ARTIFACTS FROM BEHAVIORAL TRACES
 
 '''
@@ -74,6 +96,99 @@ def fcn_remove_pupilArtifacts(time_points, pupil_trace, run_trace, whisk_trace, 
     
     # corrected pupil trace
     pupil_trace_corrected = pupil_trace.copy()
+    run_trace_corrected = run_trace.copy()
+    whisk_trace_corrected = whisk_trace.copy()
+    
+        
+    # loop over remove_windows and nan-out those periods of time 
+    nWinds = np.shape(remove_windows)[0]
+    for iWind in range(0, nWinds):
+        tStart = remove_windows[iWind,0]
+        tEnd = remove_windows[iWind,1]
+        iStart = np.argmin(np.abs(time_points-tStart))
+        iEnd = np.argmin(np.abs(time_points-tEnd))
+        pupil_trace_corrected[iStart:iEnd+1] = np.nan
+        run_trace_corrected[iStart:iEnd+1] = np.nan
+        whisk_trace_corrected[iStart:iEnd+1] = np.nan
+            
+        
+    # loop over artifacts and nan-out the window around those artifacts
+    
+    # variable indicating if artifacts still remain
+    artifacts_remaining = True
+    
+    # loop while artifacts remain
+    while artifacts_remaining:
+        
+        # get the first artifact index
+        tInd = tInd_artifacts[0]
+        
+        # convert to indices        
+        tInd_begin = tInd + nInds_dt_before #(already includes - sign)
+        tInd_end =  tInd + nInds_dt_after
+        
+        # remove artifacts from pupil trace
+        pupil_trace_corrected[tInd_begin:tInd_end+1] = np.nan
+        
+        # remove artifacts from running and whisk traces
+        run_trace_corrected[tInd_begin:tInd_end+1] = np.nan
+        whisk_trace_corrected[tInd_begin:tInd_end+1] = np.nan
+        
+        # skip over any other artifacts within this window
+        ind_remaining_artifacts = np.nonzero( tInd_artifacts >= tInd_end )[0]
+        tInd_artifacts = tInd_artifacts[ind_remaining_artifacts]
+        
+        # update artifacts remaining
+        if np.size(tInd_artifacts) == 0:
+            artifacts_remaining = False    
+    
+        
+    # return corrected pupil trace
+    return pupil_trace_corrected, run_trace_corrected, whisk_trace_corrected
+
+
+
+'''
+INPUTS
+    time_points:                    array of time points at which behavioral traces are sampled     
+    pupil_trace_raw:                pupil trace vs time (raw)
+    pupil_trace_norm:               pupil trace vs time (normalized)
+    run_trace:                      running trace vs time (raw)
+    whisk_trace:                    whisking trace vs time (raw)
+    remove_windows:                 array of time windows to remove from data
+    diff_thresh:                    threshold on difference of consecutive pupil time points for first time point to be considered an artifact
+    delta_t_compare:                at each time t, the pupil size at time t is compared to the pupil size at time t + delta_t_compare to determine if
+                                    there's an artifact at time t
+    artifact_window:                2x1 array; first element is amount of time before first detected artificat to remove from trace (should be <0)
+                                    second element is amount of time after first detected artifact to remove from trace (should be >0)
+OUPUTS:
+    pupil_trace_corrected:          corrected pupil trace with artifacts removed
+    run_trace_corrected:            corrected run trace with artifacts removed
+    whisk_trace_corrected:          corrected whisk trace with artifacts removed
+'''
+
+def fcn_remove_pupilArtifacts_rawTrace(time_points, pupil_trace_raw, pupil_trace_norm, run_trace, whisk_trace, \
+                              remove_windows, diff_thresh, delta_t_compare, artifact_window):
+    
+    # sampling rate
+    samp_rate = np.min(np.diff(time_points))
+    
+    
+    # convert delta_t_compare to samples
+    nInds_delta_t_compare = np.round(delta_t_compare/samp_rate).astype(int)
+    
+    # convert dt_before and dt_after to samples
+    nInds_dt_before = np.round(artifact_window[0]/samp_rate).astype(int)
+    nInds_dt_after = np.round(artifact_window[1]/samp_rate).astype(int)
+    
+    # difference in pupil trace values between two time points
+    diff_pupil_trace = np.abs(pupil_trace_norm[nInds_delta_t_compare:]-pupil_trace_norm[:-nInds_delta_t_compare])
+    
+    # indices of pupil trace artifacts
+    tInd_artifacts = np.nonzero(diff_pupil_trace >= diff_thresh)[0]
+    
+    # corrected pupil trace
+    pupil_trace_corrected = pupil_trace_raw.copy()
     run_trace_corrected = run_trace.copy()
     whisk_trace_corrected = whisk_trace.copy()
     
@@ -291,4 +406,142 @@ def fcn_run_behavioral_preprocessing(session_name, params, data_path):
 
 
 
+#%% 
+
+'''
+maximum of smoothed pupil trace
+used when normalizing data by a global value for all sessions
+'''
+
+def fcn_find_max_smoothedPupilTrace(session_name, params, data_path):
+
+    
+    # open the file   
+    f = h5py.File(data_path + session_name + '.mat','r')
+
+    # extract data
+    time_stamps = f['time_stamp'][0]
+    run_trace_raw = f['walk'][0]
+    pupil_trace_raw = f['pupil'][0]
+    whisk_trace_raw = f['whisk'][0]
+
+
+    # close file
+    f.close()
+    
+    # get parameters
+    remove_windows = params['remove_windows']
+    artifact_thresh_pupil = params['artifact_thresh_pupil'] 
+    delta_t_compare = params['delta_t_compare']
+    artifact_window = params['artifact_window']
+    smoothing_window_length = params['smoothing_window_length']
+    smoothing_window_step = params['smoothing_window_step']
+                           
+    
+    # normalize pupil
+    pupil_trace_norm = fcn_normalize_percentMax(pupil_trace_raw)
+        
+            
+    # remove artifacts based on pupil trace
+    pupil_trace_corrected, run_trace_corrected, whisk_trace_corrected = \
+    fcn_remove_pupilArtifacts_rawTrace(time_stamps, \
+                              pupil_trace_raw, pupil_trace_norm, run_trace_raw, whisk_trace_raw,\
+                              remove_windows, artifact_thresh_pupil, delta_t_compare, artifact_window)
+             
+    
+    # smooth and downsample the data
+    time_smooth, pupil_trace_smooth, run_trace_smooth, whisk_trace_smooth = \
+    fcn_smooth_downsample_behavioralData(time_stamps, \
+                                         pupil_trace_corrected, run_trace_corrected, whisk_trace_corrected, \
+                                         smoothing_window_length, smoothing_window_step)
+    
+    # maximum of pupil trace
+    max_smoothedPupilTrace = np.nanmax(pupil_trace_smooth)
+    
+    return max_smoothedPupilTrace
+        
+    
+
+#%%
+
+'''
+master function that runs pre-processing steps
+implements a global normalization of pupil traces, such that all sessions are
+normalized relative to the same factor
+
+INPUTS
+    session_name:                   name of session to process    
+    params:                         parameters dictionary for a particular session
+    data_path:                      for for loading data
+
+
+'''
+
+def fcn_run_behavioral_preprocessing_globalPupilNorm(session_name, params, data_path, pupil_norm_factor):
+   
+    
+    # open the file   
+    f = h5py.File(data_path + session_name + '.mat','r')
+
+    # extract data
+    time_stamps = f['time_stamp'][0]
+    run_trace_raw = f['walk'][0]
+    pupil_trace_raw = f['pupil'][0]
+    whisk_trace_raw = f['whisk'][0]
+
+    # running units
+    run_trace_units = ''.join(chr(i[0]) for i in f[f['beh_units'][1,0]][:])
+    pupil_trace_units = 'max_normalized'
+    whisk_trace_units = 'max_normalized'
+    
+
+    # close file
+    f.close()
+    
+    # get parameters
+    remove_windows = params['remove_windows']
+    artifact_thresh_pupil = params['artifact_thresh_pupil'] 
+    delta_t_compare = params['delta_t_compare']
+    artifact_window = params['artifact_window']
+    smoothing_window_length = params['smoothing_window_length']
+    smoothing_window_step = params['smoothing_window_step']
+                           
+    
+    # normalize pupil
+    pupil_trace_norm = fcn_normalize_percentMax(pupil_trace_raw)
+        
+
+            
+    # remove artifacts based on pupil trace
+    pupil_trace_corrected, run_trace_corrected, whisk_trace_corrected = \
+    fcn_remove_pupilArtifacts_rawTrace(time_stamps, \
+                              pupil_trace_raw, pupil_trace_norm, run_trace_raw, whisk_trace_raw,\
+                              remove_windows, artifact_thresh_pupil, delta_t_compare, artifact_window)
+             
+    
+    # smooth and downsample the data
+    time_smooth, pupil_trace_smooth, run_trace_smooth, whisk_trace_smooth = \
+    fcn_smooth_downsample_behavioralData(time_stamps, \
+                                         pupil_trace_corrected, run_trace_corrected, whisk_trace_corrected, \
+                                         smoothing_window_length, smoothing_window_step)
+            
+    # renormalize pupil
+    pupil_trace_smooth_norm = fcn_normalize_byValue(pupil_trace_smooth, pupil_norm_factor)  
+        
+  
+    
+    # output parameters and data as dictionaries
+    output_params = params.copy()
+    results = {}
+    results['time'] = time_smooth
+    results['pupil_trace'] = pupil_trace_smooth_norm
+    results['run_trace'] = run_trace_smooth
+    results['whisk_trace'] = whisk_trace_smooth
+    results['run_trace_units'] = run_trace_units
+    results['pupil_trace_units'] = pupil_trace_units
+    results['whisk_trace_units'] = whisk_trace_units
+    
+    
+    # return
+    return output_params, results
 

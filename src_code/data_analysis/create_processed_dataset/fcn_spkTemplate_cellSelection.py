@@ -303,6 +303,10 @@ def fcn_spkTemplate_cellSelection(session_name, params, raw_data_path, processed
         removeClusters_all = np.concatenate((lowRate_cells, removeClusters_twoPeaks, removeClusters_noiseFloor_drift))
         removeClusters_all = np.unique(removeClusters_all)
         goodClusters_all = np.rint(np.setdiff1d( np.arange(0,len(good_clusters)), removeClusters_all)).astype(int)
+        
+        print(lowRate_cells)
+        print(removeClusters_twoPeaks)
+        print(removeClusters_noiseFloor_drift)
     
     elif cut_type == 'version2':
         

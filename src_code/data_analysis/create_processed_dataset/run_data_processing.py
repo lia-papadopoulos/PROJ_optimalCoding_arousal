@@ -8,12 +8,14 @@ master script for creating intermediate pre-processed dataset
 # import preprocessing functions
 from fcn_spkTemplate_cellSelection import fcn_spkTemplate_cellSelection
 from fcn_behavioral_preprocessing import fcn_run_behavioral_preprocessing
+from fcn_behavioral_preprocessing import fcn_run_behavioral_preprocessing_globalPupilNorm
 from fcn_get_stimulus_data import fcn_get_stimulus_data
 from fcn_save_processed_data import fcn_save_processed_data
 
 # import parameters
 import cell_selection_info
 import behavioral_preprocessing_info
+
 
 
 # session information
@@ -27,11 +29,21 @@ all_sessions_to_run = [
                       ]
 
     
+# global pupil normalization (i.e., not per session)
+globalPupilNorm = True
+pupilNorm_factor = 0.7378132991114432
+    
 # path to data that Su processed
 processed_data_path = '/mnt/ion-nas2/Brain_Initiative/Neuropixels/Su_NP/ToLiaLuca/'
 
 # where to save the data
 outpath = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/analysis_SuData/processed_data_LP/'
+
+# end of filename
+if globalPupilNorm == False:
+    fname_end = ''
+else:
+    fname_end = '_globalPupilNorm'
 
 
 #%% loop over sessions and process data
@@ -56,8 +68,12 @@ for indSession, session_name in enumerate(all_sessions_to_run):
     behavioralPreprocessing_inputParams =  behavioral_preprocessing_info.params_dict[session_name]
     
     # run behavioral preprocessing
-    behavioralPreprocessing_params, behavioralData = \
+    if globalPupilNorm == False:
+        behavioralPreprocessing_params, behavioralData = \
         fcn_run_behavioral_preprocessing(session_name, behavioralPreprocessing_inputParams, processed_data_path) 
+    else:
+        behavioralPreprocessing_params, behavioralData = \
+        fcn_run_behavioral_preprocessing_globalPupilNorm(session_name, behavioralPreprocessing_inputParams, processed_data_path, pupilNorm_factor)         
         
     
     ##### extract stimulus data ##############################################
@@ -66,7 +82,7 @@ for indSession, session_name in enumerate(all_sessions_to_run):
     
     
     ##### save the data ######################################################
-    fcn_save_processed_data(session_name, outpath, \
+    fcn_save_processed_data(session_name, outpath, fname_end, \
                             cellSelection_params, cellSelection_results, \
                             behavioralPreprocessing_params, behavioralData, \
                             stimulusInfo)
