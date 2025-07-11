@@ -1,32 +1,25 @@
 
 
+import sys
+
+sys.path.append('../../')
+import global_settings
+
 # path to functions
-
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-
-
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-             'PROJ_VariabilityGainMod/scripts/master_sims/'
-
-func_path1 = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-            'PROJ_VariabilityGainMod/scripts/functions/'
-            
-func_path2 = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-            'PROJ_VariabilityGainMod/scripts/analysis_SuData/'
-            
-# load path
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
+func_path0 = global_settings.path_to_src_code + 'run_simulations/'
+func_path1 = global_settings.path_to_src_code + 'functions/'
+func_path2 = global_settings.path_to_src_code + 'data_analysis/'
+decode_path = global_settings.path_to_sim_output + 'decoding_analysis/'
+load_path = global_settings.path_to_sim_output + ''
+save_path = global_settings.path_to_sim_output + 'evoked_corr/'
     
-# decode path
-decode_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/decoding_analysis/')
-
-
-# save path
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/evoked_corr/')
+# for clustering
+corr_path = global_settings.path_to_sim_output + 'evoked_corr/'
+psth_path =  global_settings.path_to_sim_output + 'psth/'
+sim_path = global_settings.path_to_sim_output + ''
+cluster_outpath = global_settings.path_to_sim_output + 'evoked_corr/hClustering/'
     
-
     
 #%% simulations params
    

@@ -15,6 +15,8 @@ import numpy.matlib
 import importlib
 import os
 
+import evoked_corr_vs_perturbation_settings as settings
+
 # loading parameters
 simParams_fname = 'simParams_051325_clu'
 #simParams_fname = 'simParams_051325_hom'
@@ -37,13 +39,13 @@ n_neuronDraws = 10
 linkage_method = 'average'
 
 # data paths
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-func_path1 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/functions/'
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-psth_path = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/psth/'
-corr_path = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/evoked_corr/'
-sim_path = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/'
-outpath = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/evoked_corr/hClustering/'
+func_path0 = settings.func_path0
+func_path1 = settings.func_path1
+sim_params_path = settings.sim_params_path
+psth_path = settings.psth_path
+corr_path = settings.corr_path
+sim_path = settings.sim_path
+outpath = settings.cluster_outpath
 
 
 sys.path.append(func_path0)

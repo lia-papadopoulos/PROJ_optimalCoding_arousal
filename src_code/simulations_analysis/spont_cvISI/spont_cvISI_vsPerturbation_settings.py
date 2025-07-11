@@ -3,26 +3,25 @@
 settings file for spont_cvISI_vsPerturbation
 """
 
+import sys
 
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
+sys.path.append('../../')
+import global_settings
 
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
 
+func_path = global_settings.path_to_src_code + 'functions/'
 
-func_path = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-            'PROJ_VariabilityGainMod/scripts/functions/'
+func_path0 = global_settings.path_to_src_code + 'run_simulations/'
 
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
+load_path = global_settings.path_to_sim_output + ''
+
+load_path_plotting = global_settings.path_to_sim_output + 'spont_cvISI_vsPerturbation/'
+
+save_path = global_settings.path_to_sim_output + 'spont_cvISI_vsPerturbation/'
     
-load_path_plotting = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/spont_cvISI_vsPerturbation/')
-
-
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/spont_cvISI_vsPerturbation/')
-
-save_path_plotting = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/Figures/test_stim_expSyn/spont_cvISI_vsPerturbation/')
+fig_path = global_settings.path_to_sim_figures + 'spont_cvISI_vsPerturbation/'
     
-
     
 #%% simulations params
    

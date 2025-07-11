@@ -5,25 +5,21 @@ settings file for spont_spikeSpectra_vsPerturbation
 
 # imports for setting params
 import numpy as np
+import sys
 
+sys.path.append('../../')
+import global_settings
 
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
-
-
-func_path = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-            'PROJ_VariabilityGainMod/scripts/functions/'
-
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
+# path to functions
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
+func_path0 = global_settings.path_to_src_code + 'run_simulations/'
+func_path = global_settings.path_to_src_code + 'functions/'
+load_path = global_settings.path_to_sim_output + ''
+save_path = global_settings.path_to_sim_output + 'spont_spikeSpectra_vsPerturbation/'
     
-load_path_plotting = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/spont_spikeSpectra_vsPerturbation/')
-
-
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/test_stim_expSyn/spont_spikeSpectra_vsPerturbation/')
-
-save_path_plotting = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/Figures/test_stim_expSyn/spont_spikeSpectra_vsPerturbation/')
+# for plotting
+load_path_plotting = global_settings.path_to_sim_output + 'spont_spikeSpectra_vsPerturbation/'
+save_path_plotting = global_settings.path_to_sim_figures + 'spont_spikeSpectra_vsPerturbation/'
     
 
     

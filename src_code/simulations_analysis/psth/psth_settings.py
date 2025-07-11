@@ -3,27 +3,26 @@
 psth settings
 """
 
+import sys
+
+sys.path.append('../../')
+import global_settings
+
 #%% paths
 
 
-sim_params_path = '/home/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/scripts/master_sims/'
+sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
 
+func_path1 = global_settings.path_to_src_code + 'functions/'
 
-func_path0 = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-             'PROJ_VariabilityGainMod/scripts/master_sims/'
+func_path0 = global_settings.path_to_src_code + 'run_simulations/'
 
-func_path1 = '/home/liap/PostdocWork_Oregon/My_Projects/' \
-            'PROJ_VariabilityGainMod/scripts/functions/'
+load_path = global_settings.path_to_sim_output + ''
 
-# load path
-load_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-             'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/')
-
-save_path = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-              'PROJ_VariabilityGainMod/data_files/test_stim_expSyn/psth/')
+save_path = global_settings.path_to_sim_output + 'psth/'
     
-save_path_plotting = ('/mnt/data0/liap/PostdocWork_Oregon/My_Projects/'\
-                     'PROJ_VariabilityGainMod/data_files/Figures/test_stim_expSyn/psth/')
+save_path_plotting = global_settings.path_to_sim_figures + 'psth/'
+    
     
     
 #%% simulations params
