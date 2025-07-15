@@ -11,3 +11,5 @@ path_to_2clusterMFT_output = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PRO
 path_to_original_data = '/mnt/ion-nas2/Brain_Initiative/Neuropixels/Su_NP/ToLiaLuca/'
 path_to_processed_data = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/analysis_SuData/processed_data_LP/'
 path_to_data_analysis_output = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/analysis_SuData/'
+
+path_to_plotting_font = '/home/liap/fonts/Arial.ttf'
