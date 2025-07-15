@@ -53,6 +53,7 @@ runBlock_step = settings.runBlock_step
 runSplit_method = settings.runSplit_method
 rateDrift_cellSelection = settings.rateDrift_cellSelection
 global_pupilNorm = settings.global_pupilNorm
+highDownsample = settings.highDownsample
 
 
 #%% CHECKS
@@ -78,7 +79,7 @@ session_name = args.session_name
 
 #%% GET DATA
 
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm
+data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
 
 session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)

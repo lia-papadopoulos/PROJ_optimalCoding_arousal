@@ -44,6 +44,7 @@ decode_outpath = decode_params.decode_outpath_pupil
 
 global_pupilNorm = decode_params.global_pupilNorm
 rateDrift_cellSelection = decode_params.rateDrift_cellSelection
+highDownsample = decode_params.highDownsample
 
 trial_window = decode_params.trial_window
 windSize = decode_params.windSize
@@ -92,7 +93,7 @@ session_name = args.session_name
 
 #%% GET DATA
 
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm
+data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
 
 session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
@@ -444,7 +445,7 @@ for repInd in range(0, n_decodeReps):
     }
     
         
-    fname_pupilNorm = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm
+    fname_pupilNorm = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
         
     if (rest_only == True and trialMatch == True):   

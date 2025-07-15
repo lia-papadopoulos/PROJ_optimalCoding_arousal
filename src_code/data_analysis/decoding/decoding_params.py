@@ -34,6 +34,7 @@ func_path2 = global_settings.path_to_src_code + 'functions/'
 # global pupil normalization
 global_pupilNorm = False
 rateDrift_cellSelection = False
+highDownsample = True
 
 # decoding general
 n_kFolds = 5

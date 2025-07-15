@@ -68,6 +68,9 @@ rateDrift_cellSelection = False
 # pupil normalization
 global_pupilNorm = False
 
+# downsampled version of data 
+highDownsample = True
+
 
 ### for plotting ###
 
