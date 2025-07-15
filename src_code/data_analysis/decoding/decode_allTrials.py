@@ -41,6 +41,9 @@ n_kFold_reps = decode_params.n_kFold_reps
 nShuffles = decode_params.nShuffles
 shuffle_percentile = decode_params.shuffle_percentile
 lda_solver = decode_params.lda_solver
+global_pupilNorm = decode_params.global_pupilNorm
+rateDrift_cellSelection = decode_params.rateDrift_cellSelection
+highDownsample = decode_params.highDownsample
 
 
 #%% USER INPUTS
@@ -59,7 +62,9 @@ session_name = args.session_name
 
 #%% GET DATA
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
+data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
+
+session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
  
 #%% update session info
@@ -150,8 +155,8 @@ for repInd in range(0, n_decodeReps):
     }
     
                 
-    fname_end = (('_allTrials_windSize%0.3fs_windStep%0.3fs_decoder%s_crossVal%s_nFreqs%d') % \
-                 (windSize, windStep, decoderType, crossvalType, nFreqs_decode))
+    fname_end = (('_allTrials_windSize%0.3fs_windStep%0.3fs_decoder%s_crossVal%s_nFreqs%d%s') % \
+                 (windSize, windStep, decoderType, crossvalType, nFreqs_decode, data_name))
     
     save_filename = ( (decode_outpath + 'decode_toneFreq_session%s' + fname_end + '_rep%d.mat') % (session_name, repInd) )
             
