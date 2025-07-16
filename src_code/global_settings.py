@@ -13,3 +13,5 @@ path_to_processed_data = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_Va
 path_to_data_analysis_output = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/analysis_SuData/'
 
 path_to_plotting_font = '/home/liap/fonts/Arial.ttf'
+
+path_to_manuscript_figs = '/mnt/data0/liap/PostdocWork_Oregon/My_Projects/PROJ_VariabilityGainMod/data_files/manuscript_figs/Neuron_04082024/revision1/'
