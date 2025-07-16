@@ -41,6 +41,10 @@ pupilBlock_size = 0.1
 pupilBlock_step = 0.1
 pupilSplit_method = 'percentile'
 
+# data set loading  parameters
+global_pupilNorm = False
+rateDrift_cellSelection = False
+highDownsample = True
 
 # number of trials needed
 nTrials_thresh = 2

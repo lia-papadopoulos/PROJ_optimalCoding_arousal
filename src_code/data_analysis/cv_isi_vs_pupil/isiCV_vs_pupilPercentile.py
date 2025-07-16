@@ -53,6 +53,10 @@ pupilBlock_size = settings.pupilBlock_size
 pupilBlock_step = settings.pupilBlock_step
 pupilSplit_method = settings.pupilSplit_method
 
+# dataset loading parameters
+global_pupilNorm = settings.global_pupilNorm
+rateDrift_cellSelection = settings.rateDrift_cellSelection
+highDownsample = settings.highDownsample
 
 # number of trials needed
 nTrials_thresh = settings.nTrials_thresh
@@ -98,8 +102,9 @@ session_name = args.session_name
 
 #%% load data
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
+data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
+session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
 #%% parse data by pre-stimulus percentiles computed from 100 ms window
 ### want to use same percentile splits for all analyses
@@ -393,7 +398,7 @@ else:
     fName_end = ''
     
 
-save_filename = ( (outpath + 'spont_cvISI_pupilPercentile_raw_%s_windLength%0.3fs_%s.mat') % (session_name, window_length, fName_end) )      
+save_filename = ( (outpath + 'spont_cvISI_pupilPercentile_raw_%s_windLength%0.3fs_%s%s.mat') % (session_name, window_length, fName_end, data_name) )      
 savemat(save_filename, results) 
 
 
