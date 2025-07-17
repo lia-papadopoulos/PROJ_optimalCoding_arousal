@@ -35,7 +35,8 @@ stimulus_window = settings.stimulus_window
 window_length = settings.window_length
 window_step = settings.window_step
 rateDrift_cellSelection = settings.rateDrift_cellSelection
-
+global_pupilNorm = settings.global_pupilNorm
+highDownsample = settings.highDownsample
 
 #%% USER INPUTS
 
@@ -54,7 +55,7 @@ session_name = args.session_name
 
 #%% SESSION INFO
 
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection
+data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
 session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 

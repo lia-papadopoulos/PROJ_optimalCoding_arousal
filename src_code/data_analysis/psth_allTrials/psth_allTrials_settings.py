@@ -41,5 +41,7 @@ window_length = 100e-3
 # window_step
 window_step = 1e-3
 
-# rateDrift_cellSelection
+# data params
+global_pupilNorm = False
 rateDrift_cellSelection = False
+highDownsample = True
