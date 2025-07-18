@@ -29,7 +29,7 @@ from fcn_SuData import fcn_compute_pupilMeasure_eachTrial
 from fcn_SuData import fcn_get_trials_in_pupilBlocks
 from fcn_SuData import fcn_trials_perFrequency_perPupilBlock
 from fcn_SuData import fcn_pupilPercentile_to_pupilSize
-from fcn_SuData import fcn_compute_minRunSpeed_inTrials
+from fcn_SuData import fcn_compute_avgRunSpeed_inTrials
 from fcn_SuData import fcn_determine_runningTrials
 from fcn_SuData import fcn_trials_perFrequency_perRunBlock
 
@@ -53,6 +53,10 @@ restOnly = settings.restOnly
 trialMatch = settings.trialMatch
 runThresh = settings.runThresh
 runSpeed_method = settings.runSpeed_method
+rateDrift_cellSelection = settings.rateDrift_cellSelection
+global_pupilNorm = settings.global_pupilNorm
+highDownsample = settings.highDownsample
+
 
 #%% CHECKS
 
@@ -78,8 +82,9 @@ session_name = args.session_name
 
 #%% SESSION INFO
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
+data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
+session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
 #%% UPDATE SESSION INFO
 
@@ -121,7 +126,7 @@ session_info = fcn_compute_pupilMeasure_eachTrial(session_info)
 #%% running info 
 
 # compute run speed in each trial
-session_info = fcn_compute_minRunSpeed_inTrials(session_info, session_info['trial_start'], session_info['trial_end'])
+session_info = fcn_compute_avgRunSpeed_inTrials(session_info, session_info['trial_start'], session_info['trial_end'])
 
 # classify trials as running or resting
 session_info = fcn_determine_runningTrials(session_info, runThresh)
@@ -369,6 +374,6 @@ if ( (restOnly == True) and (trialMatch == False) ):
 else:
     fName_end = ''
     
-save_filename = ( (outpath + 'psth_pupil_%s%s_windLength%0.3fs.mat') % (session_name, fName_end, window_length) )      
+save_filename = ( (outpath + 'psth_pupil_%s%s_windLength%0.3fs%s.mat') % (session_name, fName_end, window_length, data_name) )      
 savemat(save_filename, results) 
 

@@ -58,5 +58,10 @@ pupilSize_method = 'avgSize_beforeStim'
 # rest only
 restOnly = False
 trialMatch = False
-runThresh = 1.25
+runThresh = 2.
 runSpeed_method = 'avgSize_beforeStim'
+
+# data params
+global_pupilNorm = False
+rateDrift_cellSelection = False
+highDownsample = True
