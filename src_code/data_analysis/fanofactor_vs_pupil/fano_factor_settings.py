@@ -69,7 +69,7 @@ runBlock_size = 1.
 runBlock_step = 1.
 runSplit_method = 'percentile'
 
-# rate drift cell selection
+# data selection
 global_pupilNorm = False
 rateDrift_cellSelection = False
 highDownsample = False

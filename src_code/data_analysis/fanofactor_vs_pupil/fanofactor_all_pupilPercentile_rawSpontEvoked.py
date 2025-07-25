@@ -27,7 +27,7 @@ from fcn_SuData import fcn_compute_pupilMeasure_eachTrial
 from fcn_SuData import fcn_get_trials_in_pupilBlocks
 from fcn_SuData import fcn_pupilPercentile_to_pupilSize
 from fcn_SuData import fcn_getTrials_in_pupilRange
-from fcn_SuData import fcn_compute_minRunSpeed_inTrials
+from fcn_SuData import fcn_compute_avgRunSpeed_inTrials
 from fcn_SuData import fcn_determine_runningTrials
 from fcn_SuData import fcn_trials_perFrequency_perRunBlock
 from fcn_SuData import fcn_makeTrials_spont
@@ -81,6 +81,11 @@ runBlock_size = settings.runBlock_size
 runBlock_step = settings.runBlock_step
 runSplit_method = settings.runSplit_method
 
+# cell selection
+global_pupilNorm = settings.global_pupilNorm
+rateDrift_cellSelection = settings.rateDrift_cellSelection
+highDownsample = settings.highDownsample
+
 #%%
 
 if restOnly == True:
@@ -108,7 +113,9 @@ session_name = args.session_name
 
 #%% GET DATA
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
+data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
+
+session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
 nCells = session_info['nCells']
 
@@ -151,7 +158,7 @@ session_info = fcn_compute_pupilMeasure_eachTrial(session_info)
 #%% running info 
 
 # compute run speed in each trial
-session_info = fcn_compute_minRunSpeed_inTrials(session_info, session_info['trial_start'], session_info['trial_end'])
+session_info = fcn_compute_avgRunSpeed_inTrials(session_info, session_info['trial_start'], session_info['trial_end'])
 
 # classify trials as running or resting
 session_info = fcn_determine_runningTrials(session_info, runThresh)
@@ -272,7 +279,7 @@ session_info['trial_pupilMeasure'] = avg_pupilSize.copy()
 
 #%% running speed
 
-session_info = fcn_compute_minRunSpeed_inTrials(session_info, trial_start, trial_end)
+session_info = fcn_compute_avgRunSpeed_inTrials(session_info, trial_start, trial_end)
 
 session_info = fcn_determine_runningTrials(session_info, runThresh)
 
@@ -481,7 +488,7 @@ else:
     fName_end = ''
     
 
-save_filename = ( (outpath + 'spont_evoked_fanofactor_all_pupilPercentile_raw_%s_windLength%0.3fs_pupilLag%0.3fs_%s.mat') % (session_name, window_length, pupilLag, fName_end) )      
+save_filename = ( (outpath + 'spont_evoked_fanofactor_all_pupilPercentile_raw_%s_windLength%0.3fs_pupilLag%0.3fs_%s%s.mat') % (session_name, window_length, pupilLag, fName_end, data_name) )      
 savemat(save_filename, results) 
 
 
