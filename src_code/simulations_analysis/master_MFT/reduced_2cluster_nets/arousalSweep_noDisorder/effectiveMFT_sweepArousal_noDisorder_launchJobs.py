@@ -21,7 +21,7 @@ os.system("tsp -S %s" % simul_jobs)
 for param_indx in range(0, nArousal_samples+1):
                 
     # COMMAND TO RUN
-    command = " tsp python run_effectiveMFT_sweepArousal_noDisorder_ALT2.py --param_indx %d " % (param_indx)
+    command = " tsp python run_effectiveMFT_sweepArousal_noDisorder_ALT3.py --param_indx %d " % (param_indx)
 
     # SUBMIT JOBS
     os.system(command) 
