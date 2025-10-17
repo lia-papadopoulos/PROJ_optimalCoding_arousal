@@ -4,7 +4,7 @@ This code runs the data analysis, simulations, and plotting associated with the 
 
 ## Software Versions
 
-Python version 3.9  
+Python version 3.9.9 
 NumPy version 1.26  
 SciPy version 1.12  
 scikit-learn version 0.24  
@@ -15,7 +15,7 @@ scikit-learn version 0.24
 
 The neural data can be downloaded from...
 
-**FILL IN***
+<span style="color:blue"> *FILL IN* </span>.
 
 ### Setting up 
 
