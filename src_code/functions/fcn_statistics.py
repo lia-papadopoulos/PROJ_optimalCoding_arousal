@@ -1,48 +1,9 @@
 
-"""
-Created on Sat Jun 26 12:19:41 2021
-
-@author: liapapadopoulos
-"""
-
 #%%
 
 import numpy as np
 import sys
 import scipy.stats
-import statsmodels.stats.descriptivestats
-
-
-def fcn_partialCorr(x, y, z, method='Spearman'):
-    
-    if method == 'Spearman':
-    
-        res = scipy.stats.spearmanr(x, y)
-        rxy = res.statistic
-        
-        res = scipy.stats.spearmanr(x, z)
-        rxz = res.statistic
-        
-        res = scipy.stats.spearmanr(y, z)
-        ryz = res.statistic
-    
-    elif method == 'Pearson':
-        
-        res = scipy.stats.spearmanr(x, y)
-        rxy = res.statistic
-        
-        res = scipy.stats.spearmanr(x, z)
-        rxz = res.statistic
-        
-        res = scipy.stats.spearmanr(y, z)
-        ryz = res.statistic
-        
-    else:
-        sys.exit()
-        
-    partial_corr = (rxy - rxz*ryz)/np.sqrt( (1-rxz**2)*(1-ryz**2) )
-
-    return partial_corr
 
 
 #%% CODE FOR IMPLEMENTING STATISTICAL TESTS
@@ -221,19 +182,6 @@ def fcn_Wilcoxon(x, y):
     return results_dict
 
 
-
-def fcn_SignTest_twoSided(x, y):
-    
-    nanVals = np.nonzero((np.isnan(x)) | np.isnan(y))
-    x = np.delete(x, nanVals)
-    y = np.delete(y, nanVals)
-    
-    sample = x - y
-    test_stat, pVal = statsmodels.stats.descriptivestats.sign_test(sample)
-
-    return test_stat, pVal
-
-
 def fcn_paired_tTest_twoSided(x, y):
     
     nanVals = np.nonzero((np.isnan(x)) | np.isnan(y))
@@ -288,3 +236,37 @@ def fcn_pctChange_mean(x):
     norm_x = ((x-np.mean(x))/np.mean(x))*100
 
     return norm_x
+
+
+#%% compute partial correlation
+
+def fcn_partialCorr(x, y, z, method='Spearman'):
+    
+    if method == 'Spearman':
+    
+        res = scipy.stats.spearmanr(x, y)
+        rxy = res.statistic
+        
+        res = scipy.stats.spearmanr(x, z)
+        rxz = res.statistic
+        
+        res = scipy.stats.spearmanr(y, z)
+        ryz = res.statistic
+    
+    elif method == 'Pearson':
+        
+        res = scipy.stats.spearmanr(x, y)
+        rxy = res.statistic
+        
+        res = scipy.stats.spearmanr(x, z)
+        rxz = res.statistic
+        
+        res = scipy.stats.spearmanr(y, z)
+        ryz = res.statistic
+        
+    else:
+        sys.exit()
+        
+    partial_corr = (rxy - rxz*ryz)/np.sqrt( (1-rxz**2)*(1-ryz**2) )
+
+    return partial_corr

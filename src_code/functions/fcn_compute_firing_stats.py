@@ -1085,45 +1085,6 @@ def fcn_dimensionality(cov_matrix):
     return dimensionality
 
 
-#%% response efficacy for a single stimulus
-
-'''
-trialAvg_rate_resp                  (n_respCells, n_tPts)
-trialAvg_rate_nonresp               (n_nonrespCells, n_tPts)
-trialVar_rate_resp                  (n_respCells, n_tPts)
-trialVar_rate_nonresp               (n_nonrespCells, n_tPts)
-'''
-
-def fcn_compute_response_efficacy(trialAvg_rate_resp, trialAvg_rate_nonresp, trialVar_rate_resp, trialVar_rate_nonresp):
-    
-    
-    # cell avg rate of response cells
-    cellAvg_trialAvg_rate_respCells = np.mean(trialAvg_rate_resp,0)    
-
-    # cell avg rate of nonresponse cells
-    cellAvg_trialAvg_rate_nonrespCells = np.mean(trialAvg_rate_nonresp,0)   
-    
-    # response signal
-    resp_signal_vs_time = cellAvg_trialAvg_rate_respCells - cellAvg_trialAvg_rate_nonrespCells   
-    
-    # cell avg var rate of response cells
-    cellAvg_trialVar_rate_respCells = np.nanmean(trialVar_rate_resp,0)        
-     
-    # cell avg var rate of nonresponse cells
-    cellAvg_trialVar_rate_nonrespCells = np.nanmean(trialVar_rate_nonresp,0)  
-     
-    # total trial sd
-    resp_var_vs_time = np.sqrt( (1/2)*(cellAvg_trialVar_rate_respCells + cellAvg_trialVar_rate_nonrespCells))
-                          
-    # response efficacy
-    resp_efficacy_vs_time = resp_signal_vs_time/resp_var_vs_time 
-    
-    return resp_signal_vs_time, resp_var_vs_time, resp_efficacy_vs_time
-
-
-
-
-
 #%% significantly responding cells
 
 

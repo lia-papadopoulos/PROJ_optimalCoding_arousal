@@ -1,7 +1,6 @@
 
 """
-SET OF FUNCTIONS TO AID IN DECODING ANALYSIS
-Would be better to make a class so we aren't passing so many variables around
+SET OF FUNCTIONS FOR DECODING ANALYSES
 """
 
 # standard imports
