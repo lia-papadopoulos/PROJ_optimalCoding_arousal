@@ -4,10 +4,10 @@ This code runs the data analysis, simulations, and plotting associated with the 
 
 ## Software Versions
 
-Python version 3.9
-NumPy version 1.26
-SciPy version 1.12
-scikit-learn version 0.24
+Python version 3.9  
+NumPy version 1.26  
+SciPy version 1.12  
+scikit-learn version 0.24  
 
 ## Usage
 
