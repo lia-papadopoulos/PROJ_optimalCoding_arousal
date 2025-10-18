@@ -46,8 +46,9 @@ Below is a brief description of the files in `run_simulations/`
     'networkSeed': random seed for setting up the network connectivity  
     'arousalLevel': level of arousal for the simulation (between 0 and 1  )
 3. Run:  
-
-    ```$ python run_testSimulation.py``` 
+```
+    $ python run_testSimulation.py
+``` 
     
 
 ### Running batch simulations
