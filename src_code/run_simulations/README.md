@@ -47,7 +47,7 @@ Below is a brief description of the files in `run_simulations/`
     'arousalLevel': level of arousal for the simulation (between 0 and 1  )
 3. Run:  
 ```
-    $ python run_testSimulation.py
+$ python run_testSimulation.py
 ``` 
     
 
@@ -63,5 +63,5 @@ Below is a brief description of the files in `run_simulations/`
 3. Specify the number of cores/job and the number of jobs to run simultaneously using task spooler  
 4. Run:
 ```
-    $ python launchJobs.py
+$ python launchJobs.py
 ``` 
