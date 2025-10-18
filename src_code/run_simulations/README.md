@@ -18,17 +18,17 @@ Below is a brief description of the files in `run_simulations/`
 
 ### Files for simulation setup  
     
-    `fcn_simulation_setup.py`: set of functions that are used to set up simulations given model parameters
+`fcn_simulation_setup.py`: set of functions that are used to set up simulations given model parameters
    
-    `paths_file.py`: specifies paths and which set of parameters to use for simulations  
+`paths_file.py`: specifies paths and which set of parameters to use for simulations  
 
 ### Files for running simulations
 
-    `run_testSimulation.py`: script for running a single simulation (see below for usage)  
+`run_testSimulation.py`: script for running a single simulation (see below for usage)  
 
-    `masterSim.py`: main script for running batch simulations (see below for usage)
+`masterSim.py`: main script for running batch simulations (see below for usage)
 
-    `launchJobs.py`: calls `masterSim.py` and submits jobs to a computing cluster using task spooler (see below for usage)
+`launchJobs.py`: calls `masterSim.py` and submits jobs to a computing cluster using task spooler (see below for usage)
 
 ## Usage
 
@@ -60,6 +60,6 @@ Below is a brief description of the files in `run_simulations/`
 	a. 'sim_params_name' (name of simulation parameters file that you want to run)    
 	b. 'save_path' (where to save simulation output)  
 3. Specify the number of cores/job and the number of jobs to run simultaneously using task spooler  
-4. Run:  
+4. Run:
 
     $ python launchJobs.py 
