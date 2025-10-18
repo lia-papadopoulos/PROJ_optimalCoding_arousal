@@ -62,5 +62,6 @@ Below is a brief description of the files in `run_simulations/`
 	b. 'save_path' (where to save simulation output)  
 3. Specify the number of cores/job and the number of jobs to run simultaneously using task spooler  
 4. Run:
-
-    ```$ python launchJobs.py``` 
+```
+    $ python launchJobs.py
+``` 
