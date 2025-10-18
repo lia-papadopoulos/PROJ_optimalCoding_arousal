@@ -5,9 +5,9 @@
 
 ## Files
 
-Below is a brief description of the files in `src_code/run_simulations/`
+Below is a brief description of the files in `run_simulations/`
 
-### files that specify parameter sets associated with different analyses
+### Files that specify parameter sets associated with different analyses
 
 1. `simParams_041725_clu_varyJEEplus.py`: simulation parameters associated with Fig. S5A,B  
 2. `simParams_050925_clu.py`: simulation parameters associated with Fig. S3  
@@ -16,19 +16,19 @@ Below is a brief description of the files in `src_code/run_simulations/`
 5. `simParams_051325_clu.py`: simulation parameters associated with Fig. 3A,C; Fig. 4A-D, Fig. 5C,E, Fig. 6A,B,F, Fig. 7A-C, Fig. 8A-C, Fig. S2F, Fig. S4A, Fig. S5C, Fig. S7H-J
 6. `simParams_051325_hom.py`: simulation parameters associated with Fig. 3B,C; Fig. 4A, Fig. 5D,F, Fig. S2G, Fig. S4B  
 
-### files for simulation setup  
-
-`fcn_simulation_setup.py`: set of functions that are used to set up simulations given model parameters
+### Files for simulation setup  
+    
+    `fcn_simulation_setup.py`: set of functions that are used to set up simulations given model parameters
    
-`paths_file.py`: specifies paths and which set of parameters to use for simulations  
+    `paths_file.py`: specifies paths and which set of parameters to use for simulations  
 
-### files for running simulations
+### Files for running simulations
 
-`run_testSimulation.py`: script for running a single simulation (see below for usage)  
+    `run_testSimulation.py`: script for running a single simulation (see below for usage)  
 
-`masterSim.py`: main script for running batch simulations (see below for usage)
+    `masterSim.py`: main script for running batch simulations (see below for usage)
 
-`launchJobs.py`: calls `masterSim.py` and submits jobs to a computing cluster using task spooler (see below for usage)
+    `launchJobs.py`: calls `masterSim.py` and submits jobs to a computing cluster using task spooler (see below for usage)
 
 ## Usage
 
@@ -46,6 +46,7 @@ Below is a brief description of the files in `src_code/run_simulations/`
     'networkSeed': random seed for setting up the network connectivity  
     'arousalLevel': level of arousal for the simulation (between 0 and 1  )
 3. Run:  
+
     $ python run_testSimulation.py 
     
 
@@ -58,6 +59,7 @@ Below is a brief description of the files in `src_code/run_simulations/`
 2. Open `paths_file.py` and set:  
 	a. 'sim_params_name' (name of simulation parameters file that you want to run)    
 	b. 'save_path' (where to save simulation output)  
-3. Specify the number of cores/job and the number of jobs to run simultaneously  
+3. Specify the number of cores/job and the number of jobs to run simultaneously using task spooler  
 4. Run:  
+
     $ python launchJobs.py 
