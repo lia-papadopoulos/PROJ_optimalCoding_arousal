@@ -1,10 +1,7 @@
 
-"""
-single cell tuning to perturbation strength
-"""
 
-#%%
-#Base
+#%% BASIC IMPORTS
+
 import sys
 import numpy as np
 import scipy.stats
@@ -15,10 +12,12 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('agg')
 
+#%% SETTINGS 
+
 import settings as settings
 
+#%% FUNCTIONS
 
-# path to functions
 func_path = settings.func_path
 func_path2 = settings.func_path2
                        
@@ -28,7 +27,6 @@ from fcn_simulation_loading import fcn_set_sweepParam_string
 
 sys.path.append(func_path2)
 from fcn_simulation_setup import fcn_define_arousalSweep
-
 
 
 #%% SETTINGS
@@ -88,14 +86,13 @@ else:
     print('assumming linear arousal model')
 
 
-#%% number of arousal samples
+#%% NUMBER OF AROUSAL SAMPLES
+
 n_arousalSamples = np.size(arousal_level)
 
 #%% FILENAMES
 
-
 fname_begin = ( '%s%s_%s_sweep_%s_network%d_IC%d_stim%d_stimType_%s_stim_rel_amp%0.3f_simulationData.mat' )
-
 
 #%% LOAD ONE SIMULATION TO SET EVERYTHING UP
 
@@ -162,7 +159,8 @@ for indParam in range(0,n_arousalSamples):
                 # rate
                 neuron_IDs = spikes_window[1,:].astype(int)
                 spike_times = spikes_window[0,:]
-                spike_cnts = np.zeros(N)               
+                spike_cnts = np.zeros(N)      
+                
                 # loop over spikes array and record spikes
                 for i in range(0,len(spike_times),1):
                     
@@ -220,7 +218,7 @@ for indNet in range(0, nNets):
     frac_negCorr_pert_rate[indNet] = np.size(np.nonzero( (pval_pert_rate_base[:, indNet] < sig_level) & (corr_pert_rate_base[:, indNet] < 0)  )[0])/(N)
 
     
-#%% SAVE THE DATA
+#%% SAVE THE RESULTS
 
 params = {}
 results = {}
@@ -338,7 +336,6 @@ plt.xlim([-0.5, 0.5])
 plt.ylim([-1.1, 1.1])
 plt.xticks([])
 plt.yticks([-1, -0.5, 0, 0.5, 1], [1, 0.5, 0, 0.5, 1])
-#plt.legend(loc='lower right', fontsize=14, frameon=False)
 plt.tight_layout()
 plt.savefig( (fig_name + '_frac_pos_neg_corr_allNetworks.png') )    
 
