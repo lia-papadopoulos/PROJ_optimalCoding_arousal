@@ -1,8 +1,4 @@
 
-"""
-compute rates of selective (targeted by stimulus) and nonselective (not targeted by stimulus) clusters
-in the window around peak decoding performance
-"""
 
 
 #%% standard imports
@@ -44,7 +40,6 @@ sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
 net_type = 'baseEIclu'
 nNetworks = 10
 
-# window for computing spike counts
 window_length = 100e-3
 window_step = 1e-3
 window_std = 25e-3
@@ -98,7 +93,7 @@ avg_Ecluster_diff_rates = np.zeros((n_arousalLevels, nNetworks, nTrials, nStim))
 
 #------------------------ main analysis block --------------------------------#
 
-#------------------------- loop over parameters --------------------------#
+#------------------------- loop over arousal --------------------------#
 for param_ind in range(0,n_arousalLevels):
 
     sweep_param_str = fcn_set_sweepParam_string(n_sweepParams, sweep_param_name, swept_params_dict, param_ind) 
@@ -183,8 +178,6 @@ for param_ind in range(0,n_arousalLevels):
                 avg_Ecluster_diff_rates[param_ind, net_ind, IC_ind, stimInd] =  np.mean(Erates_clu_stim[targetedClusters, :]) - np.mean(Erates_clu_stim[non_targetedClusters, :])
                 
             print(param_ind, net_ind, IC_ind)
-
-
 
 # average across stimuli and trials
 rates_selective_trialAvg_stimAvg = np.mean(np.mean(avg_Ecluster_rates_selective,3),2)
