@@ -1,10 +1,6 @@
 
-'''
-evoked correlations
-'''
-#%%
 
-# basic imports
+#%% basic imports
 import sys
 import numpy as np
 from scipy.io import loadmat
@@ -12,8 +8,10 @@ from scipy.io import savemat
 import argparse
 import importlib
 
-# import parameters file
-import evoked_corr_vs_perturbation_settings as settings
+#%% import settings
+import evoked_corr_settings as settings
+
+#%% functions
 func_path0 = settings.func_path0
 func_path1 = settings.func_path1
 func_path2 = settings.func_path2
@@ -31,7 +29,7 @@ from fcn_compute_firing_stats import fcn_compute_spkCounts
 from fcn_compute_firing_stats import Dict2Class
 from fcn_statistics import fcn_zscore
 
-#%% UNPACK PARAMETERS FILE
+#%% unpack settings
 simParams_fname = settings.simParams_fname
 net_type = settings.net_type
 nNetworks = settings.nNetworks
@@ -72,19 +70,17 @@ stim_rel_amp = s_params['stim_rel_amp']
 del params
 del s_params
 
-#%% ARGPARSER
+#%% argparser
 parser = argparse.ArgumentParser() 
 parser.add_argument('-net_indx', '--net_indx', type=int)    
 args = parser.parse_args()
 indNetwork = args.net_indx
 
-#%% beginning of filename
+#%% filenames
 fname_begin = ( '%s%s_%s_sweep_%s_network%d_IC%d_stim%d_stimType_%s_stim_rel_amp%0.3f_simulationData.mat')
-
-
 fname_begin_decode = ( '%s%s_sweep_%s_network%d_windL%dms_ensembleSize%d_rateThresh%0.2fHz_%s.mat') 
 
-#%% LOAD ONE SIMULATION TO SET EVERYTHING UP
+#%% load one simulation to set everything up
 
 # number of arousal avlues
 nParam_vals = np.size(swept_params_dict['param_vals1'])
@@ -113,29 +109,25 @@ stimOnset = s_params.stim_onset
 # spike counts
 spkCounts_E, spkCounts_I, t_window = fcn_compute_spkCounts(s_params, spikes, baseWind_burn, windL, windStep)   
 
-
+# print
 print(t_window)
 
-#%% COMPUTE SPIKE COUNTS OF EACH CELL ACROSS TIME, FOR EACH TRIAL AND STIMULUS CONDITION
+#%% MAIN ANALYSIS BLOCK
 
 # t eval
 tEval_allArousal = np.zeros((nParam_vals))
-
 
 # average spike count all trials subsample
 sampled_cells = np.zeros((nCells_sample, nSamples))
 avg_spkCount_allTrials_subsample = np.zeros((nCells_sample, nStim, nSamples))
 
-# correlation
+# correlations
 corr_eachStim_eachArousal_subsample = np.zeros((nCells_sample, nCells_sample, nStim, nParam_vals, nSamples))
 corr_eachStim_eachArousal_subsample_shuffle = np.zeros((nCells_sample, nCells_sample, nStim, nParam_vals, nSamples, nShuffles))
-
-
 corr_allTrials_subsample = np.zeros((nCells_sample, nCells_sample, nStim, nSamples))
 shuffle_corr_allTrials_subsample = np.zeros((nCells_sample, nCells_sample, nStim, nSamples, nShuffles))
 
-
-
+# loop over stimuli and arousal level
 for indStim in range(0,nStim,1):
 
     # spike counts for this frequency
@@ -223,7 +215,6 @@ for indStim in range(0,nStim,1):
             shuffle_corr_allTrials_subsample[:,:,indStim,indSample,indShuffle] = np.corrcoef(zscore_spkCounts_allTrials_subsample_shuffle, rowvar=False)
 
 
-        
         # single parameter
         for indParam in range(0, nParam_vals):
                 
@@ -238,20 +229,17 @@ for indStim in range(0,nStim,1):
                 corr_eachStim_eachArousal_subsample_shuffle[:, :, indStim, indParam, indSample, indShuffle] = np.corrcoef(zscore_spkCounts_allTrials_subsampled_shuffle, rowvar=False)   
                 
                                                   
-            
-
+        
 # average over stimuli
 avg_spkCount_allTrials_subsample = np.mean(avg_spkCount_allTrials_subsample, axis=1)
 
-# correlation
+# correlations
 corr_allTrials_subsample = np.nanmean(corr_allTrials_subsample, axis=2)
 shuffle_corr_allTrials_subsample = np.nanmean(shuffle_corr_allTrials_subsample, axis=2)
-
 corr_stimAvg_arousalAvg = np.nanmean(corr_eachStim_eachArousal_subsample, axis=(2,3))
-
 corr_stimAvg_arousalAvg_shuffle = np.nanmean(corr_eachStim_eachArousal_subsample_shuffle, axis=(2,3))
 
-#%% SAVE DATA
+#%% SAVE RESULTS
 
 parameters_dictionary = {'simID':               simID, \
                          'net_type':            net_type, \

@@ -1,12 +1,5 @@
 
-"""
-run hierarchical clustering
-evoked correlations
-"""
-
-
-#%%
-
+#%% imports
 import numpy as np
 from scipy.io import loadmat
 from scipy.io import savemat
@@ -15,30 +8,30 @@ import numpy.matlib
 import importlib
 import os
 
-import evoked_corr_vs_perturbation_settings as settings
+#%% settings
+import evoked_corr_settings as settings
 
-# loading parameters
-simParams_fname = 'simParams_051325_clu'
-#simParams_fname = 'simParams_051325_hom'
-sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
-net_type = 'baseEIclu'
-#net_type = 'baseHOM'
-nNetworks = 10
+#%% unpack settings
 
-# parameters
-psth_windSize = 100e-3
-corr_windSize = 100e-3
-Ecells_only = True
-sigLevel = 0.05
-run_parCorr = False
+# specify simulations to analyze
+simParams_fname = settings.simParams_fname
+sweep_param_name = settings.sweep_param_name
+net_type = settings.net_type
+nNetworks = settings.nNetworks
+
+# analysis parameters
+psth_windSize = settings.psth_windSize
+corr_windSize = settings.corr_windSize
+Ecells_only = settings.Ecells_only
+sigLevel = settings.sigLevel
+run_parCorr = settings.run_parCorr()
 rate_thresh = -np.inf
-run_configCorr = False
-run_shuffleCorr = True
-nNulls = 100
-n_neuronDraws = 10
-linkage_method = 'average'
+run_shuffleCorr = settings.run_shuffleCorr
+nNulls = settings.nNulls
+n_neuronDraws = settings.n_neuronDraws
+linkage_method = settings.linkage_method
 
-# data paths
+# paths
 func_path0 = settings.func_path0
 func_path1 = settings.func_path1
 sim_params_path = settings.sim_params_path
@@ -47,11 +40,10 @@ corr_path = settings.corr_path
 sim_path = settings.sim_path
 outpath = settings.cluster_outpath
 
-
+# functions
 sys.path.append(func_path0)
 sys.path.append(func_path1)
 import fcn_hierarchical_clustering
-import fcn_analyze_corr
 import fcn_compute_firing_stats
 from fcn_simulation_setup import fcn_define_arousalSweep
 
@@ -88,16 +80,16 @@ if os.path.exists(outpath) == False:
 #%% number of arousal values
 nParam_vals = np.size(swept_params_dict['param_vals1'])
 
-#%% loop over networks
+#%% MAIN ANALYSIS BLOCK
 
+# loop over networks
 for indNet in range(0, nNetworks): 
-
 
     # load psth data to get significant cells for each stim
     sigCells_eachStim = np.zeros((nStim), dtype='object')
     resp_eachStim = np.zeros((nStim), dtype='object')
     
-    # each stimulus
+    # loop over stimuli
     for indStim in range(0, nStim):
         
         # filename
@@ -115,7 +107,6 @@ for indNet in range(0, nNetworks):
     allSigCells = fcn_compute_firing_stats.fcn_sigCells_anyStimulus(sigCells_eachStim)
     allSigCells = allSigCells.astype(int)
     
-    
     # initialize
     remove_cells_subsample = np.ones((n_neuronDraws), dtype='object')*np.nan
     keep_cells_subsample = np.ones((n_neuronDraws), dtype='object')*np.nan
@@ -132,33 +123,29 @@ for indNet in range(0, nNetworks):
     dissimilarity_config = np.ones((n_neuronDraws, nNulls), dtype='object')*np.nan
     linkageMatrix_config = np.ones((n_neuronDraws, nNulls), dtype='object')*np.nan  
     
-    
     # load correlation data
     params_tuple = (corr_path, simID, net_type, sweep_param_name, indNet, stim_shape, stim_rel_amp, corr_windSize)
     fname_corr_full = ( (fname_corr) % (params_tuple) )
     corr_data = loadmat(fname_corr_full, simplify_cells = True)
             
-    
     # unpack corr data
     nTrials = corr_data['parameters']['nTrials']
     nSamples = nTrials * nStim * nParam_vals
     nCells_all = corr_data['parameters']['nCells_all']
-    
     
     # remove I cells
     if Ecells_only == True:
         Icells = np.nonzero(allSigCells >= nCells_all)[0]
         allSigCells = np.delete(allSigCells, Icells)
 
-    
     # loop over neuron draws
     for indDraw in range(0, n_neuronDraws):
     
+        # get data
         avg_spikeCount_allTrials = corr_data['avg_spkCount_allTrials_subsample'][:, indDraw].copy()
         corr = corr_data['corr_stimAvg_arousalAvg'][:,:,indDraw].copy()
         corr_shuffle = corr_data['corr_stimAvg_arousalAvg_shuffle'][:,:,indDraw,:].copy()
         indCells_sample = corr_data['parameters']['indCells_sample'][:, indDraw].copy()
-
     
         # only keep subsample cells in sig cells
         allSigCells_subsample = np.array([])
@@ -196,35 +183,7 @@ for indNet in range(0, nNetworks):
         
         corr_shuffle_cleaned[np.isnan(corr_shuffle_cleaned)] = 0.
         corr_shuffle_save[indDraw] = corr_shuffle_cleaned.copy()
-        
-    
-        # if running clustering on configuration null model         
-        if run_configCorr:
-            
-            # correlation matrix
-            C = corr_cleaned.copy()
-            
-            # number of cells
-            N = C.shape[0] 
-    
-            # initialize configuration null model
-            C_config = np.zeros((N, N, nNulls))
-            
-            # compute null model
-            C_con = fcn_analyze_corr.fcn_compute_configCorr_nullModel(C)
-                
-            # loop over number of repetitions
-            for indNull in range(0, nNulls):
-                    
-                # correlation matrix from configuration null model
-                C_sam = fcn_analyze_corr.fcn_sample_configCorr_nullModel(C_con, nSamples)
-            
-                # store
-                C_config[:,:,indNull] = C_sam.copy()
-    
-    
-            corr_config_save[indDraw] = C_config.copy()
-        
+           
             
         ### update removed cells
         keep_cells_subsample[indDraw] = np.delete(indCells_sample, remove_cells_subsample[indDraw].astype(int))
@@ -243,15 +202,6 @@ for indNet in range(0, nNetworks):
                 dissimilarity_shuffle[indDraw, indNull] = fcn_hierarchical_clustering.fcn_compute_dissimilarity(corr_shuffle_cleaned[:,:,indNull])
                 linkageMatrix_shuffle[indDraw, indNull] = fcn_hierarchical_clustering.fcn_run_hierarchical_clustering(corr_shuffle_cleaned[:,:,indNull], linkage_method)        
     
-        # configuration corr
-        if run_configCorr:
-            
-            for indNull in range(0, nNulls):
-                
-                dissimilarity_config[indDraw, indNull] = fcn_hierarchical_clustering.fcn_compute_dissimilarity(C_config[:,:,indNull])
-                linkageMatrix_config[indDraw, indNull] = fcn_hierarchical_clustering.fcn_run_hierarchical_clustering(C_config[:,:,indNull], linkage_method)
-                        
-            
    
     ### save the data
     data_save = dict()
@@ -273,11 +223,6 @@ for indNet in range(0, nNetworks):
         data_save['dissimilarity_shuffle'] = dissimilarity_shuffle
         data_save['linkageMatrix_shuffle'] = linkageMatrix_shuffle   
         data_save['corr_shuffle'] = corr_shuffle_save
-        
-    if run_configCorr:
-        data_save['dissimilarity_config'] = dissimilarity_config
-        data_save['linkageMatrix_config'] = linkageMatrix_config   
-        data_save['corr_config'] = corr_config_save
 
         
     data_save['linkage_method'] = linkage_method
