@@ -1,7 +1,6 @@
 
 
-#%%
-
+#%% imports
 import sys
 import numpy as np
 from scipy.io import loadmat
@@ -9,16 +8,16 @@ from scipy.io import savemat
 import argparse
 import importlib
 
+#%% settings
 import spont_cvISI_vsPerturbation_settings as settings
+
+#%% functions
 func_path = settings.func_path
 sys.path.append(func_path)
 from fcn_compute_firing_stats import fcn_compute_total_spkCount
 from fcn_compute_firing_stats import Dict2Class
 
-
-#%% UNPACK PARAMETERS FILE
-   
-# load settings
+#%% unpack settings
 sim_params_path = settings.sim_params_path
 simParams_fname = settings.simParams_fname
 net_type = settings.net_type
@@ -28,13 +27,10 @@ nNetworks = settings.nNetworks
 sweep_param_name = settings.sweep_param_name
 windL = settings.windL
 
-
 #%% load sim parameters
-
 sys.path.append(sim_params_path)
 params = importlib.import_module(simParams_fname) 
 s_params = params.sim_params
-
 simID = s_params['simID']
 nTrials = s_params['n_ICs']
 nStim = s_params['nStim']
@@ -42,9 +38,9 @@ stim_shape = s_params['stim_shape']
 stim_type = s_params['stim_type']
 stim_rel_amp = s_params['stim_rel_amp']
 
+#%% argparser
 
-#%% ARGPARSER
-
+# initialize
 parser = argparse.ArgumentParser() 
 
 # swept parameter name + value as string
@@ -53,24 +49,20 @@ parser.add_argument('-sweep_param_str_val', '--sweep_param_str_val', type=str, r
 # arguments of parser
 args = parser.parse_args()
 
-
 #-------------------- argparser values for later use -------------------------#
 
 # name of swept parameter with value as a string
 sweep_param_str_val = args.sweep_param_str_val
 
 
-#%% FILENAMES
-
+#%% filename
 fname_begin = ( '%s%s_%s_sweep_%s_network%d_IC%d_stim%d_stimType_%s_stim_rel_amp%0.3f_' )
 
+#%% load one simulation to set everything up
 
-#%% LOAD ONE SIMULATION TO SET EVERYTHING UP
-
-
+# parameters
 params_tuple = (load_path, simID, net_type, sweep_param_str_val, 0, 0, 0, stim_shape, stim_rel_amp)
 
-    
 # filename
 filename = ( (fname_begin + 'simulationData.mat') % params_tuple )
 
@@ -87,9 +79,7 @@ spikes = data['spikes']
 N = s_params.N
 Ne = s_params.N_e
 
-#%% COMPUTE SPIKE COUNTS OF EACH CELL ACROSS TIME, FOR EACH TRIAL AND STIMULUS CONDITION
-
-
+#%% MAIN ANALYSIS BLOCK
 
 # spike counts
 avg_spkCount = np.zeros((N, nNetworks, nStim))
@@ -98,7 +88,7 @@ avg_spkCount = np.zeros((N, nNetworks, nStim))
 cvISI_eachTrial = np.ones((N, nNetworks, nStim, nTrials))*np.nan
 cvISI_trialAggregate = np.ones((N, nNetworks, nStim))*np.nan
 
-
+# loop over networks, stimuli, trials
 for indNetwork in range(0, nNetworks, 1):
         
     for indStim in range(0,nStim,1):
@@ -166,8 +156,7 @@ for indNetwork in range(0, nNetworks, 1):
 avg_cvISI_eachTrial = np.nanmean(cvISI_eachTrial, 3)
             
  
-
-#%% SAVE DATA
+#%% save the results
 
 parameters_dictionary = {'load_path':           load_path, \
                          'save_path':           save_path, \
@@ -186,10 +175,8 @@ parameters_dictionary = {'load_path':           load_path, \
                          'Ne':                  Ne, \
                          'N':                   N}
 
-    
-    
 results_dictionary = {'avg_spkCount':             avg_spkCount, \
-                      'avg_cvISI_eachTrial':                 avg_cvISI_eachTrial, \
+                      'avg_cvISI_eachTrial':      avg_cvISI_eachTrial, \
                       'cvISI_trialAggregate':     cvISI_trialAggregate, \
                       'parameters':               parameters_dictionary}
 
