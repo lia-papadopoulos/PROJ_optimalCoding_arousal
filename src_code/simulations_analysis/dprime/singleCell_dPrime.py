@@ -1,5 +1,5 @@
 
-
+#%% imports
 import sys
 import numpy as np
 from scipy.io import loadmat
@@ -7,27 +7,25 @@ from scipy.io import savemat
 import argparse
 import importlib
 
+#%% settings file
 import dPrime_settings as settings
-func_path = settings.func_path
 
+#%% functions
+func_path = settings.func_path
 sys.path.append(func_path)
 from fcn_compute_firing_stats import fcn_compute_spkCounts
 from fcn_compute_firing_stats import Dict2Class
 
-#%% SETUP
-
-# load settings
+#%% setting up
 sim_params_path = settings.sim_params_path
 simParams_fname = settings.simParams_fname
 net_type = settings.net_type
 load_path = settings.load_path
 save_path = settings.save_path
 sweep_param_name = settings.sweep_param_name
-
 nNetworks = settings.nNetworks
 windL = settings.windL
 windStep = settings.windStep
-
 
 #%% load sim parameters
 
@@ -45,14 +43,14 @@ stim_rel_amp = s_params['stim_rel_amp']
 del params
 del s_params
 
-#%% ARGPARSER
+#%% argparser
 
+# initialize
 parser = argparse.ArgumentParser() 
     
 # swept parameter name + value as string
 parser.add_argument('-sweep_param_str_val', '--sweep_param_str_val', type=str, required = True)
               
-
 # arguments of parser
 args = parser.parse_args()
 
@@ -62,13 +60,13 @@ args = parser.parse_args()
 sweep_param_str_val = args.sweep_param_str_val
 
 
-#%% FILENAMES
+#%% filenames
 
 # beginning of filename
 fname_begin = ( '%s%s_%s_sweep_%s_network%d_IC%d_stim%d_stimType_%s_stim_rel_amp%0.3f_' )
 
 
-#%% LOAD ONE SIMULATION TO SET EVERYTHING UP
+#%% load one simulation to set everything up
 
 # params tuple
 params_tuple = (load_path, simID, net_type, sweep_param_str_val, 0, 0, 0, stim_shape, stim_rel_amp)
@@ -95,8 +93,7 @@ t_window = t_window - stimOn
 Nwindows = np.size(t_window)
 
 
-#%% INITIALIZE
-
+#%% main analysis block
 
 dprime = np.zeros((Nwindows, N, nStim, nStim, nNetworks))
 firing_rate = np.zeros((Nwindows, N, nStim, nNetworks))
@@ -157,7 +154,7 @@ freqAvg_dprime = np.nanmean(dprime, axis=(2,3)) # time, neurons, networks
 stimAvg_firingRate = np.mean(firing_rate, axis=(2)) # (time, neurons, networks)
 
 
-#%% SAVE DATA
+#%% save data
 
 parameters_dictionary = {'simID':               simID, \
                          'net_type':            net_type, \
