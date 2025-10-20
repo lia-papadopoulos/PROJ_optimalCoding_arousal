@@ -1,5 +1,3 @@
-# LAUNCH JOBS FOR PARAMETER SWEEP
-
 
 #%% imports
 import os

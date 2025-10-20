@@ -1,47 +1,35 @@
 
+#%% basic imports
 import sys
 import numpy as np
 
 sys.path.append('../../')
 import global_settings
 
-
-
 #%% paths
-
-    
 sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
-
 func_path1 = global_settings.path_to_src_code + 'functions/'
-
 func_path2 = global_settings.path_to_src_code + 'run_simulations/'
-
 load_path = global_settings.path_to_sim_output + ''
-
-save_path = global_settings.path_to_sim_output + 'clusterRates_numActiveClusters/'
-    
+save_path = global_settings.path_to_sim_output + 'clusterRates_numActiveClusters/'   
 fig_path = global_settings.path_to_sim_figures + 'clusterRates_numActiveClusters/'
     
-
-#%% simulations params
-
-load_from_simParams = True
-
-#%% simulation details always specified
-#sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
-sweep_param_name = 'zeroMean_sd_nu_ext_ee'
+#%% simulation details that always need to be specified
+sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
+#sweep_param_name = 'zeroMean_sd_nu_ext_ee'
 #sweep_param_name = 'same_eachClustersd_nu_ext_e_pert'
 net_type = 'baseEIclu'
 #net_type = 'baseHOM'
-nNetworks = 5
+nNetworks = 10
+
+#%% whether or not to load simulation parameters from simParams file
+load_from_simParams = True
    
-#%% if loading from simParams file, give simParams_fname
-#simParams_fname = 'simParams_051325_clu'
-#simParams_fname = 'simParams_012425_clu'
-simParams_fname = 'simParams_050925_clu'
+#%% if loading from simParams file, give name of simParams file to use
+simParams_fname = 'simParams_051325_clu'
+#simParams_fname = 'simParams_050925_clu'
 
-#%% if not loading from sim params file, need to specify different information
-
+#%% if not loading from simParams file, need to specify different information
 simID = 113020232105
 nTrials = 30
 nStim = 5
@@ -58,7 +46,6 @@ burnTime_end = 0.1
 window_step = 1e-3
 window_std = 25e-3
 rate_thresh_array = np.array([0,1])
-
 
 #%% cluster
 maxCores = 48

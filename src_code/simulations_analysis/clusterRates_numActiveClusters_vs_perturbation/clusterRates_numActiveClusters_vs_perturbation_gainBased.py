@@ -1,8 +1,3 @@
-'''
-compute the rate of active clusters and the number of active clusters at each
-point in time during baseline period of simulations
-'''
-
 
 #-------------------- basic imports ----------------------------------------------#
 
@@ -40,8 +35,6 @@ from fcn_compute_firing_stats import fcn_compute_clusterActivation
 load_from_simParams = settings.load_from_simParams
 load_path = settings.load_path
 save_path = settings.save_path
-fig_path = settings.fig_path
-
     
 #-------------------- parameters ----------------------------------------------#
 net_type = settings.net_type
@@ -382,7 +375,6 @@ parameters = {}
 
 parameters['load_path'] = load_path
 parameters['save_path'] = save_path
-parameters['fig_path'] = fig_path
 parameters['simID'] = simID
 parameters['net_type'] = net_type
 parameters['nNets'] = nNets
