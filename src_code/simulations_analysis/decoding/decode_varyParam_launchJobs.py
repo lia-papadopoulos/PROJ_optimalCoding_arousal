@@ -53,11 +53,10 @@ if load_from_simParams == True:
 simul_jobs = round(maxCores/cores_per_job)
 os.system("tsp -S %s" % simul_jobs)
 
-
 # number of parameter values
 nParam_vals = np.size(swept_params_dict['param_vals1'])
 
-# loop over swept parameter, networks and launch jobs
+# loop over ensemble size, arousal, networks, and window size and launch parallel jobs
 for ind_ensembleSize in range(0,len(ensembleSize_vals)):
                 
     ensembleSize = ensembleSize_vals[ind_ensembleSize]
@@ -66,21 +65,17 @@ for ind_ensembleSize in range(0,len(ensembleSize_vals)):
             
         sweep_param_str = fcn_set_sweepParam_string(n_sweepParams, sweep_param_name, swept_params_dict, indParam) 
             
-        
         for ind_network in range(indNet_start,nNetworks,1):
-            
             
             for ind_windL in range(0,len(windL_vals)):
                 
                 windL = windL_vals[ind_windL]
                     
                     
-                # COMMAND TO RUN
                 command = "tsp python decode_varyParam_master.py " \
                           "--sweep_param_name %s '--sweep_param_str_val' %s --ind_network %d --windL %f --ensembleSize %d " \
                           % (sweep_param_name, sweep_param_str, ind_network, windL, ensembleSize)
     
-                # SUBMIT JOBS
                 os.system(command) 
 
     

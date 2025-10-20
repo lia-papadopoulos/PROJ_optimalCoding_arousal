@@ -1,4 +1,4 @@
-
+#%% imports
 
 import sys
 import numpy as np
@@ -7,9 +7,11 @@ from scipy.io import savemat
 import argparse
 import importlib
 
+#%% decoding settings file
 import decode_settings as settings
-func_path = settings.func_path
 
+#%% functions
+func_path = settings.func_path
 sys.path.append(func_path)
 from fcn_compute_firing_stats import fcn_compute_spkCounts
 from fcn_compute_firing_stats import Dict2Class
@@ -17,15 +19,13 @@ from fcn_decoding import fcn_repeated_stratified_kFold_crossVal
 from fcn_make_network_cluster import fcn_compute_cluster_assignments
 from fcn_decoding import fcn_draw_neurons
 
-
-#%% SETUP
+#%% setting up
 
 # load settings
 load_from_simParams = settings.load_from_simParams
 net_type = settings.net_type
 load_path = settings.load_path
 save_path = settings.save_path
-
 burnTime = settings.burnTime
 windStep = settings.windStep
 classifier= settings.classifier
@@ -75,10 +75,9 @@ if load_from_simParams == True:
     del s_params
 
 
-#%% SET PARAMETERS THAT CAN BE PASSED IN
+#%% set parameters that can be passed through argparse
     
 parser = argparse.ArgumentParser() 
-
 
 # swept parameter name
 parser.add_argument('-sweep_param_name', '--sweep_param_name', \
@@ -102,7 +101,7 @@ parser.add_argument('-ind_network', '--ind_network', type=int, required=True)
 args = parser.parse_args()
 
 
-#%% GET ARG PARSER VARIABLES FOR LATER USE
+#%% quantities from argparse
 
 # name of swept parameter
 sweep_param_name = args.sweep_param_name
@@ -115,8 +114,7 @@ windL = args.windL
 # ensemble size
 ensembleSize = args.ensembleSize
 
-#%% SET FILENAMES
-
+#%% filenames
 
 if sweep_param_name == 'stim_rel_amp':
     fname = ( '%s%s_%s_sweep_%s_network%d_IC%d_stim%d_simulationData.mat')
@@ -134,18 +132,17 @@ else:
 filename = ( (fname) %  (params_tuple) )
 
 
-#%% LOAD ONE SIMULATION TO SET EVERYTHING UP
+#%% settin gup
 
 # load data
-data = loadmat(filename, simplify_cells=True)   
+data = loadmat(filename, simplify_cells=True)  
+ 
 # cluster sizes
-
 if 'popSize_E' in data:
     clustSize_E = data['popSize_E']
 else:
     clustSize_E = data['clust_sizeE']
     
-
 if 'popSize_I' in data:
     clustSize_I = data['popSize_I']
 else:
@@ -171,16 +168,12 @@ Nwindows = np.size(t_window)
 # baseline windows
 baseWindow = np.nonzero( (t_window >= burnTime) & (t_window <= stimOn) )[0]
 
-#%% COMPUTE SPIKE COUNTS OF EACH CELL ACROSS TIME, FOR EACH TRIAL AND STIMULUS
-#   CONDITION
+#%% compute spike counts of each cell as a function of time, and for each trial and stimulus
 
-# all 
 all_spkCnts_E = np.zeros((Nwindows, Ne, nTrials, nStim))
-
 all_stimCells = np.array([])
 
 Ecluster_inds, _ = fcn_compute_cluster_assignments(clustSize_E, clustSize_I)
-
 
 for indTrial in range(0,nTrials,1):
     
@@ -212,7 +205,7 @@ for indTrial in range(0,nTrials,1):
         spkCounts_E, _, _ = fcn_compute_spkCounts(s_params, spikes, burnTime, windL, windStep)       
         all_spkCnts_E[:, :, indTrial, indStim] = spkCounts_E
         
-# cells with good firing rate
+        
 trialAvg_rate = np.mean(all_spkCnts_E, axis=(2,3))/windL
 avg_baselineRate = np.mean(trialAvg_rate[baseWindow, :], 0)
 goodRate_cells = np.nonzero(avg_baselineRate >= rate_thresh)[0]
@@ -221,7 +214,7 @@ all_stimCells = np.unique(all_stimCells).astype(int)
 all_stimCells = np.intersect1d(goodRate_cells, all_stimCells)            
 
 
-#%% DECODING
+#%% RUN DECODING
 
 # initialize arrays for decoding analysis
 accuracy_samples = np.zeros((Nwindows, nSamples))
@@ -230,11 +223,9 @@ sd_accuracy_shuffle_samples = np.zeros((Nwindows, nSamples))
 lowPercentile_accuracy_shuffle_samples = np.zeros((Nwindows, nSamples))
 highPercentile_accuracy_shuffle_samples = np.zeros((Nwindows, nSamples))
 p_accuracy_samples =  np.zeros((Nwindows, nSamples))
-#confusion_mat_samples = np.zeros((nStim,nStim,Nwindows, nSamples))
-
 subsampled_cells = np.zeros((ensembleSize, nSamples))
 
-#---------------LOOP OVER RANDOM DRAWS OF NEURONS -----------------------------#
+# loop over different random cell subsamples
 for indSample in range(0, nSamples):
 
     # subsample from excitatory cells
@@ -250,11 +241,9 @@ for indSample in range(0, nSamples):
     subsampled_cells[:, indSample] = ensembleInds
 
 
-    #---------------LOOP ACROSS TIME WINDOWS---------------------------------------#
+    # loop over time windows
     for tInd in range(0,Nwindows,1):
-        
-        #---------------SETUP FOR DECODING-----------------------------------------#
-        
+                
         # initialize array to hold spike count data for all trials, stim conditions, 
         # and cells in the ensemble
         X = np.zeros((nTrials*nStim, ensembleSize))
@@ -277,7 +266,7 @@ for indSample in range(0, nSamples):
                 classLabels[rowInd] = indStim    
                 
                 
-        #---------------RUN DECODING-------------------------------------------# 
+        # run the decoding
         accuracy_samples[tInd, indSample], \
         mean_accuracy_shuffle_samples[tInd, indSample], sd_accuracy_shuffle_samples[tInd, indSample], \
         lowPercentile_accuracy_shuffle_samples[tInd, indSample], \
@@ -288,7 +277,7 @@ for indSample in range(0, nSamples):
                                                    compute_shuffleDist, nShuffles, \
                                                    shuffle_percentile, lda_solver)
 
-#%% AVERAGE OVER SAMPLES
+#%% average
 
 accuracy = np.mean(accuracy_samples, 1)
 mean_accuracy_shuffle = np.mean(mean_accuracy_shuffle_samples, 1)
@@ -297,8 +286,8 @@ lowPercentile_accuracy_shuffle = np.mean(lowPercentile_accuracy_shuffle_samples,
 highPercentile_accuracy_shuffle = np.mean(highPercentile_accuracy_shuffle_samples, 1)
 p_accuracy = np.mean(p_accuracy_samples, 1)
 
-    
-#%% SAVE DATA
+
+#%% save the results
 
 parameters_dictionary = {'simID':               simID, \
                          'net_type':            net_type, \
