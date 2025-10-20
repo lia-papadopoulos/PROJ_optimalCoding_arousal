@@ -1,7 +1,6 @@
 
 
-#%%
-
+#%% imports
 import sys
 import numpy as np
 from scipy.io import loadmat
@@ -9,22 +8,22 @@ from scipy.io import savemat
 import argparse
 import importlib
 
-import FF_evoked_vs_perturbation_settings as settings
-func_path = settings.func_path
+#%% settings
+import FF_settings as settings
 
+#%% functions
+func_path = settings.func_path
 sys.path.append(func_path)
 from fcn_compute_firing_stats import fcn_compute_spkCounts
 from fcn_compute_firing_stats import Dict2Class
 
 
 #%% unpack settings
-
 load_from_simParams = settings.load_from_simParams
 net_type = settings.net_type
 load_path = settings.load_path
 save_path = settings.save_path
 sweep_param_name = settings.sweep_param_name
-
 nNetworks = settings.nNetworks
 windL = settings.windL
 windStep = settings.windStep
@@ -62,10 +61,10 @@ if load_from_simParams == True:
 
 
 
-#%% ARGPARSER
+#%% argparser
 
+# initialize
 parser = argparse.ArgumentParser() 
-
 
 # swept parameter name + value as string
 parser.add_argument('-sweep_param_str_val', '--sweep_param_str_val', \
@@ -73,7 +72,6 @@ parser.add_argument('-sweep_param_str_val', '--sweep_param_str_val', \
     
 # index of swept parameter
 parser.add_argument('-param_indx', '--param_indx', type=int)    
-
 
 # arguments of parser
 args = parser.parse_args()
@@ -87,7 +85,7 @@ sweep_param_str_val = args.sweep_param_str_val
 inputParam_indx = args.param_indx
 
 
-#%% LOAD ONE SIMULATION TO SET EVERYTHING UP
+#%% load one simulation to set everything up
 
 # fname begin
 fname_begin = ( '%s_%s_sweep_%s' % (simID, net_type, sweep_param_str_val) )
@@ -120,14 +118,13 @@ spkCounts_E, spkCounts_I, t_window = fcn_compute_spkCounts(s_params, spikes, 0, 
 n_windows = len(t_window)
 
 
-#%% COMPUTE SPIKE COUNTS OF EACH CELL ACROSS TIME, FOR EACH TRIAL AND STIMULUS CONDITION
+#%% RUN THE FANO FACTOR ANALYSIS
 
 fanofactor = np.ones((N, nStim, nNetworks, n_windows))*np.nan
 
 avg_spkCount = np.ones((N, nStim, nNetworks, n_windows))*np.nan
 
 for indNetwork in range(0, nNetworks, 1):
-        
     
     for indStim in range(0,nStim,1):
         
@@ -152,7 +149,6 @@ for indNetwork in range(0, nNetworks, 1):
             s_params = Dict2Class(data['sim_params'])
             spikes = data['spikes']
             
-            
             # spike counts
             spkCounts_E, spkCounts_I, t_window = fcn_compute_spkCounts(s_params, spikes, 0, windL, windStep)       
             
@@ -161,14 +157,14 @@ for indNetwork in range(0, nNetworks, 1):
             
             spkCounts_allTrials[:, indTrial, :] = all_spkCounts
                                           
-      
+        # fano factor
         fanofactor[:, indStim, indNetwork, :] = np.var(spkCounts_allTrials,1)/np.mean(spkCounts_allTrials,1)
 
+        # avge spk count
         avg_spkCount[:, indStim, indNetwork, :] = np.mean(spkCounts_allTrials,1)
 
-            
 
-#%% SAVE DATA
+#%% save the results
 
 parameters_dictionary = {'simID':               simID, \
                          'net_type':            net_type, \

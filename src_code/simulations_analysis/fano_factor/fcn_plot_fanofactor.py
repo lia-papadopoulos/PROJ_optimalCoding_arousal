@@ -1,23 +1,17 @@
 
-"""
-helper functions for plotting the fano factor
-"""
 
 #%% basic imports
 
 import sys
 import numpy as np
-from scipy.io import loadmat
 
 sys.path.append('../../')
 import global_settings
 
 sys.path.append(global_settings.path_to_src_code + 'data_analysis/')     
-from fcn_SuData_analysis import fcn_significant_cells
-from fcn_SuData_analysis import fcn_significant_cells_responseSign
 
 
-#%%
+#%% get tone-responsive units that also pass rate cut
 
 def fcn_sigUnits_pass_rateCut(units_pass_rate_cut, all_sig_units, sig_units_eachFreq, nStim):
 
@@ -88,7 +82,7 @@ def fcn_avg_quantity_freq_units(quantity, units_eachFreq):
     return avg_quantity
 
 
-#%% combine vector quantity across sessions
+#%% combine quantity across sessions
 
 # quantity:     object array of size (nSessions, )
 # quantity[i]:  array of size (n_i, )
@@ -111,7 +105,6 @@ def fcn_combine_vecQuantity_overNetworks(quantity):
 # quantity          object array of size (nSessions, nPupil)
 # quantity[i,j]     array of size (n_i, )
 
-
 def fcn_combine_vecQuantity_low_high_pupil_overNetworks(quantity):    
     
     
@@ -119,77 +112,6 @@ def fcn_combine_vecQuantity_low_high_pupil_overNetworks(quantity):
     quantity_allSessions_highPupil = fcn_combine_vecQuantity_overNetworks(quantity[:, -1])
     
     return quantity_allSessions_lowPupil, quantity_allSessions_highPupil
-    
-
-#%% compute significantly responding cells
-
-
-def fcn_sig_cells_allStim(nCells, psth_path, simID, net_type, sweep_param_name, sweep_param_vals, \
-                          indNetwork, nStim, stim_shape, stim_rel_amp, windL, tSig, sig_level, sig_type):
-
-    fname_end = ( '_stimType_%s_stim_rel_amp%0.3f_' % (stim_shape, stim_rel_amp) )
-    
-
-    base_rate = np.zeros((nCells, nStim, len(sweep_param_vals)))
-    all_sig_cells = np.array([])
-    significant_cells_eachStim = np.zeros((nStim), dtype='object')
-    
-    for indStim in range(0, nStim):
-    
-        
-        # psth data
-        data = loadmat((psth_path +  '%s_%s_sweep_%s_network%d_stim%d' + fname_end + '_psth_windSize%0.3fs.mat') % \
-                       (simID, net_type, sweep_param_name, indNetwork, indStim, windL), simplify_cells=True)
-            
-
-        # UNPACK PSTH         
-        base_window = data['parameters']['base_window']
-        stim_window = data['parameters']['stim_window']  
-        t_window = data['bin_times']  
-        trialAvg_psth = data['trialAvg_psth_allBaseMod']
-        trialAvg_gain = data['trialAvg_gain_allBaseMod']
-        trialAvg_psth_eachBaseMod = data['trialAvg_psth_eachBaseMod']
-        psth_pval_corrected = data['psth_pval_corrected']
-
-        
-        # baseline time windows
-        base_bins = np.nonzero( (t_window <= base_window[1]) & (t_window >= base_window[0]) )[0]
-        
-        for indCell in range(0, nCells):
-            
-            for indBaseMod in range(0, len(sweep_param_vals)):
-        
-                # time average baseline firing rate
-                base_rate[indCell, indStim, indBaseMod] = np.mean(trialAvg_psth_eachBaseMod[indCell, base_bins, indBaseMod]) # N x nBaseMod
-        
-
-        # significance of stimulus response
-        _, sig_cells = \
-            fcn_significant_cells(psth_pval_corrected, \
-                                  tSig, t_window, \
-                                      trialAvg_psth, \
-                                          base_window, stim_window, sig_level)
-                
-        sig_cells_pos, sig_cells_neg = fcn_significant_cells_responseSign(sig_cells, t_window, trialAvg_gain, base_window, stim_window)
-                
-        if sig_type == 'all':
-            significant_cells_eachStim[indStim] = sig_cells.copy()
-            all_sig_cells = np.append(all_sig_cells, sig_cells)            
-        elif sig_type == 'pos':
-            significant_cells_eachStim[indStim] = sig_cells_pos.copy()
-            all_sig_cells = np.append(all_sig_cells, sig_cells_pos)
-        elif sig_type == 'neg':
-            significant_cells_eachStim[indStim] = sig_cells_neg.copy()
-            all_sig_cells = np.append(all_sig_cells, sig_cells_neg)
-        else:
-            sys.exit('unknown value for sig_type')
-
-    # save all signficant cells
-    significant_cells = np.unique(all_sig_cells).astype(int)
-
-    return significant_cells, significant_cells_eachStim, base_rate
-
-
 
 #%% average fano factor timecourse over specific set of units for each stimulus
 

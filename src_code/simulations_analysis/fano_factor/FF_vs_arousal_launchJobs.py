@@ -7,7 +7,7 @@ import sys
 import importlib
 
 #%% from settings
-import FF_evoked_vs_perturbation_settings as settings
+import FF_settings as settings
 func_path0 = settings.func_path0
 func_path = settings.func_path
 sim_params_path = settings.sim_params_path
@@ -34,6 +34,7 @@ else:
     
 
 #%% load sim parameters
+
 if load_from_simParams == True:
     # load sim parameters
     params = importlib.import_module(simParams_fname) 
@@ -52,21 +53,16 @@ if load_from_simParams == True:
 simul_jobs = round(maxCores/cores_per_job)
 os.system("tsp -S %s" % simul_jobs)
 
-
-#%% LAUNCH JOBS
-
 # number of parameter values
 nParam_vals = np.size(swept_params_dict['param_vals1'])
 
-# loop over swept parameter, networks and launch jobs
+# loop over arousal
 for param_indx in range(0, nParam_vals):
             
     # swept param label
     sweep_param_str = fcn_set_sweepParam_string(n_sweepParams, sweep_param_name, swept_params_dict, param_indx) 
         
-    # COMMAND TO RUN
-    command = " tsp python FFRaw_preEvoked_evoked_vs_perturbation_timecourse.py --sweep_param_str_val %s --param_indx %d " % (sweep_param_str, param_indx)
-
-    # SUBMIT JOBS
+    # run FF analysis
+    command = " tsp python FF_vs_arousal.py --sweep_param_str_val %s --param_indx %d " % (sweep_param_str, param_indx)
     os.system(command) 
 
