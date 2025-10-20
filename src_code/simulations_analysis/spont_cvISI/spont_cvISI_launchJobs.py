@@ -6,7 +6,7 @@ import sys
 import importlib
 
 #%% from settings
-import spont_cvISI_vsPerturbation_settings as settings
+import settings as settings
 
 #%% functions
 func_path0 = settings.func_path0

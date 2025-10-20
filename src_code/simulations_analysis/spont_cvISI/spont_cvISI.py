@@ -9,7 +9,7 @@ import argparse
 import importlib
 
 #%% settings
-import spont_cvISI_vsPerturbation_settings as settings
+import settings as settings
 
 #%% functions
 func_path = settings.func_path
