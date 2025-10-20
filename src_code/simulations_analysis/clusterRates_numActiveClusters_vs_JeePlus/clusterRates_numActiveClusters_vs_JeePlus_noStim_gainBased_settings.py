@@ -8,22 +8,13 @@ import global_settings
 
 #%% paths
 
-
 sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
-
 func_path1 = global_settings.path_to_src_code + 'functions/'
-
 func_path2 = global_settings.path_to_src_code + 'run_simulations/'
-
 load_path = global_settings.path_to_sim_output + ''
-
-save_path = global_settings.path_to_sim_output + 'clusterRates_numActiveClusters_sweepJeePlus/'
+save_path = global_settings.path_to_sim_output + 'clusterRates_numActiveClusters_sweepJeePlus/'   
     
-fig_path = global_settings.path_to_sim_figures + 'clusterRates_numActiveClusters_sweepJeePlus/'
-    
-
 #%% simulation params
-   
 simParams_fname = 'simParams_041725_clu_varyJEEplus'
 sweep_param_name = 'JplusEE_sweep'
 net_type = 'baseEIclu'
