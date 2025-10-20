@@ -1,4 +1,3 @@
-# LAUNCH JOBS FOR PARAMETER SWEEP
 
 
 #%% imports
@@ -55,15 +54,12 @@ os.system("tsp -S %s" % simul_jobs)
 # number of parameter values
 nParam_vals = np.size(swept_params_dict['param_vals1'])
 
-# loop over swept parameter, networks and launch jobs
+# loop over swept parameters and launch jobs
 for param_indx in range(0, nParam_vals):
             
     sweep_param_str = fcn_set_sweepParam_string(n_sweepParams, sweep_param_name, swept_params_dict, param_indx) 
 
-    
-    # COMMAND TO RUN
     command = " tsp python clusterTimescale_vs_perturbation.py --sweep_param_str_val %s " % (sweep_param_str)
 
-    # SUBMIT JOBS
     os.system(command) 
 
