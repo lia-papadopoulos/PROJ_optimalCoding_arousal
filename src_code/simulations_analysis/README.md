@@ -1,67 +1,94 @@
 
 # Overview
 
-`src_code/simulations_analysis/` contains code to analyze the model simulations. The code is organized into different subdirectories, where each subdirectory corresponds to a particular analysis. Below, we provide a brief description of each subdirectory in `simulations_analysis/`. We then go over one example in detail.
+`src_code/simulations_analysis/` contains code to analyze the model simulations. The code is organized into different subdirectories, where each subdirectory corresponds to a different analysis. Below, we provide a brief description of each subdirectory in `simulations_analysis/`. We then explain how to run one analysis in detail.
 
 ## Subdirectories
 
 Each subdirectory in `simulations_analysis/` corresponds to a different analysis. 
 
-### cellRates_vs_perturbation
+### cellRates_vs_perturbation/
 
 Contains code to compute relationships between single-cell firing rates and arousal level (associated with Fig. S2F,G; Fig. S3C).
 
-1. `settings.py`: file where all paths and parameters for the analysis are set
-2. `singelCell_tuning_to_perturbation.py`: script that loads in `settings.py` and then runs and saves the analysis
+1. `settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results. 
+2. `singelCell_tuning_to_perturbation.py`: Runs and saves the analysis for the parameters in `settings.py`
 
-### clusterRates_numActiveClusters_vs_JeePlus
+### clusterRates_numActiveClusters_vs_JeePlus/
+
+Contains code to compute cluster firing rates and the number of active clusters as a function of the intracluster E-to-E connection strength, JeePlus (associated with Fig. S5B).
+
+1. `clusterRates_numActiveClusters_vs_JeePlus_noStim_gainBased_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results. 
+2. `clusterRates_numActiveClusters_vs_JeePlus_noStim_gainBased.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a particular value of JeePlus.
+3. `clusterRates_numActiveClusters_vs_JeePlus_noStim_gainBased_launchJobs.py`: Loads in simulation info based on the settings file, and for each value of JeePlus in the parameter sweep, runs `clusterRates_numActiveClusters_vs_JeePlus_noStim_gainBased.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each value of JeePlus). The user must specify ahead of time the number of cores to use for each job and how many jobs to run simultaneously.
+
+### clusterRates_numActiveClusters_vs_perturbation/
+
+Contains code to compute cluster firing rates and the number of active clusters as a function of arousal (associated with Fig. 6B; Fig. S3F; Fig. S5C; ).
+
+1. `clusterRates_numActiveClusters_vs_perturbation_gainBased_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  
+2. `clusterRates_numActiveClusters_vs_perturbation_gainBased.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a particular arousal level. 
+3. `clusterRates_numActiveClusters_vs_perturbation_gainBased_launchJobs.py`: Loads in simulation info based on the settings file, and for each arousal level in the parameter sweep, runs `clusterRates_numActiveClusters_vs_perturbation_gainBased.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each arousal level). The user must specify ahead of time the number of cores to use for each job and how many jobs to run simultaneously.
+
+### clusterTimescale/
+
+Contains code to compute cluster activation and interactive timescales as a function of arousal (associated with Fig. 6G; Fig. S36)
+
+1. `clusterTimescale_vs_perturbation_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  
+2. `clusterTimescale_vs_perturbation.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a particular arousal level.  
+3. `clusterTimescale_vs_perturbation_launchJobs.py`: Loads in simulation info based on the settings file, and for each arousal level in the parameter sweep, runs `clusterTimescale_vs_perturbation.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each arousal level). The user must specify ahead of time the number of cores to use for each job and how many jobs to run simultaneously.
 
 
+### decoding/
 
+Contains code to run decoding analyses as a function of arousal and for different ensemble sizes (associated with Fig. 5E,F Fig. S3E; Fig. S4A,B)
 
-### Files that specify parameter sets associated with different analyses
+1. `decode_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  
+2. `decode_varyParam_master.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a particular arousal level, network realization, and ensemble size. 
+3. `decode_varyParam_launchJobs.py`: Loads in simulation info based on the settings file, then loops over arousal level, network realizations, and ensemble size and runs `decode_varyParam_master.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each combination of the arousal level, network realization, and ensemble size). The user must specify ahead of time the number of cores to use for each job and how many jobs to run simultaneously.
 
-1. `simParams_041725_clu_varyJEEplus.py`: simulation parameters associated with Fig. S5A,B  
-2. `simParams_050925_clu.py`: simulation parameters associated with Fig. S3  
-3. `simParams_051325_clu_spont.py`: simulation parameters associated with Fig. S6A-C  
-4. `simParams_051325_clu_spontLong.py`: simulation parameters associated with Fig. S6G  
-5. `simParams_051325_clu.py`: simulation parameters associated with Fig. 3A,C; Fig. 4A-D, Fig. 5C,E, Fig. 6A,B,F, Fig. 7A-C, Fig. 8A-C, Fig. S2F, Fig. S4A, Fig. S5C, Fig. S7H-J
-6. `simParams_051325_hom.py`: simulation parameters associated with Fig. 3B,C; Fig. 4A, Fig. 5D,F, Fig. S2G, Fig. S4B  
+### deltaRate_selective_nonSelective/
 
-### Files for simulation setup  
-    
-`fcn_simulation_setup.py`: set of functions that are used to set up simulations given model parameters
-   
-`paths_file.py`: specifies paths and which set of parameters to use for simulations  
+Contains code to run the cluster signal analysis (associated with Fig. 7B)
 
-### Files for running simulations
+`deltaRate_selective_nonSelective.py`: Script that specifies all simulation and analysis parameters, and that runs and saves the analysis. 
 
-`run_testSimulation.py`: script for running a single simulation (see below for usage)  
+### dprime/
 
-`masterSim.py`: main script for running batch simulations (see below for usage)
+Contains code to compute the single-cell neural discriminability index as a function of arousal (associated with Fig. 5C,D; Fig. S3D)
 
-`launchJobs.py`: calls `masterSim.py` and submits jobs to a computing cluster using task spooler (see below for usage)
+1. `dPrime_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  
+2. `singleCell_dPrime.py`:  Main analysis script; loads the settings file and then runs and saves the analysis for particular arousal level.
+3. `singleCell_dPrime_launchJobs.py`: Loads in simulation info based on the settings file and for each arousal level, runs `singleCell_dPrime.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each arousal level). The user must specify ahead of time the number of cores to use for each job and how many jobs to run simultaneously.
+
+### fano_factor/
+
+Contains code to run the Fano factor analyses as a function of arousal (associated with Fig. 8A-C; Fig. S3H; Fig.S7H-J)
+
+1. `fcn_plot_fanofactor.py`: Set of functions to help with plotting Fano factor (used in `src_code/manuscript_plotting_scripts/`)
+2. `FF_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  
+3. `FF_vs_arousal.py`: Main analysis script; loads the settings file and then runs and saves the Fano factor analysis for a particular arousal level.  
+4. `FF_vs_arousal_launchJobs.py`: Loads in simulation info based on the settings file, then loops over arousal levels and runs `FF_vs_arousal.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each arousal level). The user must specify ahead of time the number of cores to use for each job and how many jobs to run simultaneously.
+
+### numActive_targeted_nontargeted_clusters/
+
+Contains code to run the cluster reliability analysis (associated with Fig. 7C), as well as several supplementary analyses that are not in the manuscript.
+
+1. `settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  
+2.  `numActive_targeted_nontargeted_clusters_vs_perturbation_gainBased.py`: Main analysis script; loads the settings file and then runs and saves the analysis for particular arousal level.
+3. `numActive_targeted_nontargeted_clusters_vs_perturbation_gainBased_launchJobs.py`: Loads in simulation info based on the settings file and for each arousal level, runs `numActive_targeted_nontargeted_clusters_vs_perturbation_gainBased_launchJobs.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each arousal level). The user must specify ahead of time the number of cores to use for each job and how many jobs to run simultaneously.
+
+### psth/
+
+Contains code to compute the amplitude and significance of stimulus-evoked responses using trials combined across all arousal levels. The results of this analysis are used to compute the pairwise tuning similarity and to determine the set of the cells that respond significantly to at least one stimulus for the clustering analyses.
+
+1. `psth_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  
+2. `compute_psth.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a particular network and stimulus realization.
+3. `compute_psth_launchJobs.py`:  Loads in simulation info based on the settings file, then runs `compute_psth.py` (using task spooler) for each network and stimulus realization. This enables the user to run parallel jobs on a computing cluster (one job for each combination of network and stimulus realization). The user must specify ahead of time the number of cores to use for each job and how many jobs to run simultaneously.
+
 
 ## Usage
 
-### Running a test simulation 
-
-`run_testSimulation.py` is used to run a single simulation associated with one of the parameter sets described above. The basic steps to do this are:  
-
-1. Open `../global_settings.py` and set global absolute paths for your project  
-2. Open `paths_file.py` and set:  
-	a. 'sim_params_name' (name of simulation parameters file that you want to run)  
-	b. 'save_path' (where to save simulation output)  
-3. Open `run_testSimulation.py` and specify:  
-    'externalInput_seed': random seed for setting up external inputs  
-    'stimClusters_seed' and 'stimNeurons_seed': random seeds for setting up stimulation  
-    'networkSeed': random seed for setting up the network connectivity  
-    'arousalLevel': level of arousal for the simulation (between 0 and 1  )
-3. Run:  
-```
-$ python run_testSimulation.py
-``` 
-    
 
 ### Running batch simulations
 
