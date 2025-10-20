@@ -5,8 +5,26 @@ functions to analyze correlation matrices and clustering structure
 
 import numpy as np
 import sys
-import matplotlib.pyplot as plt
 
+
+#%% fcn_sizeClusters
+
+def fcn_sizeClusters(clusterID):
+    
+    '''
+    compute size of each cluster in the partition
+    '''
+    
+    maxCluster = np.max(clusterID).astype(int)
+    
+    sizeClusters = np.zeros((maxCluster + 1))
+    
+    for indClu in range(0, maxCluster + 1):
+
+        sizeClusters[indClu] = np.size(np.nonzero(clusterID == indClu))
+    
+    
+    return sizeClusters
 
 #%% fcn_sorted_corrMatrix
 
