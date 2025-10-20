@@ -1,9 +1,5 @@
 
-"""
-compute significance of stimulus responses
-"""
-
-# basic imports
+#%% imports
 import sys
 import numpy as np
 from scipy.io import loadmat
@@ -13,10 +9,11 @@ import importlib
 
 # import parameters file
 import psth_settings as settings
+
+#%% functions
 func_path0 = settings.func_path0
 func_path1 = settings.func_path1
 sim_params_path = settings.sim_params_path
-
 sys.path.append(sim_params_path)
 sys.path.append(func_path0)
 sys.path.append(func_path1)
@@ -28,25 +25,21 @@ from fcn_compute_firing_stats import fcn_compute_spkCounts
 from fcn_statistics import fcn_MannWhitney_twoSided
 from fcn_statistics import fcn_Wilcoxon
 
-
 #%% settings
-
 load_path = settings.load_path
 save_path = settings.save_path
 simParams_fname = settings.simParams_fname
 net_type = settings.net_type
 sweep_param_name = settings.sweep_param_name
-
 base_window = settings.base_window
 stim_window = settings.stim_window
 binSize = settings.binSize
 stepSize = settings.stepSize
 burnTime = settings.burnTime
 
-
-
 #%% argparser
 
+# setup
 parser = argparse.ArgumentParser() 
 parser.add_argument('-ind_network', '--ind_network', type=int, default=0)
 parser.add_argument('-ind_stim', '--ind_stim', type=int, default=0)
@@ -116,31 +109,27 @@ base_bins = np.nonzero( (t_window <= base_window[1] + stimOnset)  & (t_window > 
 preStim_wind = np.argmin(np.abs(t_window - stimOnset))
 postStim_wind = np.argmin(np.abs(t_window - (stimOnset + binSize)))
 
-
-
+# print a few things
 print(preStim_wind)
 print(postStim_wind)
 print(t_window[preStim_wind])
 print(t_window[postStim_wind])
 print(base_bins)
 print(evoked_bins)
-
 print(len(base_bins))
 print(len(evoked_bins))
-
 
 # initialize all quantities
 singleTrial_psth = np.zeros((nTrials, N_e + N_i, n_bins, n_baseMod))
 singleTrial_gain = np.zeros((nTrials, N_e + N_i, n_bins, n_baseMod))
-
 psth_pval_allBaseMod = np.ones((N_e + N_i, n_bins))*np.inf
 psth_pval_eachBaseMod = np.ones((N_e + N_i, n_bins, n_baseMod))*np.inf
 pval_preStim_vs_postStim_allBaseMod = np.ones((N_e + N_i))*np.inf
 
 
+#%% MAIN ANALYSIS BLOCK
 
-#------------------------ main analysis block --------------------------------#
-        
+#%% compute stimulus responses        
 
 # loop over baseline modulation values
 for ind_baseMod in range(0, n_baseMod):
@@ -160,14 +149,12 @@ for ind_baseMod in range(0, n_baseMod):
         spikes = data['spikes'] 
         stimOnset = s_params.stim_onset
         
- 
         # spike times
         spike_times = spikes[0,:]
                 
         # neuron IDs
         neuron_IDs = spikes[1,:].astype(int)
         
-                
         # compute rate of each cell vs time
         spkCounts_E, spkCounts_I, _ = fcn_compute_spkCounts(s_params, spikes, burnTime, binSize, stepSize)
         rateE_bins = np.transpose(spkCounts_E/binSize)
@@ -180,18 +167,13 @@ for ind_baseMod in range(0, n_baseMod):
         
             singleTrial_gain[ind_trial, indCell, :, ind_baseMod] = singleTrial_psth[ind_trial, indCell, :, ind_baseMod] - np.mean(singleTrial_psth[ind_trial, indCell, base_bins, ind_baseMod])
             
-            
         print(ind_baseMod, ind_trial)
             
         
-#-----------------------------------------------------------------------------#
-
-# statistical signficance of stimulus response for each cell
-
+#%% compute statistical signficance of stimulus response for each cell
 # combine data across all baseline modulations
-          
-# baseline psth for all trials, time points, baseline modulations
 
+# loop over cells
 for indCell in range((N_e + N_i)):
 
     base_psth =  singleTrial_psth[:, indCell, base_bins, :].flatten()
@@ -215,8 +197,6 @@ for indCell in range((N_e + N_i)):
         
         print(indCell, indT)
         
-        
-
     # compare single trial responses in static baseline window to those in static stimulus window
     preStim_psth = singleTrial_psth[:, indCell, preStim_wind, :].flatten()
     postStim_psth = singleTrial_psth[:, indCell, postStim_wind, :].flatten()
@@ -229,10 +209,7 @@ for indCell in range((N_e + N_i)):
 psth_pval_corrected = psth_pval_allBaseMod*np.size(evoked_bins)       
      
 
-#-----------------------------------------------------------------------------#
-
-# statistical signficance of stimulus response for each cell
-
+#%% compute statistical signficance of stimulus response for each cell
 # consider each baseline modulation separately
         
 for indCell in range((N_e + N_i)):
@@ -265,13 +242,8 @@ for indCell in range((N_e + N_i)):
 psth_pval_eachBaseMod_corrected = psth_pval_eachBaseMod*np.size(evoked_bins)   
         
         
+#%% averages
         
-        
-#------------------------ save the results ------------------------------------#
-        
-        
-# trial average psth and gain
-
 trialAvg_psth_eachBaseMod = np.mean(singleTrial_psth, 0)
 trialAvg_gain_eachBaseMod = np.mean(singleTrial_gain, 0)
     
@@ -285,7 +257,7 @@ trialVar_psth_allBaseMod = np.var(singleTrial_psth, axis = (0, 3) )
 trialVar_gain_allBaseMod = np.var(singleTrial_gain, axis = (0, 3) )     
         
         
-#------------------------ save the results ------------------------------------#
+#%% save the results
 
 parameters_dictionary = {'simID':               simID, \
                          'net_type':            net_type, \
