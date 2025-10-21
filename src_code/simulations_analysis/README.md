@@ -86,6 +86,16 @@ Contains code to compute the amplitude and significance of stimulus-evoked respo
 2. `compute_psth.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a specified network and stimulus realization.
 3. `compute_psth_launchJobs.py`:  Loads in simulation info based on the settings file, then runs `compute_psth.py` (using task spooler) for each network and stimulus realization. This enables the user to run parallel jobs on a computing cluster (one job for each combination of network and stimulus realization). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
 
+### run_MFT/
+
+This directory contains code to run the mean-field analyses of the clustered network model. The code is organized into three different subdirectories, each corresponding to a different analysis in the paper.
+
+#### `run_MFT/arousalSweep/`
+
+1. `run_MFT/arousalSweep/`: 
+2. `run_MFT/JeePlus_sweep/`
+3. `run_MFT/reduced_2cluster_nets/`
+
 
 ### spikeCount_correlations/
 
