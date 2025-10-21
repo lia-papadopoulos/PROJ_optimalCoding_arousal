@@ -1,7 +1,7 @@
 
 # Overview
 
-`src_code/simulations_analysis/` contains code to analyze the model simulations. The code is organized into different subdirectories, where each subdirectory corresponds to a different analysis. Below, we provide a brief description of each subdirectory in `simulations_analysis/`. We then explain how to run one analysis in detail.
+`src_code/simulations_analysis/` contains code to analyze the model simulations. The code is organized into different subdirectories, where each subdirectory corresponds to a different analysis. Below, we provide a brief description of each subdirectory in `simulations_analysis/`. We then explain how to run one analysis in detail. Note that all code is setup to submit batch jobs using task-spooler.
 
 ## Subdirectories
 
@@ -134,7 +134,7 @@ Contains code to compute the spike spectrum of individual cells as a function of
 
 6. Specify parameters that determine which set of simulations to analyze.
 
-a. For Fig. 5C:
+    1. For Fig. 5C:
     
 ```
     simParams_fname = 'simParams_051325_clu'
@@ -143,7 +143,7 @@ a. For Fig. 5C:
     nNetworks = 10   
 ```
 
-b. For Fig. 5D:
+    2. For Fig. 5D:
     
 ```
     simParams_fname = 'simParams_051325_hom'
@@ -152,7 +152,7 @@ b. For Fig. 5D:
     nNetworks = 10   
 ```    
 
-c. For Fig. S3D:
+    3. For Fig. S3D:
     
 ```
     simParams_fname = 'simParams_050925_clu'
