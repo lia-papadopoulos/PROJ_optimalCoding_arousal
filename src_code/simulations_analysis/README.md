@@ -143,8 +143,7 @@ Contains code to compute the spike spectrum of individual cells as a function of
     nNetworks = 10   
 ```
 
-    2. For Fig. 5D:
-    
+&nbsp; &nbsp; a. For Fig. 5D:
 ```
     simParams_fname = 'simParams_051325_hom'
     sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
