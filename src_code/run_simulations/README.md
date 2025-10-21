@@ -53,14 +53,15 @@ $ python run_testSimulation.py
 
 ### Running batch simulations
 
-`masterSim.py` and `launchJobs.py` are used to run a complete set of batch simulations associated with one of the parameter sets described above. A given parameters file (e.g., `simParams_051325_clu.py`) contains all model and simulation parameters required for running the batch simulations; this includes specifying which model parameters should be swept over (e.g., to simulate different levels of arousal), as well how many network realizations, initial conditions, and stimulus realizations to run for a fixed set of parameters. `launchJobs.py` takes in the specified parameters file, and for each combination of the swept parameter values, network realization, and initial conditions, it runs `masterSim.py` using task spooler. `masterSim.py` then runs the network simulation for the given parameters and saves the results in a specified output directory (note that the loop over the stimulus realization is done within `masterSim.py`, so this part is not parallelized). The user must specify ahead of time the number of cores to use for each job (i.e., for each call of `masterSim.py`), as well as how many jobs to run simultaneously. The basic steps for running batch simulations are:  
+`masterSim.py` and `launchJobs.py` are used to run a complete set of batch simulations associated with one of the parameter sets described above. A given parameters file (e.g., `simParams_051325_clu.py`) contains all model and simulation parameters required for running the batch simulations; this includes specifying which model parameters should be swept over (e.g., to simulate different levels of arousal), as well how many network realizations, initial conditions, and stimulus realizations to run for a fixed set of parameters. `launchJobs.py` takes in the specified parameters file, and for each combination of the swept parameter values, network realization, and initial conditions, it runs `masterSim.py` using task spooler. `masterSim.py` then runs the network simulation for the given parameters and saves the results in the output directory specified in `../global_settings.py` (note that the loop over the stimulus realization is done within `masterSim.py`, so this part is not parallelized). The user must configure their computing cluster to use a specified number of cores for each job (i.e., for each call of `masterSim.py`), and then set `cores_per_job` in the parameters file equal to that value. In the settings file, the user also specifies the total number cores that can be used simultaneously (`maxCores`). `cores_per_job` and `maxCores` are then used to determine the number of jobs to run simultaneously. The basic steps for running batch simulations are:  
 
 
 1. Open `../global_settings.py` and set global absolute paths for your project  
 2. Open `paths_file.py` and set:  
 	a. 'sim_params_name' (name of simulation parameters file that you want to run)    
 	b. 'save_path' (where to save simulation output)  
-3. Specify the number of cores/job and the number of jobs to run simultaneously using task spooler  
+3. Configure computing cluster to use desired number of cores/job
+3. Specify `cores_per_job` and `maxCores` in the simulation parameters file
 4. Run:
 ```
 $ python launchJobs.py
