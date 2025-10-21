@@ -1,7 +1,6 @@
 
 
-#%%
-
+#%% imports
 import sys
 import numpy as np
 from scipy.io import loadmat
@@ -9,7 +8,10 @@ from scipy.io import savemat
 import argparse
 import importlib
 
-import spont_spikeSpectra_vsPerturbation_settings as settings
+#%% settings
+import spont_spikeSpectra_settings as settings
+
+#%% functions
 func_path = settings.func_path
 sys.path.append(func_path)
 from fcn_compute_firing_stats import fcn_compute_total_spkCount
@@ -17,9 +19,7 @@ from fcn_compute_firing_stats import Dict2Class
 from fcn_compute_firing_stats import mt_specpb_lp
 from fcn_compute_firing_stats import raw_specpb_lp
 
-#%% UNPACK PARAMETERS FILE
-   
-# load settings
+#%% unpack settings
 sim_params_path = settings.sim_params_path
 simParams_fname = settings.simParams_fname
 net_type = settings.net_type
@@ -31,8 +31,7 @@ windL = settings.windL
 dt = settings.dt
 df_array = settings.df_array
 
-#%% load sim parameters
-
+#%% load simulation parameters
 sys.path.append(sim_params_path)
 params = importlib.import_module(simParams_fname) 
 s_params = params.sim_params
@@ -44,9 +43,9 @@ stim_shape = s_params['stim_shape']
 stim_type = s_params['stim_type']
 stim_rel_amp = s_params['stim_rel_amp']
 
+#%% argparser
 
-#%% ARGPARSER
-
+# initialize
 parser = argparse.ArgumentParser() 
 
 # swept parameter name + value as string
@@ -55,24 +54,21 @@ parser.add_argument('-sweep_param_str_val', '--sweep_param_str_val', type=str, r
 # arguments of parser
 args = parser.parse_args()
 
-
 #-------------------- argparser values for later use -------------------------#
 
 # name of swept parameter with value as a string
 sweep_param_str_val = args.sweep_param_str_val
 
 
-#%% FILENAMES
-
+#%% filename
 fname_begin = ( '%s%s_%s_sweep_%s_network%d_IC%d_stim%d_stimType_%s_stim_rel_amp%0.3f_' )
 
 
-#%% LOAD ONE SIMULATION TO SET EVERYTHING UP
+#%% load one simulation to set everything up
 
-
+# parameters
 params_tuple = (load_path, simID, net_type, sweep_param_str_val, 0, 0, 0, stim_shape, stim_rel_amp)
 
-    
 # filename
 filename = ( (fname_begin + 'simulationData.mat') % params_tuple )
 
@@ -89,28 +85,29 @@ spikes = data['spikes']
 N = s_params.N
 Ne = s_params.N_e
 
-#%% setting up for spectra
+#%% setting up 
 
 # bins
 bins = np.arange(0, windL+dt, dt)
+
+# number of frequencies
 nFreq_spectra = int(windL/(2*dt) + 1)
 
-# numbre of df
+# number of df
 n_df = np.size(df_array)
 
-#%% COMPUTE SPIKE COUNTS OF EACH CELL ACROSS TIME, FOR EACH TRIAL AND STIMULUS CONDITION
+#%% MAIN ANALYSIS BLOCK
 
-# ff
+# avg spike count
 avg_spkCount = np.zeros((N, nNetworks, nStim))
 
 # spectra of every cell for each frequency in each pupil block
 power_spectra = np.zeros((N, nNetworks, nStim, nFreq_spectra, n_df, 2))
 norm_power_spectra = np.zeros((N, nNetworks, nStim, nFreq_spectra, n_df, 2))
-
 power_spectra_raw = np.zeros((N, nNetworks, nStim, nFreq_spectra, 2))
 norm_power_spectra_raw = np.zeros((N, nNetworks, nStim, nFreq_spectra, 2))
 
-
+# loop over networks, stimuli, trials
 for indNetwork in range(0, nNetworks, 1):
         
     for indStim in range(0,nStim,1):
@@ -178,7 +175,7 @@ for indNetwork in range(0, nNetworks, 1):
                     raw_specpb_lp(spont_spikes_binned[indCell, :, :], 1/dt, True, 1)
 
 
-#%% SAVE DATA
+#%% save the results
 
 parameters_dictionary = {'load_path':           load_path, \
                          'save_path':           save_path, \

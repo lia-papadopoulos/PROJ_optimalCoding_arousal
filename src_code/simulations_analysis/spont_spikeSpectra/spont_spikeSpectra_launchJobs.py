@@ -1,4 +1,3 @@
-# LAUNCH JOBS FOR PARAMETER SWEEP
 
 #%% imports
 import os
@@ -7,7 +6,7 @@ import sys
 import importlib
 
 #%% from settings
-import spont_spikeSpectra_vsPerturbation_settings as settings
+import spont_spikeSpectra_settings as settings
 func_path0 = settings.func_path0
 func_path = settings.func_path
 sim_params_path = settings.sim_params_path
@@ -15,6 +14,7 @@ sys.path.append(func_path)
 sys.path.append(func_path0)
 sys.path.append(sim_params_path)
 
+#%% functions
 from fcn_simulation_loading import fcn_set_sweepParam_string
 from fcn_simulation_setup import fcn_define_arousalSweep
 
@@ -45,14 +45,12 @@ os.system("tsp -S %s" % simul_jobs)
 # number of parameter values
 nParam_vals = np.size(swept_params_dict['param_vals1'])
 
-# loop over swept parameter, networks and launch jobs
+# loop over arousal and launch jobs
 for indParam in range(0, nParam_vals):
                 
     sweep_param_str = fcn_set_sweepParam_string(n_sweepParams, sweep_param_name, swept_params_dict, indParam) 
         
-    # COMMAND TO RUN
-    command = " tsp python spont_spikeSpectra_vsPerturbation.py --sweep_param_str_val %s " % (sweep_param_str)
+    command = " tsp python spont_spikeSpectra.py --sweep_param_str_val %s " % (sweep_param_str)
 
-    # SUBMIT JOBS
     os.system(command) 
 
