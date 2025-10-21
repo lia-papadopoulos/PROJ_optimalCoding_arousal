@@ -137,13 +137,17 @@ Contains code to compute the spike spectrum of individual cells as a function of
     a. For Fig. 5C:
     
 ```
+
     simParams_fname = 'simParams_051325_clu'
     sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
     net_type = 'baseEIclu'
     nNetworks = 10   
+    
 ```
 
+
     b. For Fig. 5D:
+    
     
 ```
     simParams_fname = 'simParams_051325_hom'
