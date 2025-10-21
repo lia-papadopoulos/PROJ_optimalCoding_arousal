@@ -35,7 +35,7 @@ The `src_code/` directory contains all code required to run the simulations, ana
 
 ### MFT
 
-`src_code/MFT/` contains modules for that are used for the mean-field analyses of the clustered network model.
+`src_code/MFT/` contains modules that are used for the mean-field analyses of the clustered network model.
 
 #### data_analysis
 
