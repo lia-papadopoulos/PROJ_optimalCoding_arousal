@@ -33,7 +33,7 @@ from fcn_SuData import fcn_get_trials_in_pupilBlocks
 #%% PARAMETERS
 
 zscore_withinPupil = settings.zscore_withinPupil
-rateDrift_cellSelection = settings.rateDrift_cellSelection
+base_subtract = settings.base_subtract
 window_length = settings.window_length
 trial_window_evoked = settings.trial_window_evoked
 pupilSize_method = settings.pupilSize_method
@@ -42,9 +42,13 @@ nTrials_thresh = settings.nTrials_thresh
 n_subsamples = settings.n_subsamples
 pupilBlock_size = settings.pupilBlock_size
 pupilBlock_step = settings.pupilBlock_step
-pupilSplit_method = settings.pupilSize_method
+pupilSplit_method = settings.pupilSplit_method
 data_path = settings.data_path
 outpath = settings.outpath
+
+global_pupilNorm = settings.global_pupilNorm
+highDownsample = settings.highDownsample
+cellSelection = settings.cellSelection
 
 #%% USER INPUTS
 
@@ -63,7 +67,7 @@ session_name = args.session_name
 
 #%% GET DATA
 
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection
+data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
 session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
@@ -98,6 +102,9 @@ singleTrial_spikeCounts_base = np.zeros(np.shape(singleTrial_spikeTimes))
 for indCell in range(0, nCells):
     singleTrial_spikeCounts_evoked[:, indCell] = fcn_compute_spkCounts_inWindow(singleTrial_spikeTimes[:,indCell], 0., window_length)
     singleTrial_spikeCounts_base[:, indCell] = fcn_compute_spkCounts_inWindow(singleTrial_spikeTimes[:,indCell], -window_length,0)
+    
+if base_subtract:
+    singleTrial_spikeCounts_evoked = singleTrial_spikeCounts_evoked - singleTrial_spikeCounts_base
 
 #%% compute pupil measure in each trial
 session_info = fcn_compute_pupilMeasure_eachTrial(session_info)
@@ -246,6 +253,9 @@ for indSample in range(0, n_subsamples):
 # averaging
 corr_evoked_allPupil = np.nanmean(corr_evoked_allPupil, axis=(2))
 
+corr_evoked_eachPupil_freqAvg = np.mean(corr_evoked_eachPupil_eachFreq, axis=(3,4))
+corr_evoked_eachPupil_freqAvg_shuffle = np.mean(corr_evoked_eachPupil_eachFreq_shuffle, axis=(3))
+
 corr_base_allPupil = np.nanmean(corr_base_allPupil, axis=(2))
 
 corr_evoked_allPupil_freqAvg = np.nanmean(corr_evoked_allPupil_eachFreq, axis=(2,3))
@@ -271,7 +281,9 @@ params = {'session_path':         data_path, \
           'pupilBlock_step':      pupilBlock_step, \
           'pupilSplit_method':    pupilSplit_method, \
           'nTrials_thresh':       nTrials_thresh, \
-          'rateDrift_cellSelection': rateDrift_cellSelection, \
+          'cellSelection':        cellSelection, \
+          'global_pupilNorm':     global_pupilNorm, \
+          'highDownsample':       highDownsample, \
           'zscore_withinPupil':   zscore_withinPupil}
 
     
@@ -280,8 +292,11 @@ results = {'params':                                params, \
            'avg_pupilSize_evokedTrials':                  avg_pupilSize_evokedTrials, \
            'trialAvg_evoked_spkCount':         trialAvg_evoked_spkCount, \
            'trialAvg_base_spkCount':         trialAvg_base_spkCount, \
+           'corr_evoked_eachPupil_eachFreq':    corr_evoked_eachPupil_eachFreq, \
            'corr_evoked_allPupil':                              corr_evoked_allPupil, \
            'corr_evoked_allPupil_shuffle':                      corr_evoked_allPupil_shuffle,\
+           'corr_evoked_eachPupil_freqAvg':                     corr_evoked_eachPupil_freqAvg, \
+           'corr_evoked_eachPupil_freqAvg_shuffle':             corr_evoked_eachPupil_freqAvg_shuffle, \
            'corr_base_allPupil':                              corr_base_allPupil, \
            'corr_base_allPupil_shuffle':                      corr_base_allPupil_shuffle,\
            'corr_evoked_allPupil_freqAvg':                   corr_evoked_allPupil_freqAvg, \
@@ -292,6 +307,6 @@ results = {'params':                                params, \
 }            
         
 
-
-save_filename = ( (outpath + 'evoked_correlations_pupilPercentile_combinedBlocks_%s_windLength%0.3fs_%s.mat') % (session_name, window_length, data_name) )      
+base_subtract_str = '_baselineSubtract'*base_subtract
+save_filename = ( (outpath + 'evoked_correlations_pupilPercentile_combinedBlocks_%s_windLength%0.3fs_%s%s.mat') % (session_name, window_length, base_subtract_str, data_name) )      
 savemat(save_filename, results) 

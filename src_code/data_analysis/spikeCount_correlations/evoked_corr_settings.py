@@ -32,8 +32,14 @@ func_path2 = global_settings.path_to_src_code + 'functions/'
 # z-scoring
 zscore_withinPupil = True
 
-# rateDrift_cellSelection
-rateDrift_cellSelection = False
+# baseline subtraction
+base_subtract = False
+
+# data params
+global_pupilNorm = False
+highDownsample = False
+cellSelection = ''
+
 
 # trial window
 window_length = 100e-3
@@ -61,6 +67,7 @@ pupilSplit_method = 'percentile'
 linkage_method = 'average'
 fcluster_criterion='distance'
 cells_toKeep = 'allSigCells' 
+#cells_toKeep = 'all'
 rate_thresh = -np.inf
 wind_length_clustering = 100e-3
 sig_level = 0.05
