@@ -1,24 +1,18 @@
 
-"""
-mftParams_2cluster_effective
-
-"""
-
+# basic imports
 import numpy as np
 import sys
 
+# global settings
 sys.path.append('../../../../')
 import global_settings
 
+# parameters
 class mft_params:
 
-    
-    # INIT METHOD
     def __init__(self):     
         
-        #-----------------------------------------------------------------------------
-        # DEFAULTS
-        #-----------------------------------------------------------------------------   
+        # mft parameters
         self.newRun = False
         self.n_Epops = 3
         self.n_Ipops = 1
@@ -31,9 +25,7 @@ class mft_params:
         self.nSteps_MFT_DynEqs = 30000
         self.nu_vec_selective = [60, 0, 1, 16]
         self.nu_vec_nonselective = [30, 30, 1, 16]
-    
-        print('mft_params class initialized')
-                
+                    
         # JpluseEE values
         self.JplusEE_array = np.arange(15, 22.05, 0.05)
 
@@ -42,7 +34,7 @@ class mft_params:
         self.func_path2 = global_settings.path_to_src_code + 'MFT/funcs_MFT/basicEI_networks/'
         
         # path to simParams (used when newRun = True)
-        self.simParams_path = global_settings.path_to_src_code + 'simulations_analysis/master_MFT/reduced_2cluster_nets/arousalSweep_noDisorder/'
+        self.simParams_path = global_settings.path_to_src_code + 'simulations_analysis/run_MFT/reduced_2cluster_nets/arousalSweep_noDisorder/'
 
         # filenames
         self.fName_begin = '051300002025_clu'
@@ -52,7 +44,7 @@ class mft_params:
         self.pathName_end_paramData = 'effectiveMFT_sweep_%s_2Ecluster' % self.fName_begin_paramData
         self.pathName_paramData = (global_settings.path_to_2clusterMFT_output + '%s/' % (self.pathName_end_paramData))
 
-        # paths        
+        # outpaths        
         self.fig_outpath = global_settings.path_to_2clusterMFT_figures + 'MFT_sweep_JeePlus_2Ecluster/'
         self.data_outpath = global_settings.path_to_2clusterMFT_output + 'MFT_sweep_JeePlus_2Ecluster/'
         

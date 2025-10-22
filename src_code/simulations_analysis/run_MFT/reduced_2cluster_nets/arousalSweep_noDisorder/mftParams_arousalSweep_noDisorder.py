@@ -1,20 +1,11 @@
 
-"""
-mftParams_arousalSweep_noDisorder
-"""
 
 import numpy as np
 
 class mft_params:
-
     
-    # INIT METHOD
     def __init__(self):     
         
-        #-----------------------------------------------------------------------------
-        # DEFAULTS
-        #-----------------------------------------------------------------------------   
-     
         self.additional_externalVariance = 0.
         self.nSteps_MFT_DynEqs = 100000
         self.dt_MFT_DynEqs = 1e-4
@@ -28,7 +19,3 @@ class mft_params:
         self.inFocus_pops_i = np.array([])
         self.outFocus_pops_e = np.array([2])
         self.outFocus_pops_i = np.array([0])
-
-
-        # PRINT
-        print('mft_params class initialized')

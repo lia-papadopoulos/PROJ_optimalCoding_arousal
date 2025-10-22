@@ -1,14 +1,6 @@
 
-"""
-EFFECTIVE MFT FOR NETWORKS WITH 2 E CLUSTERS
-"""
 
-#%% imports
-
-# import settings
-import effectiveMFT_sweepArousal_noDisorder_settings as settings
-
-# basic imports
+#%% basic imports
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,8 +10,19 @@ from scipy.io import savemat
 from scipy.io import loadmat
 import argparse
 
+#%% import settings
+import effectiveMFT_sweepArousal_noDisorder_settings as settings
+
+#%% for effective mft
+
+rate_min = 0.
+rate_max = 58.
+nBins = 50
+
+
 #%% unpack settings
 
+# paths
 func_path1 = settings.func_path1
 func_path2 = settings.func_path2
 func_path3 = settings.func_path3
@@ -37,7 +40,7 @@ arousal_multFactor = settings.arousal_multFactor
 load_arousalParams_from_settings = settings.load_arousalParams_from_settings
 
 
-#%% load my own functions
+#%% load functions
 
 from mftParams_arousalSweep_noDisorder import mft_params
 
@@ -55,22 +58,23 @@ sys.path.append(simParams_path)
 from simParams_arousalSweep_noDisorder import sim_params
 
 #%% argparser
-# parser
+
+# initialize
 parser = argparse.ArgumentParser() 
-# possible swept parameters used in launch jobs
+# arousal index
 parser.add_argument('-param_indx', '--param_indx', type=int, required=True)
 # arguments of parser
 args = parser.parse_args()
 
-#-------------------- argparser values for later use -------------------------#
+# argparser values for later use
 param_indx = args.param_indx
 
 #%% arousal parameters
 if load_arousalParams_from_settings == True:
-    ### load arousal parameters from settings file
+    ### load arousal parameters from simulation parameters
     swept_params_dict = settings.swept_params_dict
 else:
-    ### load araousal parameters from file
+    ### load araousal parameters from saved file
     arousalParams = loadmat(arousalParams_path + arousalParams_fname, simplify_cells = True)
     swept_params_dict = arousalParams['swept_params_dict_mft']
     ### update arousal parameters based on multiplication factor for reduced network mft
@@ -85,7 +89,7 @@ if param_indx > len(swept_params_dict['param_vals1']) - 1:
     sys.exit(0)
 
 
-#%% initialize simulation and analysis parameters classes
+#%% initialize simulation and analysis parameters
 params = sim_params()
 m_params = mft_params()    
 
@@ -106,7 +110,7 @@ params.popsizeI = popsizeI
 print('setup done')
 
 
-#%% MFT
+#%% START ANALYSIS...
 
 #%%
 
@@ -245,20 +249,14 @@ print(inFocus_nu_e_out[0] - nu_vec_in[0], inFocus_nu_e_out[1] - nu_vec_in[1])
 
 
 
-#%% EFFECTIVE THEORY [WRITE FUNCTION FOR THIS]
+#%% EFFECTIVE MFT 
 
-# min and maximum rates to consider for in-focuse populations
-rate_min = 0.
-rate_max = 58.
-
-# step sizes for in-focus population rate locations
 d_nu = 0
-nBins = 50
+
 while np.mod(d_nu, 2) == 0:
     nBins = nBins+1
     d_nu = np.round((rate_max - rate_min)/nBins,2)
     
-print(nBins)
 
 # values of pop1 and pop2 rates at which to compute effective force
 pop1_rates = np.append(np.flip(np.arange(saddlePoint_inFocus_e[0] - d_nu, rate_min, -d_nu)), np.arange(saddlePoint_inFocus_e[0], rate_max + d_nu, d_nu))
@@ -386,7 +384,7 @@ while (count < np.size(nu1_grid)+10):
     nu_vec_in = m_params.nu_vec.copy()
          
 
-#%% FIND INTEGRATION PATH BY LOOPING OVER ROWS OF GRID AND FINDING GRID POINTS AT MINIMUM FORCE
+#%% integration path
 
 # location of grid point for saddle point
 saddlePoint_ind_nu1 = np.argmin(np.abs(nu1_grid[0,:] - saddlePoint_inFocus_e[0]))
@@ -422,15 +420,13 @@ minEnergy_pathCoords_SaddletoB = np.flip(minEnergy_pathCoords_SaddletoA, axis=1)
 
 
 
-#%%
-
+#%% get force and transfer function along minimum energy path
 
 force_minEnergy_path_SaddletoA = np.zeros((np.shape(minEnergy_pathInds_SaddletoA)[0], 2))
 force_minEnergy_path_SaddletoB = np.zeros((np.shape(minEnergy_pathInds_SaddletoB)[0], 2))
 
 phiIn_minEnergy_path_SaddletoA = np.zeros((np.shape(minEnergy_pathInds_SaddletoA)[0], 2))
 phiIn_minEnergy_path_SaddletoB = np.zeros((np.shape(minEnergy_pathInds_SaddletoB)[0], 2))
-
 
 # Saddle toA
 for pathInd in range(0, np.shape(minEnergy_pathInds_SaddletoA)[0]):
@@ -458,12 +454,11 @@ for pathInd in range(0, np.shape(minEnergy_pathInds_SaddletoB)[0]):
     phiIn_minEnergy_path_SaddletoB[pathInd, 1] = nu2_grid[yInd, xInd]  
 
 
-# COMPUTE LINE INTEGRAL OF F*dr
-# FOR  (Saddle --> A) AND (Saddle --> B)
+#%% compute F*dr, phi*dr
+### for (Saddle --> A) AND (Saddle --> B)
 
 F_project_dr_SaddletoA = np.zeros(np.shape(minEnergy_pathInds_SaddletoA)[0]-1)
 F_project_dr_SaddletoB = np.zeros(np.shape(minEnergy_pathInds_SaddletoB)[0]-1)
-
 
 F_dot_dr_SaddletoA = np.zeros(np.shape(minEnergy_pathInds_SaddletoA)[0]-1)
 F_dot_dr_SaddletoB = np.zeros(np.shape(minEnergy_pathInds_SaddletoB)[0]-1)
@@ -486,14 +481,12 @@ for count in range(0, len(dr_magnitude_SaddletoA)):
     # F project dr
     F_project_dr_SaddletoA[count] = np.dot(Fstep, dr/np.linalg.norm(dr))
 
-
     # F dot dr
     F_dot_dr_SaddletoA[count] = np.dot(Fstep, dr)
 
     # phi vector along step
     phiIn_step = phiIn_minEnergy_path_SaddletoA[count,:]
     phiIn_dot_dr_SaddletoA[count] = np.dot(phiIn_step, dr)
-
 
     # dr magnitude
     dr_magnitude_SaddletoA[count] = np.sqrt(np.sum(dr**2))
@@ -526,19 +519,16 @@ for count in range(0, len(dr_magnitude_SaddletoB)):
     # update step count
     count+=1
 
-#%%COMPUTE POTENTIAL ENERGY AS A FUNCTION OF DISTANCE AWAY FROM SADDLE POINT
+#%% compute potential as a function of the distance away from the saddle point
 
-
-# total force project dr
-# from A to B
+# force project dr from A to B
 F_project_dr = np.append(-np.flip(F_project_dr_SaddletoA), F_project_dr_SaddletoB[1:])
 
-# total force dot dr
-# from A to B
+# force dot dr from A to B
 F_dot_dr = np.append(-np.flip(F_dot_dr_SaddletoA), F_dot_dr_SaddletoB[1:])
 
-# total potential, U(r) - U(saddle), from r = saddle to r=A
-# flip to get U(r) - U(saddle) from r=A to r=Saddle
+# potential U(A) - U(saddle), from r=saddle to r=A
+# flip to get U(saddle) - U(A) from r=A to r=Saddle
 U_of_r_AtoSaddle = np.flip(np.cumsum(-F_dot_dr_SaddletoA))
 
 # note: could alternatively compute
@@ -546,14 +536,14 @@ U_of_r_AtoSaddle = np.flip(np.cumsum(-F_dot_dr_SaddletoA))
 # total potential, U(r) - U(A), from r = A, to r=Saddle
 # will differ by constant offset
 
-# total potential, U(r) - U(saddle), from r = saddle to r=B
+# potential, U(B) - U(saddle), from r = saddle to r=B
 U_of_r_SaddletoB = np.cumsum(-F_dot_dr_SaddletoB)
 
-# total potential
-# from A to B
+# total potential from A to B
 U_of_r = np.append(U_of_r_AtoSaddle, U_of_r_SaddletoB[1:])
-U_of_r = U_of_r + np.abs(np.min(U_of_r))
 
+# put minimum at zero
+U_of_r = U_of_r + np.abs(np.min(U_of_r))
 
 # path distance
 path_position_SaddletoA = -np.cumsum(np.append(0,dr_magnitude_SaddletoA))
@@ -575,7 +565,6 @@ transfer_of_r = F_project_dr + path_position
 
 #%% PLOT VECTOR FIELDS
 
-
 # plot the results of the vector field using grid
 plt.figure()
 plt.quiver(nu1_grid[::1,::1], nu2_grid[::1,::1], F_pop1[::1,::1], F_pop2[::1,::1])
@@ -587,7 +576,6 @@ plt.ylabel('nu 2')
 plt.tight_layout()
 plt.savefig(fig_outpath + fName_begin + '_forceField_%s.pdf' % (sweep_param_str_val))
 
-
 # plot the results of the normalized vector field
 plt.figure()
 plt.quiver(nu1_vec, nu2_vec, F_pop1_norm_vec, F_pop2_norm_vec)
@@ -598,8 +586,6 @@ plt.xlabel('nu 1')
 plt.ylabel('nu 2') 
 plt.tight_layout()
 plt.savefig(fig_outpath + fName_begin + '_forceField_normalized_%s.pdf' % (sweep_param_str_val))
-
-
 
 # plot a heat map of the force magnitude
 force_mag = np.sqrt(F_pop1**2 + F_pop2**2)
@@ -613,7 +599,6 @@ plt.xlabel('nu 1')
 plt.ylabel('nu 2')
 plt.tight_layout()
 plt.savefig(fig_outpath + fName_begin + '_forceField_log_magnitude_%s.pdf' % (sweep_param_str_val))
-
 
 
 #%% PLOT MINIMUM ENERGY PATH ON HEATMAP OF FORCE MAGNITUDE
@@ -642,7 +627,6 @@ plt.tight_layout()
 plt.savefig(fig_outpath + fName_begin + '_forceField_log_magnitude_integrationPath_%s.pdf' % (sweep_param_str_val))
 
 
-
 #%% PLOT MINIMUM ENERGY PATH ON FORCE FIELD
 
 plt.figure()
@@ -665,7 +649,6 @@ plt.tight_layout()
 plt.savefig(fig_outpath + fName_begin + '_forceField_integrationPath_%s.pdf' % (sweep_param_str_val))
 
 
-
 #%% PLOT FORCE VS POSITION
 
 plt.figure()
@@ -683,7 +666,6 @@ plt.tight_layout()
 plt.savefig(fig_outpath + fName_begin + '_force_vs_path_%s.pdf' % (sweep_param_str_val))
 
 
-        
 #%% PLOT POTENTIAL ENERGY VS POSITION
 
 plt.figure()
@@ -694,7 +676,6 @@ plt.tight_layout()
 plt.savefig(fig_outpath + fName_begin + '_potentialEnergy_vs_path_%s.pdf' % (sweep_param_str_val))
 
 plt.close('all')
-
 
 
 #%% PLOT TRANSFER FUNCTION VS POSITION
@@ -710,8 +691,7 @@ plt.savefig(fig_outpath + fName_begin + '_transferFunction_vs_path_%s.pdf' % (sw
 plt.close('all')
 
 
-#%% SAVE DATA
-
+#%% SAVE THE RESULTS
 
 settings_dictionary = {'fName_begin':               fName_begin, \
                        'sweep_param_name':          sweep_param_name, \
@@ -754,7 +734,6 @@ results_dictionary = {'sim_params':                     params, \
                       'F_project_dr':                         F_project_dr, \
                       'transfer_of_r':                         transfer_of_r, \
                       'U_of_r':                         U_of_r}
-
 
 
 fName_end = ('_effectiveMFT_ALT3_%s.mat' % (sweep_param_str_val))

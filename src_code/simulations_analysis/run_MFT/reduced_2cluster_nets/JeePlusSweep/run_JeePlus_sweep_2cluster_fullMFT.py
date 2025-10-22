@@ -1,11 +1,5 @@
 
-"""
-JeePlus sweep
-"""
-
-#%% imports
-
-# basic imports
+#%% basic imports
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,23 +9,18 @@ from scipy.io import savemat
 from scipy.io import loadmat
 import glob
 
-# mft parameters
+#%% parameters
 from mftParams_JeePlus_sweep_2cluster_fullMFT import mft_params
 
-# instatiate mft_params
+#%% instatiate parameters for running mft
 m_params = mft_params()
 
-# sim parameters
+#%% baseline simulation parameters
 simParams_path = m_params.simParams_path
 sys.path.append(simParams_path)
 from simParams_arousalSweep_noDisorder import sim_params
 
-
-#%% initialize simulation and analysis parameters classes
-
-
 #%% unpack mft_params
-
 func_path1 = m_params.func_path1
 func_path2 = m_params.func_path2
 fig_outpath = m_params.fig_outpath
@@ -39,25 +28,21 @@ data_outpath = m_params.data_outpath
 pathName_paramData = m_params.pathName_paramData
 fName_begin_paramData = m_params.fName_begin_paramData
 fName_begin = m_params.fName_begin
-
 n_Epops = m_params.n_Epops
 n_Ipops = m_params.n_Ipops
 JplusEE_array = m_params.JplusEE_array
 nu_vec_selective = m_params.nu_vec_selective
 nu_vec_nonselective = m_params.nu_vec_nonselective
 
-
-#%% load my own functions
-
+#%% load custom functions
 sys.path.append(func_path1)    
 sys.path.append(func_path2)     
-
 from fcn_compute_firing_stats import Dict2Class
 import fcn_MFT_fixedInDeg_clusNet
 from fcn_make_network_2cluster import fcn_make_network_cluster
 
 
-#%% load simulation parameters from sd_nu_ext_sweep
+#%% load simulation parameters 
 
 if m_params.newRun == True:
       
@@ -77,7 +62,7 @@ else:
     params = Dict2Class(sim_params)
 
 
-#%% SWEEP OVER JPLUSEE
+#%% setup for sweep over JeePlus
 
 JplusEE_backwards = np.flip(JplusEE_array)
 
@@ -94,7 +79,7 @@ MaxReEig_forwards = np.zeros((len(JplusEE_forwards)))
 
 #%% RUN THE MFT
 
-# BACKWARDS
+# backwards sweep
 
 # initial rates
 m_params.nu_vec = m_params.nu_vec_selective.copy()
@@ -105,7 +90,7 @@ for Jind in range(0,len(JplusEE_backwards),1):
     # update value of Jplus
     params.JplusEE = JplusEE_backwards[Jind]
     
-    # find fixed point and stability     
+    # find fixed point 
     mft_results = fcn_MFT_fixedInDeg_clusNet.fcn_master_MFT(params, m_params)   
         
     # save results
@@ -138,7 +123,7 @@ for Jind in range(0,len(JplusEE_backwards),1):
 
 
  
-# FORWARDS
+# forwards sweep
 
 # initial rates
 m_params.nu_vec = m_params.nu_vec_nonselective.copy()
@@ -179,8 +164,7 @@ for Jind in range(0,len(JplusEE_forwards),1):
     print(Jind)
 
 
-
-#%% SAVE DATA
+#%% SAVE RESULTS
 
 
 settings_dictionary = {'fName_begin':               fName_begin, \
