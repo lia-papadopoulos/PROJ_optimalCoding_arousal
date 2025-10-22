@@ -103,8 +103,8 @@ Contains code to run the MFT analysis of the full clustered networks as a functi
 Contains code to run the MFT analysis of the full clustered networks as a function of the E-to-E intracluster weight factor, JeePlus (associated with Fig. S5A).
 
 1. `params_JeePlus_sweep_MFT_baseline_pEIclusters.py`: File that specifies which simulations the MFT should be run for (`simParams_041725_clu_varyJEEplus`), additional parameters required for the MFT analysis, and all paths required to load functions and parameters and save results. This is the only file that needs to be changed by the user.
-2. `fcn_update_params_forMFT.py`: Given a set of parameters loaded from a saved simulation, this function updates certain quantities and/or generates new variables as required by the MFT analysis.
-2. `run_JeePlus_sweep_MFT_baseline_pEIclusters`: Based on the information in `params_JeePlus_sweep_MFT_baseline_pEIclusters.py`, this script runs the MFT as a function of the E-to-E intracluster weight factor and saves the results.
+2. `fcn_update_params_forMFT.py`: Given a set of parameters loaded from a saved simulation, this function updates certain quantities and/or generates new variables as required by the MFT analysis; called by `run_JeePlus_sweep_MFT_baseline_pEIclusters.py`.
+3. `run_JeePlus_sweep_MFT_baseline_pEIclusters.py`: Based on the information in `params_JeePlus_sweep_MFT_baseline_pEIclusters.py`, this script runs the MFT as a function of the E-to-E intracluster weight factor and saves the results.
 
 #### `reduced_2cluster_nets/`
 
@@ -112,11 +112,21 @@ Contains code to run the MFT analyses of the reduced 2-cluster networks.
 
 ##### `arousalSweep_noDisorder/`
 
-Contains code to run the effective mean-field analysis of the 2-cluster model as a function of arousal (associated with Fig. 6C-E; Fig. S5F-G)
+Contains code to run the effective MFT analysis of the 2-cluster model as a function of arousal (associated with Fig. 6C-E; Fig. S5F-G).
+
+1. `simParams_arousalSweep_noDisorder.py`: File containing baseline parameters for the 2-cluster network model.
+2. `mftParams_arousalSweep_noDisorder.py`: File containing parameters for MFT analysis of the 2-cluster network model.
+3. `effectiveMFT_sweepArousal_noDisorder_settings.py`: Settings file for running effective MFT on the 2-cluster network model as a function of arousal. Specifies arousal parameters, paths to functions, paths for loading and saving data, etc.
+4. `run_effectiveMFT_sweepArousal_noDisorder_ALT3.py`: Main script for running the effective MFT. Loads the settings file and then runs and saves the analysis for the specified parameters and a given arousal index.
+5. `effectiveMFT_sweepArousal_noDisorder_launchJobs.py`: Runs the effective MFT as a function of arousal. Loads in required information from the settings file, and then executes `run_effectiveMFT_sweepArousal_noDisorder_ALT3.py` for each arousal level using task-spooler. This enables the user to run parallel jobs on a computing cluster (one job for each arousal level). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
+
 
 ##### `JeePlusSweep/`
 
-Contains code to run the mean-field analysis of the 2-cluster model as a function of the E-to-E intracluster weight factor, JeePlus (associated with Fig. S5E)
+Contains code to run the MFT analysis of the 2-cluster model as a function of the E-to-E intracluster weight factor, JeePlus (associated with Fig. S5E).
+
+1. `mftParams_JeePlus_sweep_2cluster_fullMFT.py`: File that specifies all information required to run the MFT analysis on the 2-cluster network model as a function of JeePlus; defines MFT parameters, specifies what baseline simulation parameters to load and the values of JeePlus to sweep over, specifies paths to functions, paths for saving results, etc.
+2. `run_JeePlus_sweep_2cluster_fullMFT.py`: Scripts that runs the MFT sweep over JeePlus using the parameters specified in `mftParams_JeePlus_sweep_2cluster_fullMFT.py`.
 
 ### `spikeCount_correlations/`
 
