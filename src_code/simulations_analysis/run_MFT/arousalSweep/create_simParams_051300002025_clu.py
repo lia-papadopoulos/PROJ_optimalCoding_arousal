@@ -1,6 +1,7 @@
 
 """
-get simulation parameters necessary for mft from a set of simulations
+generate and save the simulation parameters required to run mft for a particular set of simulations
+
 in this case, the background inputs to e and i cells were drawn from a beta
 distribution in the simulations; for the mft, use parameters corresponding to
 the mean of the input distribution

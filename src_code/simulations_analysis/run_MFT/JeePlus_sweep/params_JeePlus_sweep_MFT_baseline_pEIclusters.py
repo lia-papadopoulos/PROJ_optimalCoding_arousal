@@ -1,9 +1,13 @@
 
+'''
+specify all parameters required to run MFT
+'''
 
 # basic imports
 import numpy as np
 import sys
 
+# global settings
 sys.path.append('../../../')
 import global_settings
 

@@ -1,13 +1,6 @@
 
-"""
-RUN MFT FOR FIXED IN-DEGREE NETWORKS
-ARBITRARY NUMBER OF CLUSTERS
-NO QUENCHED VARIABILITY
-USES PARAMETERS FROM A SET OF OF SIMULATIONS
-"""
 
-#%% BASIC IMPORTS
-
+#%% basic imports
 import sys
 import numpy as np
 from scipy.io import loadmat
@@ -53,7 +46,7 @@ stim_shape = default_params['stim_shape']
 stim_rel_amp = default_params['stim_rel_amp']
 n_sweepParams = default_params['nParams_sweep']
 
-#%% define arousal sweep for simulation
+#%% define parameter sweep
 default_params = fcn_define_arousalSweep(default_params)
 swept_params_dict = default_params['swept_params_dict']
 
@@ -85,7 +78,7 @@ print(s_params.nu_ext_ee)
 mft_params = Dict2Class(mft_params_dict)
 
 
-#%% SWEEP OVER THE NUMBER OF ACTIVE CLUSTERS TO LOOK FOR IN THE SOLUTION
+#%% run the mft
 
 # perform the backwards sweep over JeePlus
 JeePlus_backSweep_results = master_MFT_fixedInDeg_EIclusters.fcn_JeePlus_sweep_backwards(s_params, mft_params)
@@ -94,7 +87,7 @@ JeePlus_backSweep_results = master_MFT_fixedInDeg_EIclusters.fcn_JeePlus_sweep_b
 JeePlus_forSweep_results = master_MFT_fixedInDeg_EIclusters.fcn_JeePlus_sweep_forwards(s_params, mft_params)
     
 
-#%% DETERMINE THE CRITICAL VALUE OF JEE+ (BACKWARD SOLUTION = FORWARD SOLUTION)
+#%% determine the critical value of Jee+ (backward solution = forward solution)
 
 JeePlus_back = JeePlus_backSweep_results['JplusEE_back'].copy()
 JeePlus_for = JeePlus_forSweep_results['JplusEE_for'].copy()
@@ -117,7 +110,7 @@ for ind_nActive in range(0, len_nActive):
             break
         
         
-#%% SAVE THE DATA
+#%% SAVE THE RESULTS
 
 
 results = {}
