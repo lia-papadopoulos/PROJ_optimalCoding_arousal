@@ -1,23 +1,19 @@
-'''
-decoding vs pupil
-'''
 
-# basic imports
+#%% basic imports
 import sys        
 import numpy as np
 import argparse
 from scipy.io import savemat
 
-# decoding parameters
+#%% parameters
 import decoding_params as decode_params
 
-# path to functions
+#%% functions
 func_path1 = decode_params.func_path1
 func_path2 = decode_params.func_path2
 sys.path.append(func_path1)        
 sys.path.append(func_path2)     
 
-# main functions
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_trialInfo_eachFrequency
@@ -32,20 +28,13 @@ from fcn_SuData import fcn_pupilPercentile_to_pupilSize
 from fcn_SuData import fcn_trials_perFrequency_perRunBlock
 
 
-# decoding parameters
-import decoding_params as decode_params
-
-
-
-#%% PATHS
+#%% unpack parameters
 
 data_path = decode_params.data_path
 decode_outpath = decode_params.decode_outpath_pupil
-
 global_pupilNorm = decode_params.global_pupilNorm
-rateDrift_cellSelection = decode_params.rateDrift_cellSelection
-highDownsample = decode_params.highDownsample
-
+cellSelection = decode_params.cellSelection
+highDownSample = decode_params.highDownSample
 trial_window = decode_params.trial_window
 windSize = decode_params.windSize
 windStep = decode_params.windStep
@@ -57,14 +46,11 @@ n_kFolds = decode_params.n_kFolds
 n_kFold_reps = decode_params.n_kFold_reps
 nShuffles = decode_params.nShuffles
 shuffle_percentile = decode_params.shuffle_percentile
-
 lda_solver = decode_params.lda_solver
-
 pupilSplit_method = decode_params.pupilSplit_method
 pupilSize_method = decode_params.pupilSize_method
 pupilBlock_size = decode_params.pupilBlock_size
 pupilBlock_step = decode_params.pupilBlock_step
-
 run_thresh = decode_params.run_thresh
 rest_only = decode_params.rest_only
 trialMatch = decode_params.trialMatch
@@ -72,11 +58,10 @@ runBlock_size = decode_params.runBlock_size
 runBlock_step = decode_params.runBlock_step
 runSpeed_method = decode_params.runSpeed_method
 runSplit_method = decode_params.runSplit_method
-
 nTrials_thresh = decode_params.nTrials_thresh
 
 
-#%% USER INPUTS
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -91,16 +76,16 @@ args = parser.parse_args()
 session_name = args.session_name
 
 
-#%% GET DATA
+#%% load data
 
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
+load_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownSample
+
+data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownSample
+
+session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = load_name)
 
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
-
-
-
-#%% UPDATE SESSION INFO
+#%% update session dictionary
 
 session_info['trial_window'] = trial_window
 
@@ -127,7 +112,6 @@ session_info = fcn_spikeTimes_trials_cells(session_info)
 #%% compute pupil measure in this session
 session_info = fcn_compute_pupilMeasure_eachTrial(session_info)
 
-
 #%% for decoding with running trials
     
 # average running speed in each trial
@@ -152,9 +136,6 @@ session_info['run_block_trials'] = run_block_trials.copy()
 # determine number of trials of each stimulus type in each run block
 session_info = fcn_trials_perFrequency_perRunBlock(session_info)
 
-
-
-
 #%% if we are only doing resting trials, then set running trials to nan
 
 if rest_only == True:
@@ -166,20 +147,16 @@ if rest_only == True:
 #%% get trials in each pupil block
 session_info = fcn_get_trials_in_pupilBlocks(session_info)
 
-
 #%% determine number of trials of each stimulus type in each pupil block
 session_info = fcn_trials_perFrequency_perPupilBlock(session_info)
-
 
 #%% get pupil sizes corresponding to beginning and end of each pupil block
 pupilSize_percentileBlocks = fcn_pupilPercentile_to_pupilSize(session_info)
 
-
 #%% get pupil measure in each trial
 pupilMeasure_eachTrial = session_info['trial_pupilMeasure']
 
-
-#%%
+#%% initialize
 
 n_pupilBlocks = len(session_info['pupil_block_trials'])
 
@@ -187,15 +164,12 @@ n_pupilBlocks = len(session_info['pupil_block_trials'])
 avg_pupilSize_decodingTrials_pupilBlocks = np.zeros((n_pupilBlocks, n_decodeReps))
 med_pupilSize_decodingTrials_pupilBlocks = np.zeros((n_pupilBlocks, n_decodeReps))
 
-
 # average pupil size of trials used for decoding in each run block
 avg_pupilSize_decodingTrials_runBlocks = np.ones((1, n_decodeReps))*np.nan
 med_pupilSize_decodingTrials_runBlocks = np.ones((1, n_decodeReps))*np.nan
 
+#%% run decoding
 
-#%%
-
-# run decoding
 
 # loop over reps
 for repInd in range(0, n_decodeReps):
@@ -216,13 +190,11 @@ for repInd in range(0, n_decodeReps):
     p_accuracy_run = np.ones(1,dtype='object')*np.nan
     confusion_mat_run = np.ones(1,dtype='object')*np.nan
     
-    
     # peak accuracy
     peak_accuracy_run = np.ones(1)*np.nan
     tInd_peakAccuracy_run = np.ones(1, dtype='uint64')*np.nan
     pctCorrect_runBlock = np.ones((1, nFreqs_decode))*np.nan
         
-    
     ###########################################################################
     # if we are matching trials, then execute decoding for running data
     if ( (trialMatch == True) and (rest_only == True) ):
@@ -312,7 +284,6 @@ for repInd in range(0, n_decodeReps):
     confusion_mat = np.zeros(n_pupilBlocks,dtype='object')
     
 
-    
     # peak accuracy
     peak_accuracy = np.zeros(n_pupilBlocks)
     tInd_peakAccuracy = np.zeros(n_pupilBlocks, dtype='uint64')
@@ -377,7 +348,7 @@ for repInd in range(0, n_decodeReps):
     
     
     
-    #%% SAVE DECODING DATA
+    #%% SAVE RESULTS
          
     parameters_dictionary = {'session_path':         data_path, \
                              'session_name':         session_name, \
@@ -445,22 +416,20 @@ for repInd in range(0, n_decodeReps):
     }
     
         
-    fname_pupilNorm = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
-
         
     if (rest_only == True and trialMatch == True):   
         
         fname_end = (('_sweep_pupilSize_pupilSplit%s_pupilBlock%0.3f_pupilStep%0.3f_windSize%0.3fs_windStep%0.3fs_decoder%s_crossVal%s_nFreqs%d_restOnly_trialMatch%s') % \
-                     (pupilSplit_method, pupilBlock_size, pupilBlock_step, windSize, windStep, decoderType, crossvalType, nFreqs_decode, fname_pupilNorm))
+                     (pupilSplit_method, pupilBlock_size, pupilBlock_step, windSize, windStep, decoderType, crossvalType, nFreqs_decode, data_name))
             
     elif (rest_only == True and trialMatch == False):   
         
         fname_end = (('_sweep_pupilSize_pupilSplit%s_pupilBlock%0.3f_pupilStep%0.3f_windSize%0.3fs_windStep%0.3fs_decoder%s_crossVal%s_nFreqs%d_restOnly%s') % \
-                     (pupilSplit_method, pupilBlock_size, pupilBlock_step, windSize, windStep, decoderType, crossvalType, nFreqs_decode, fname_pupilNorm))            
+                     (pupilSplit_method, pupilBlock_size, pupilBlock_step, windSize, windStep, decoderType, crossvalType, nFreqs_decode, data_name))            
     else:
         
         fname_end = (('_sweep_pupilSize_pupilSplit%s_pupilBlock%0.3f_pupilStep%0.3f_windSize%0.3fs_windStep%0.3fs_decoder%s_crossVal%s_nFreqs%d%s') % \
-                     (pupilSplit_method, pupilBlock_size, pupilBlock_step, windSize, windStep, decoderType, crossvalType, nFreqs_decode, fname_pupilNorm))        
+                     (pupilSplit_method, pupilBlock_size, pupilBlock_step, windSize, windStep, decoderType, crossvalType, nFreqs_decode, data_name))        
         
     
     save_filename = ( (decode_outpath + 'decode_toneFreq_session%s' + fname_end + '_rep%d.mat') % (session_name, repInd) )
