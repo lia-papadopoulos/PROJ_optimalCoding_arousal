@@ -4,6 +4,7 @@
 import sys        
 import numpy as np
 
+# global settings
 sys.path.append('../../')
 import global_settings
 
@@ -14,7 +15,7 @@ sys.path.append(global_settings.path_to_src_code + 'data_analysis/')
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 
 
-#%% SESSIONS TO RUN AND FILE PATH
+#%% sessions to run and path to data
 
 sessions_to_run = [\
                    'LA3_session3', \
@@ -28,7 +29,7 @@ sessions_to_run = [\
 data_path = global_settings.path_to_processed_data
 
 
-#%% GET DATA FOR EACH SESSION
+#%% get number of cells in each session
 
 n_goodUnits = np.zeros((len(sessions_to_run)))
 
@@ -39,8 +40,11 @@ for count, session_name in enumerate(sessions_to_run):
     n_goodUnits[count] = session_info['nCells']
 
 
-#%% AVERAGE ACROSS SESSIONS
+#%% print results
     
-avg_n_goodUnits = np.mean(n_goodUnits)
+print('# good units in each session')
+print(n_goodUnits)
 
-print('# good units = %0.3f' % avg_n_goodUnits)
+# average
+avg_n_goodUnits = np.mean(n_goodUnits)
+print('avg # good units = %0.3f' % avg_n_goodUnits)
