@@ -1,32 +1,27 @@
 
 
-# basic imports
+#%% basic imports
 import sys        
 import numpy as np
 import numpy.matlib
 import argparse
 from scipy.io import savemat
 
-# import settings file
+#%% import settings file
 import psth_allTrials_settings as settings
 
-# paths to functions
+#%% functions
 sys.path.append(settings.func_path1)        
 sys.path.append(settings.func_path2)
          
-# main functions
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_statistics import fcn_Wilcoxon
-from fcn_statistics import fcn_MannWhitney_twoSided
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_spikeTimes_trials_cells
 from fcn_SuData import fcn_compute_windowed_spikeCounts
 from fcn_SuData import fcn_trialInfo_eachFrequency
 
-
-#%% settings
-
-# paths
+#%% unpack settings
 data_path = settings.data_path
 outpath = settings.outpath
 trial_window = settings.trial_window
@@ -34,11 +29,11 @@ baseline_window = settings.baseline_window
 stimulus_window = settings.stimulus_window
 window_length = settings.window_length
 window_step = settings.window_step
-rateDrift_cellSelection = settings.rateDrift_cellSelection
 global_pupilNorm = settings.global_pupilNorm
 highDownsample = settings.highDownsample
+cellSelection = settings.cellSelection
 
-#%% USER INPUTS
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -53,17 +48,12 @@ args = parser.parse_args()
 session_name = args.session_name
 
 
-#%% SESSION INFO
-
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
-
+#%% get session data
+data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
-#%% UPDATE SESSION INFO
-
+#%% update session info
 session_info['trial_window'] = trial_window
-
-print('session updated')
 
 #%% make trials
 session_info = fcn_makeTrials(session_info)
@@ -106,20 +96,21 @@ n_stimWindows = np.size(stim_tInds)
 # number of cells
 nCells = session_info['nCells']
 
+# print
 print(t_windows[base_sig_tInd], t_windows[stim_sig_tInd])
-
-
 
 #%% quantities to compute
 
 trialAvg_psth = np.zeros((nCells, n_tPts, nFreq))
 psth_pval = np.ones((nCells, n_tPts, nFreq))*np.inf
-psth_pval_baseline = np.ones((nCells, n_tPts, nFreq))*np.inf
 pval_preStim_vs_postStim = np.ones((nCells, nFreq))*np.nan
 
 delta_trialAvg_psth = np.zeros((nCells, n_tPts, nFreq))
 trialAvg_gain = np.zeros((nCells, n_tPts, nFreq))
 trialAvg_gain_alt = np.zeros((nCells, n_tPts, nFreq))
+
+peakResponse_in_stimWindow = np.zeros((nCells, nFreq))
+timeInd_peakResponse_in_stimWindow = np.zeros((nCells, nFreq))
 
 
 # loop over frequencies
@@ -148,21 +139,17 @@ for freqInd in range(0, nFreq):
         # trial avg psth
         trialAvg_psth[cellInd, :, freqInd] = np.mean(psth[:, cellInd, :], axis=0)
         
-        
         # mean baseline of trial average rate
         trialAvg_baselineRate = np.mean(trialAvg_psth[cellInd, base_tInds])
         
-        
         # delta psth
         delta_trialAvg_psth[cellInd, :, freqInd] = trialAvg_psth[cellInd, :, freqInd] - trialAvg_baselineRate
-        
         
         # single trial response gain (substract baseline avg of trial avg rate)
         gain[:, cellInd, :] = psth_allTrials[trialInds, cellInd, :] - trialAvg_baselineRate
                         
         # trial average response gain
         trialAvg_gain[cellInd, :, freqInd] = np.mean(gain[:, cellInd, :], axis=0)
-        
         
         # single trial response gain alt
         for count, i in enumerate(trialInds):
@@ -173,13 +160,10 @@ for freqInd in range(0, nFreq):
             # single trial gain
             gain_alt[count, cellInd, :] =  psth_allTrials[i, cellInd, :] - baseAvg_rate
         
-        
         # trial average gain alt
         trialAvg_gain_alt[cellInd, :, freqInd] = np.mean( gain_alt[:, cellInd, :], axis=0 )
-        
     
         # statistical significance of stimulus response
-        
         
         # compare single trial responses in static baseline window to those in static stimulus window
         preStim_psth = psth[:, cellInd, base_sig_tInd].copy()
@@ -188,8 +172,8 @@ for freqInd in range(0, nFreq):
         # run statistical test at this time point
         stat_test_data = fcn_Wilcoxon(preStim_psth, postStim_psth)
 
+        # store pvalue
         pval_preStim_vs_postStim[cellInd, freqInd] = stat_test_data['pVal_2sided']
-        
         
         # baseline psth for all trials
         base_psth = psth[:, cellInd, base_tInds].flatten()        
@@ -206,50 +190,31 @@ for freqInd in range(0, nFreq):
                 continue
             
             # run statistical test at this time point
-            _, pval = fcn_MannWhitney_twoSided(base_psth, stim_psth)
-
+            stat_test_data = fcn_Wilcoxon(preStim_psth, stim_psth)
+            pval = stat_test_data['pVal_2sided']
 
             # store pval
             psth_pval[cellInd, indT, freqInd] = pval
             
-        
-        
-        # statistical significance of baseline response (sanity check)
-        # compare N data points at each baseline time point to (M-1)*(N) other baseline time points
-        # loop over baseline time points
-        for count, indT in enumerate(base_tInds):      
-            
-            # get psth at this time point
-            base_psth_t = psth[:, cellInd, indT]
-            
-            # make sure not all baseline time points are zero
-            if np.all(base_psth == 0):
-                
-                continue
-            
-            # run statistical test
-            compare_tPts = np.setdiff1d(base_tInds, indT)
-            _pval = fcn_MannWhitney_twoSided(base_psth_t, psth[:, cellInd, compare_tPts].flatten())
-            
-            # store pval
-            psth_pval_baseline[cellInd, indT, freqInd] = pval
-            
+        # best response in stimulus window
+        avg_response = trialAvg_gain_alt[cellInd, stim_tInds, freqInd].copy()
+        abs_avg_response = np.abs(avg_response)
+        ind_max_abs_avg_response = np.argmax(abs_avg_response)
+        peakResponse_in_stimWindow[cellInd, freqInd] = avg_response[ind_max_abs_avg_response]
+        timeInd_peakResponse_in_stimWindow[cellInd, freqInd] = stim_tInds[ind_max_abs_avg_response]
             
 # corrected p values for multiple comparisons
 psth_pval_corrected = psth_pval*n_stimWindows
-psth_pval_baseline_corrected = psth_pval_baseline*np.size(base_tInds)
 
         
-#%% average gain across cells
-
+#%% average across cells
 cellAvg_trialAvg_psth = np.mean(trialAvg_psth, axis=0)
 cellAvg_trialAvg_gain = np.mean(trialAvg_gain, axis=0)
 cellAvg_trialAvg_gain_alt = np.mean(trialAvg_gain_alt, axis=0)
 cellAvg_delta_trialAvg_psth = np.mean(delta_trialAvg_psth, axis=0)
 
 
-
-#%% SAVE DATA
+#%% SAVE RESULTS
 
 
 params = {'session_path':         data_path, \
@@ -277,12 +242,12 @@ results = {'params':                                params, \
            'psth_pval':                             psth_pval, \
            'psth_pval_corrected':                   psth_pval_corrected, \
            'n_stimWindows':                         n_stimWindows, \
-           'psth_pval_baseline':                    psth_pval_baseline, \
-           'psth_pval_baseline_corrected':          psth_pval_baseline_corrected, \
            'pval_preStim_vs_postStim':              pval_preStim_vs_postStim, \
            'preStim_tInd':                          base_sig_tInd, \
            'postStim_tInd':                         stim_sig_tInd, \
-           'n_baseWindows':                         len(base_tInds)}
+           'n_baseWindows':                         len(base_tInds), \
+           'peakResponse_in_stimWindow':            peakResponse_in_stimWindow, \
+           'timeInd_peakResponse_in_stimWindow':    timeInd_peakResponse_in_stimWindow}
            
 
         
