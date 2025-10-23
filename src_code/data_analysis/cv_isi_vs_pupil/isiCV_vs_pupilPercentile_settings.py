@@ -1,14 +1,12 @@
 
-"""
-settings
-"""
-
+#%% imports
 import sys
 
 sys.path.append('../../')
 import global_settings
 
 
+#%% sessions to run
 all_sessions_to_run = ['LA3_session3', \
                        'LA8_session1', 'LA8_session2', \
                        'LA9_session1', \
@@ -18,42 +16,39 @@ all_sessions_to_run = ['LA3_session3', \
                       ]
     
 
+#%% for cluster
 maxCores = 40
 cores_per_job = 4 # needs to be set ahead of time using OMP_NUM_THREADS
 
-
+#%% paths
 func_path1 = global_settings.path_to_src_code + 'data_analysis/'
 data_path = global_settings.path_to_processed_data
 outpath = global_settings.path_to_data_analysis_output + 'isiCV_pupil/'
 
+#%% analysis parameters
 
+# for pupil bins
 bins_from_evokedTrials = True
 window_length_percentileComputation = 100e-3
-window_length = 2500e-3
-window_step = 1e-3
-inter_window_interval = 0e-3
-
-# stimulus duration
-stim_duration = 25e-3
-
-# size of pupil percentile bins
 pupilBlock_size = 0.1
 pupilBlock_step = 0.1
 pupilSplit_method = 'percentile'
+pupilSize_method = 'avgSize_beforeStim'
 
-# data set loading  parameters
-global_pupilNorm = False
-rateDrift_cellSelection = False
-highDownsample = True
-
-# number of trials needed
+# for cvisi 
+window_length = 2500e-3
+window_step = 1e-3
+inter_window_interval = 0e-3
 nTrials_thresh = 2
-
-# number of subsamples
 n_subsamples = 100
 
-# pupil size method
-pupilSize_method = 'avgSize_beforeStim'
+# other
+stim_duration = 25e-3
+
+# data set loading  parameters
+cellSelection = ''
+global_pupilNorm = False
+highDownsample = False
 
 # rest only
 restOnly = False

@@ -1,22 +1,16 @@
-'''
-cvISI vs pupil percentile
-'''
 
-#%%
-
-# basic imports
+#%% basic imports
 import sys     
 import numpy as np
 import numpy.matlib
 import argparse
 from scipy.io import savemat
 
+#%% settings
 import isiCV_vs_pupilPercentile_settings as settings
 
-# path to functions
+#%% functions
 sys.path.append(settings.func_path1)        
-
-# main functions
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_trialInfo_eachFrequency
@@ -32,42 +26,24 @@ from fcn_SuData import fcn_getTrials_in_pupilRange
 from fcn_SuData import fcn_get_trials_in_pupilBlocks
 
 
-#%% PARAMETERS
-
-# paths
+#%% unpack settings
 data_path = settings.data_path
 outpath = settings.outpath
-
-# window length
 bins_from_evokedTrials = settings.bins_from_evokedTrials
 window_length_percentileComputation = settings.window_length_percentileComputation
 window_length = settings.window_length
 window_step = settings.window_step
 inter_window_interval = settings.inter_window_interval
-
-# stimulus duration
 stim_duration = settings.stim_duration
-
-# size of pupil percentile bins
 pupilBlock_size = settings.pupilBlock_size
 pupilBlock_step = settings.pupilBlock_step
 pupilSplit_method = settings.pupilSplit_method
-
-# dataset loading parameters
 global_pupilNorm = settings.global_pupilNorm
-rateDrift_cellSelection = settings.rateDrift_cellSelection
-highDownsample = settings.highDownsample
-
-# number of trials needed
+cellSelection = settings.cellSelection
+highDownSample = settings.highDownsample
 nTrials_thresh = settings.nTrials_thresh
-
-# number of subsamples
 n_subsamples = settings.n_subsamples
-
-# pupil size method
 pupilSize_method = settings.pupilSize_method
-
-# rest only
 restOnly = settings.restOnly
 trialMatch = settings.trialMatch
 runThresh = settings.runThresh
@@ -77,7 +53,7 @@ runBlock_step = settings.runBlock_step
 runSplit_method = settings.runSplit_method
 
 
-#%%
+#%% checks
 if restOnly == True:
     sys.exit('need to make sure this code works for resting data only')
 
@@ -86,7 +62,7 @@ if ( (restOnly == True) and (trialMatch == True) ):
     
     
 
-#%% USER INPUTS
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -101,14 +77,16 @@ args = parser.parse_args()
 session_name = args.session_name
 
 #%% load data
+data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownSample
 
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
-
-session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
 #%% parse data by pre-stimulus percentiles computed from 100 ms window
 ### want to use same percentile splits for all analyses
 
+# make session dictionary
+session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
+
+# pupil blocks
 if bins_from_evokedTrials == True:
 
 
@@ -176,8 +154,7 @@ if bins_from_evokedTrials == True:
     del session_info
 
 
-#%% GET DATA
-
+#%% re-make session dictionary
 session_info = fcn_processedh5data_to_dict(session_name, data_path)
 nCells = session_info['nCells']
 
@@ -351,8 +328,8 @@ for indSample in range(0, n_subsamples):
             spont_cv_isi_trialAggregate[cellInd, pupilInd, indSample] = np.std(isi_all_trials)/(np.mean(isi_all_trials))
                 
 
-#%%
-# average over subsamples
+#%% averaging
+
 spont_cv_isi = np.nanmean(spont_cv_isi, axis = (2, 3))
 spont_cv_isi_trialAggregate = np.nanmean(spont_cv_isi_trialAggregate, axis=(2))
 avg_pupilSize_spontTrials = np.mean(avg_pupilSize_spontTrials, 1)
