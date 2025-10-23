@@ -1,19 +1,20 @@
 
 """
-fcn_SuData
+set of functions that aid in the analysis of the neural and behavioral data 
+from a particular recording session
 """
 
+#%% BASIC IMPORTS
 import numpy as np
 import sys
 from nitime.utils import dpss_windows
 import scipy.fft
 
-# global settings
+#%% GLOBAL SETTINGS
 sys.path.append('../')
 import global_settings
 
-
-# decoding functions
+#%% FUNCTIONS FOR DECODING ANALYSES
 sys.path.append(global_settings.path_to_src_code + 'functions/')  
 from fcn_decoding import fcn_stratified_kFold_crossVal
 from fcn_decoding import fcn_repeated_stratified_kFold_crossVal
@@ -22,6 +23,17 @@ from fcn_decoding import fcn_repeated_stratified_kFold_crossVal
 #%% TRIAL START AND END TIMES
 
 def fcn_makeTrials(session):
+    
+    '''
+    compute trial start and end times for a given session and store the results
+    in the session's data dictionary
+    
+    input:      
+        session:    data dictionary for a given session
+    output:     
+        session['trial_start']:     array of trial start times
+        session['trial_end']:       array of trial end times
+    '''
         
     # number of trials
     nTrials = session['nTrials']
@@ -63,6 +75,20 @@ def fcn_makeTrials(session):
 
 def fcn_makeTrials_spont(session, window_length, inter_window_interval):
     
+    '''
+    split spontaneous blocks of a given session into "trials" of a specified
+    length and time apart
+    
+    input:      
+        session:                data dictionary for a given session
+        window_length:          length of trials [s]
+        inter_window_interval:  time between trials [s]
+    output:     
+        session['nTrials']:         number of trials
+        session['trial_start']:     array of trial start times
+        session['trial_end']:       array of trial end times
+    '''
+    
     # unpack session
     n_spontBlocks = session['n_spontBlocks']
     spontBlock_start = session['spontBlock_start'].copy()
@@ -97,21 +123,23 @@ def fcn_makeTrials_spont(session, window_length, inter_window_interval):
 
 #%% FIND ALL TRIALS THAT DON'T HAVE BEHAVIORAL STATE VARIABLES DUE TO ARTIFACT REMOVAL
 
-'''
-inputs
-    trial_start:            start time of each trial
-    trial_end:              end time of each trial
-    time_stamp:             time stamp of each behavioral state measurement
-    pupil_trace_corrected:  pupil trace 
-                            [if the corrected pupil trace, will contain nan 
-                             values at certain times where an artifact was
-                             detected during the preprocessing steps]
-outputs:
-    bad_trials:             trials during which a nan value in the pupil trace
-                            detected
-'''
 
 def fcn_find_badTrials(trial_start, trial_end, time_stamp, pupil_trace):
+    
+    '''
+    find all trials taht don't have behavioral state info due to artifact removal
+    
+    inputs
+        trial_start:            start time of each trial in a session
+        trial_end:              end time of each trial session
+        time_stamp:             time stamp of each behavioral state measurement
+        pupil_trace:            pupil trace for a given session 
+                                [should contain nan values at certain times 
+                                 where an artifact was detected during preprocessing]
+    outputs
+        bad_trials:             trials during which a nan value in the pupil trace
+                                was detected
+    '''
         
     nTrials = np.size(trial_start)
     
@@ -136,6 +164,22 @@ def fcn_find_badTrials(trial_start, trial_end, time_stamp, pupil_trace):
 #%% TRIALS CORRESPONDING TO EACH STIMULUS FREQUENCY
 
 def fcn_trialInfo_eachFrequency(session):
+
+    '''
+    determine the set of trials corresponding to each tone frequency
+    
+    input:      
+        session:                data dictionary for a given session
+    output:     
+        session['unique_frequencies']:          array of unique stimulus frequencies
+        session['n_frequencies']:               number of different frequencies 
+        session['trialInds_eachFrequency']:     (n_frequencies, ) object array 
+                                                containing the trial indices 
+                                                corresponding to each tone 
+        session['nTrials_eachFrequency']:       (n_frequencies, ) array
+                                                containing the number of trials
+                                                for each frequency
+    '''
     
     trial_start = session['trial_start']
     trial_end = session['trial_end']

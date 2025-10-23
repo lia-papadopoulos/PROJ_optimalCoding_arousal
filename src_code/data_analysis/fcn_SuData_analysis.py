@@ -1,8 +1,4 @@
 
-"""
-fcn_SuData_analysis
-"""
-
 import numpy as np
 import scipy.stats
 
@@ -86,6 +82,51 @@ def fcn_significant_preStim_vs_postStim(psth_data, sig_level):
     output_dict['allSigCells_negResponse'] = allSigCells_negResponse
 
                     
+    return output_dict
+
+
+#%% alternate way of getting significant responses
+
+def fcn_significant_preStim_vs_postStim_alt(psth_data, sig_level):
+    
+    pval = psth_data['psth_pval_corrected']
+    timeInd_peakResponse_in_stimWindow = psth_data['timeInd_peakResponse_in_stimWindow']
+    nCells = np.size(pval, 0)
+    nFreq = psth_data['nFreq']
+    time = psth_data['t_window']
+    
+    nCells = np.size(pval, 0)
+    
+    sigCells_eachFreq = np.ones((nFreq), dtype='object')*np.nan
+    sigTime_eachFreq = np.ones((nCells, nFreq))*np.nan
+    allSigCells = np.array([])
+
+    for indFreq in range(0, nFreq):
+        
+        sigCells_eachFreq[indFreq] = np.array([])
+        
+        for indCell in range(0, nCells):
+            
+            sigResp = np.min(pval[indCell, :, indFreq]) < sig_level
+            ind_sigTime = timeInd_peakResponse_in_stimWindow[indCell, indFreq].astype(int)
+            sigTime_eachFreq[indCell, indFreq] = time[ind_sigTime]
+            
+            if sigResp:
+                
+                sigCells_eachFreq[indFreq] = np.append(sigCells_eachFreq[indFreq], indCell)
+                allSigCells = np.append(allSigCells, indCell)
+                                
+        sigCells_eachFreq[indFreq] = sigCells_eachFreq[indFreq].astype(int)
+                
+
+    allSigCells = np.unique(allSigCells)
+                    
+    output_dict = {}
+    output_dict['nCells'] = nCells
+    output_dict['sigCells'] = sigCells_eachFreq
+    output_dict['sigTime'] = sigTime_eachFreq
+    output_dict['allSigCells'] = allSigCells
+    
     return output_dict
 
 
