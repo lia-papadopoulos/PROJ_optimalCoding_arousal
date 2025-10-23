@@ -1,12 +1,5 @@
 
-'''
-fano factor of each cell vs pupil percentile
-vary window size
-'''
-
-#%%
-
-# basic imports
+#%% basic imports
 import sys     
 import numpy as np
 import numpy.matlib
@@ -14,15 +7,13 @@ import argparse
 from scipy.io import savemat
 
 
-# settings
+#%% settings
 import fano_factor_settings as settings
 
-# paths to functions
+#%% functions
 sys.path.append(settings.func_path1)        
 sys.path.append(settings.func_path2)
 
-
-# main functions
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_spikeTimes_trials_cells
@@ -42,40 +33,22 @@ from fcn_SuData import fcn_pupilPercentile_to_pupilSize
 from fcn_SuData import fcn_getTrials_in_pupilRange
 
 
-#%% PARAMETERS
+#%% unpack settings
 
-# paths
 data_path = settings.data_path
 outpath = settings.outpath
-
-
-# window length
 window_length = settings.window_length_sweep
 window_length_percentileComputation = settings.window_length_percentileComputation
 window_step = settings.window_step
 inter_window_interval = settings.inter_window_interval
-
-# stimulus duration
 stim_duration = settings.stim_duration
-
-# size of pupil percentile bins
 pupilBlock_size = settings.pupilBlock_size
 pupilBlock_step = settings.pupilBlock_step
 pupilSplit_method = settings.pupilSplit_method
-
-# pupil lag in seconds
 pupilLag = settings.pupilLag
-
-# number of trials needed
 nTrials_thresh = settings.nTrials_thresh
-
-# number of subsamples
 n_subsamples = settings.n_subsamples
-
-# pupil size method
 pupilSize_method = settings.pupilSize_method
-
-# rest only
 restOnly = settings.restOnly
 trialMatch = settings.trialMatch
 runThresh = settings.runThresh
@@ -84,8 +57,7 @@ runBlock_size = settings.runBlock_size
 runBlock_step = settings.runBlock_step
 runSplit_method = settings.runSplit_method
 
-
-#%%
+#%% checks
 
 if restOnly == True:
     sys.exit('need to make sure this code works for resting data only')
@@ -93,9 +65,8 @@ if restOnly == True:
 if ( (restOnly == True) and (trialMatch == True) ):
     sys.exit('cant do rest only w/ trial matching yet; need to add multiple subsamples')
     
-    
 
-#%% USER INPUTS
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -176,9 +147,8 @@ if restOnly == True:
     session_info['trial_pupilMeasure'][run_trials] = np.nan
 
 
-## pupil size corresponding to each percentile block
 
-# pupil size corresponding ot beginning and end of each pupil percentile bine
+# pupil size corresponding to beginning and end of each pupil percentile bin
 pupilSize_percentileBlocks_evoked = fcn_pupilPercentile_to_pupilSize(session_info)
 
 # pupil sizes corresponding to beginning and end of each pupil block
@@ -187,12 +157,11 @@ pupilBin_centers_evoked = np.mean(pupilSize_percentileBlocks_evoked, 0)
 # number of pupil blocks
 n_pupilBlocks = np.size(pupilBin_centers_evoked)
 
-###
+### delete session info
 del session_info
 
 
-#%% LOOP OVER TIME WINDOWS
-
+#%% loop over time windows
 
 for indWindow, wind_l in enumerate(window_length):
 
@@ -202,7 +171,7 @@ for indWindow, wind_l in enumerate(window_length):
     
     trial_window_evoked = [-wind_l, 400e-3]
     
-    #%% update session info
+    ### update session info
     
     
     session_info['trial_window'] = trial_window_evoked
@@ -221,19 +190,19 @@ for indWindow, wind_l in enumerate(window_length):
     print('session updated')
     
     
-    #%% make trials
+    ### make trials
     session_info = fcn_makeTrials(session_info)
     
     
-    #%% trials of each frequency
+    ### trials of each frequency
     session_info = fcn_trialInfo_eachFrequency(session_info)
     
     
-    #%% compute pupil measure in each trial
+    ### compute pupil measure in each trial
     session_info = fcn_compute_pupilMeasure_eachTrial(session_info)
     
     
-    #%% running info 
+    ### running info 
     
     # compute run speed in each trial
     session_info = fcn_compute_minRunSpeed_inTrials(session_info, session_info['trial_start'], session_info['trial_end'])
@@ -258,28 +227,15 @@ for indWindow, wind_l in enumerate(window_length):
     session_info = fcn_trials_perFrequency_perRunBlock(session_info)
     
     
-    #%% if we are only doing resting trials, then set running trials to nan
+    ### if we are only doing resting trials, then set running trials to nan
     
     if restOnly == True:
         
         # nan out running trials from pupil data
         session_info['trial_pupilMeasure'][run_trials] = np.nan
     
-    
-    
-    #%% get trials in each pupil block
-    '''
-    session_info = fcn_get_trials_in_pupilBlocks(session_info)
-    
-    # pupil size corresponding ot beginning and end of each pupil percentile bine
-    pupilSize_percentileBlocks_evoked = fcn_pupilPercentile_to_pupilSize(session_info)
-    
-    # pupil sizes corresponding to beginning and end of each pupil block
-    pupilBin_centers_evoked = np.mean(pupilSize_percentileBlocks_evoked, 0)
-    
-    '''
 
-    #%% bin trials according to precomputed percentile bins
+    ### bin trials according to precomputed percentile bins
     
     pupil_block_trials = np.zeros(n_pupilBlocks, dtype='object')
     nTrials_in_pupilBlocks = np.zeros((n_pupilBlocks))
@@ -298,15 +254,15 @@ for indWindow, wind_l in enumerate(window_length):
     session_info['pupil_block_trials'] = pupil_block_trials.copy()    
     
     
-    #%% determine number of trials of each stimulus type in each pupil block
+    ### determine number of trials of each stimulus type in each pupil block
     session_info = fcn_trials_perFrequency_perPupilBlock(session_info)
     
     
-    #%% number of trials/frequency in each pupil block
+    ### number of trials/frequency in each pupil block
     nTrials_perFreq_perPupilBlock = session_info['nTrials_perFreq_perPupilBlock'].copy()
     
     
-    #%% number of trials to subsample of each frequency in each pupil block
+    ### number of trials to subsample of each frequency in each pupil block
     
     nTrials_subsample_evoked[indWindow] = int(session_info['max_nTrials'])
     
@@ -318,14 +274,12 @@ for indWindow, wind_l in enumerate(window_length):
     del session_info
 
 
-
-    #%% ------------------ SPONTANEOUS DATA ANALYSIS ----------------------------------
-    
+    ### ------------------ SPONTANEOUS DATA ANALYSIS ----------------------------------
     
     session_info = fcn_processedh5data_to_dict(session_name, data_path)
     
     
-    #%% start and end of spontaneous blocks
+    ### start and end of spontaneous blocks
     
     spont_blocks = session_info['spont_blocks']
     
@@ -338,7 +292,7 @@ for indWindow, wind_l in enumerate(window_length):
     session_info['n_spontBlocks'] = np.size(session_info['spontBlock_start'])
     
     
-    #%% make trials
+    ### make trials
     
     session_info = fcn_makeTrials_spont(session_info, wind_l, inter_window_interval)
     trial_start = session_info['trial_start'].copy()
@@ -347,13 +301,13 @@ for indWindow, wind_l in enumerate(window_length):
     print('made trials')
     
     
-    #%% average pupil size across window
+    ### average pupil size across window
     
     avg_pupilSize = fcn_compute_avgPupilSize_inTrials(session_info, trial_start+pupilLag, trial_end+pupilLag)
     session_info['trial_pupilMeasure'] = avg_pupilSize
     
     
-    #%% running speed
+    ### running speed
     
     session_info = fcn_compute_minRunSpeed_inTrials(session_info, trial_start, trial_end)
     
@@ -369,8 +323,7 @@ for indWindow, wind_l in enumerate(window_length):
         session_info['trial_pupilMeasure'][run_trials] = np.nan
         
     
-    
-    #%% bin trials according to evoked pupil percentile bins
+    ### bin trials according to evoked pupil percentile bins
     
     pupil_block_trials = np.zeros(n_pupilBlocks, dtype='object')
     nTrials_in_pupilBlocks = np.zeros((n_pupilBlocks))
@@ -388,7 +341,7 @@ for indWindow, wind_l in enumerate(window_length):
     
     session_info['pupil_block_trials'] = pupil_block_trials.copy()
     
-    #%% number of trials to subsample in each pupil block
+    ### number of trials to subsample in each pupil block
     
     nTrials_subsample_spont[indWindow] = int(np.min(nTrials_in_pupilBlocks))
     
@@ -397,7 +350,7 @@ for indWindow, wind_l in enumerate(window_length):
         sys.exit('not enough trials')
 
 
-    #%% clear session info
+    ### clear session info
     del session_info
     
     
@@ -412,7 +365,6 @@ if nTrials_subsample < nTrials_thresh:
 
 #%% compute FF for each window size
 
-
 for indWindow, wind_l in enumerate(window_length):
 
     session_info = fcn_processedh5data_to_dict(session_name, data_path)
@@ -422,8 +374,7 @@ for indWindow, wind_l in enumerate(window_length):
     trial_window_evoked = [-wind_l, 400e-3]
 
     
-    #%% update session info
-    
+    ### update session info
     
     session_info['trial_window'] = trial_window_evoked
     
@@ -440,25 +391,20 @@ for indWindow, wind_l in enumerate(window_length):
     
     print('session updated')
     
-    
-    #%% make trials
+    ### make trials
     session_info = fcn_makeTrials(session_info)
     
-    
-    #%% trials of each frequency
+    ### trials of each frequency
     session_info = fcn_trialInfo_eachFrequency(session_info)
     
-    
-    #%% compute spike times of each cell in every trial [aligned to stimulus onset]
+    ### compute spike times of each cell in every trial [aligned to stimulus onset]
   
     session_info = fcn_spikeTimes_trials_cells(session_info)
  
-    
-    #%% compute pupil measure in each trial
+    ### compute pupil measure in each trial
     session_info = fcn_compute_pupilMeasure_eachTrial(session_info)
     
-    
-    #%% running info 
+    ### running info 
     
     # compute run speed in each trial
     session_info = fcn_compute_minRunSpeed_inTrials(session_info, session_info['trial_start'], session_info['trial_end'])
@@ -482,8 +428,7 @@ for indWindow, wind_l in enumerate(window_length):
     # determine number of trials of each stimulus type in each run block
     session_info = fcn_trials_perFrequency_perRunBlock(session_info)
     
-    
-    #%% if we are only doing resting trials, then set running trials to nan
+    ### if we are only doing resting trials, then set running trials to nan
     
     if restOnly == True:
         
@@ -491,17 +436,10 @@ for indWindow, wind_l in enumerate(window_length):
         session_info['trial_pupilMeasure'][run_trials] = np.nan
     
     
-    
-    #%% get trials in each pupil block
-    '''
-    session_info = fcn_get_trials_in_pupilBlocks(session_info)
-    '''
-    
-    #%% bin trials according to precomputed percentile bins
+    ### bin trials according to precomputed percentile bins
     
     pupil_block_trials = np.zeros(n_pupilBlocks, dtype='object')
     nTrials_in_pupilBlocks = np.zeros((n_pupilBlocks))
-    
     
     for indPupil in range(0, n_pupilBlocks):
     
@@ -512,17 +450,16 @@ for indWindow, wind_l in enumerate(window_length):
         
         nTrials_in_pupilBlocks[indPupil] = np.size( pupil_block_trials[indPupil] )
     
-    
     session_info['pupil_block_trials'] = pupil_block_trials.copy()    
 
     
-    #%% determine number of trials of each stimulus type in each pupil block
+    ### determine number of trials of each stimulus type in each pupil block
     session_info = fcn_trials_perFrequency_perPupilBlock(session_info)
     
-    #%% number of pupil blocks
+    ### number of pupil blocks
     n_pupilBlocks = len(session_info['pupil_block_trials'])
     
-    #%% quantities for fano factor analysis
+    ### quantities for fano factor analysis
     
     # unique frequencies
     nFreq = session_info['n_frequencies']
@@ -534,27 +471,16 @@ for indWindow, wind_l in enumerate(window_length):
     nWindows = len(t_window)
     
     avg_pupilSize_allTrials_evoked = session_info['trial_pupilMeasure'].copy()
-    
-    #%% pupil size corresponding to each percentile block
 
-    '''
-    # pupil size corresponding ot beginning and end of each pupil percentile bine
-    pupilSize_percentileBlocks_evoked = fcn_pupilPercentile_to_pupilSize(session_info)
-
-    # pupil sizes corresponding to beginning and end of each pupil block
-    pupilBin_centers_evoked = np.mean(pupilSize_percentileBlocks_evoked, 0)
-    '''
-
-    
+    ### delete    
     del session_info
 
-    #%% ------------------ SPONTANEOUS DATA ANALYSIS ----------------------------------
-    
+    ### ------------------ SPONTANEOUS DATA ANALYSIS ----------------------------------
     
     session_info = fcn_processedh5data_to_dict(session_name, data_path)
     
     
-    #%% start and end of spontaneous blocks
+    ### start and end of spontaneous blocks
     
     spont_blocks = session_info['spont_blocks']
     session_info['pupilBlock_size'] = pupilBlock_size
@@ -566,7 +492,7 @@ for indWindow, wind_l in enumerate(window_length):
     session_info['n_spontBlocks'] = np.size(session_info['spontBlock_start'])
     
     
-    #%% make trials
+    ### make trials
     
     session_info = fcn_makeTrials_spont(session_info, wind_l, inter_window_interval)
     trial_start = session_info['trial_start'].copy()
@@ -575,23 +501,23 @@ for indWindow, wind_l in enumerate(window_length):
     print('made trials')
     
     
-    #%% spike times
+    ### spike times
     
     session_info = fcn_spikeTimes_trials_cells_spont(session_info)
     
     
-    #%% spike counts of all cell sin all trials
+    ### spike counts of all cell sin all trials
     
     session_info = fcn_compute_spikeCnts_inTrials(session_info)
     
     
-    #%% average pupil size across window
+    ### average pupil size across window
     
     avg_pupilSize = fcn_compute_avgPupilSize_inTrials(session_info, trial_start+pupilLag, trial_end+pupilLag)
     session_info['trial_pupilMeasure'] = avg_pupilSize
     
     
-    #%% running speed
+    ### running speed
     
     session_info = fcn_compute_minRunSpeed_inTrials(session_info, trial_start, trial_end)
     
@@ -608,7 +534,7 @@ for indWindow, wind_l in enumerate(window_length):
         
     
     
-    #%% bin trials according to evoked pupil percentile bins
+    ### bin trials according to evoked pupil percentile bins
     
     pupil_block_trials = np.zeros(n_pupilBlocks, dtype='object')
     nTrials_in_pupilBlocks = np.zeros((n_pupilBlocks))
@@ -627,22 +553,22 @@ for indWindow, wind_l in enumerate(window_length):
     session_info['pupil_block_trials'] = pupil_block_trials.copy()
         
     
-    #%% average pupil size of spont trials in each block
+    ### average pupil size of spont trials in each block
     
     avg_pupilSize_allTrials_spont = session_info['trial_pupilMeasure'].copy()
     
-    #%% quantities for fano factor
+    ### quantities for fano factor
     
     all_trials_spont = session_info['pupil_block_trials'].copy()
     singleTrial_spikeTimes_spont = session_info['spikeTimes_trials_cells'].copy()
     singleTrial_spikeCounts_spont = session_info['spkCounts_trials_cells'].copy()
     
 
-    #%% clear session info
+    ### clear session info
     del session_info
     
 
-    #%% quantities to compute
+    ### quantities to compute
     
     # fano factor of every cell for each frequency in each pupil block
     spont_fano = np.ones((nCells, nFreq, n_pupilBlocks, n_subsamples))*np.nan
@@ -654,7 +580,6 @@ for indWindow, wind_l in enumerate(window_length):
     spont_trialAvg_spikeCount = np.ones((nCells, n_pupilBlocks))*np.nan
     evoked_trialAvg_spikeCount = np.ones((nCells, nFreq, n_pupilBlocks, nWindows))*np.nan
     pre_trialAvg_spikeCount = np.ones((nCells, nFreq, n_pupilBlocks))*np.nan
-    
     
     # average pupil size of low and high pupil trials
     avg_pupilSize_spontTrials = np.ones((n_pupilBlocks, n_subsamples))*np.nan
@@ -716,7 +641,7 @@ for indWindow, wind_l in enumerate(window_length):
     avg_pupilSize_evokedTrials = np.mean(avg_pupilSize_evokedTrials, axis=(1,2))
     
     
-    #%% SAVE DATA
+    #%% SAVE RESULTS
     
     
     

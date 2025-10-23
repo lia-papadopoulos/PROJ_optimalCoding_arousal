@@ -1,24 +1,18 @@
-'''
-fano factor of each cell using trials from all pupil percentile blocks
-'''
 
-#%%
-
-# basic imports
+#%% basic imports
 import sys     
 import numpy as np
 import numpy.matlib
 import argparse
 from scipy.io import savemat
 
-# settings
+#%% settings
 import fano_factor_settings as settings
 
-# paths to functions
+#%% functions
 sys.path.append(settings.func_path1)        
 sys.path.append(settings.func_path2)
 
-# main functions
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_spikeTimes_trials_cells
@@ -39,40 +33,22 @@ from fcn_SuData import fcn_trials_perFrequency_perPupilBlock
 from fcn_SuData import fcn_fanoFactor
 
 
-#%% PARAMETERS
+#%% unpack settings
 
-# paths
 data_path = settings.data_path
 outpath = settings.outpath
-
-
-# window length
 window_length = settings.window_length
 window_step = settings.window_step
 inter_window_interval = settings.inter_window_interval
 trial_window_evoked = settings.trial_window_evoked
-
-# stimulus duration
 stim_duration = settings.stim_duration
-
-# size of pupil percentile bins
 pupilBlock_size = settings.pupilBlock_size
 pupilBlock_step = settings.pupilBlock_step
 pupilSplit_method = settings.pupilSplit_method
-
-# pupil lag in seconds
 pupilLag = settings.pupilLag
-
-# number of trials needed
 nTrials_thresh = settings.nTrials_thresh
-
-# number of subsamples
 n_subsamples = settings.n_subsamples
-
-# pupil size method
 pupilSize_method = settings.pupilSize_method
-
-# rest only
 restOnly = settings.restOnly
 trialMatch = settings.trialMatch
 runThresh = settings.runThresh
@@ -80,13 +56,11 @@ runSpeed_method = settings.runSpeed_method
 runBlock_size = settings.runBlock_size
 runBlock_step = settings.runBlock_step
 runSplit_method = settings.runSplit_method
-
-# cell selection
 global_pupilNorm = settings.global_pupilNorm
 rateDrift_cellSelection = settings.rateDrift_cellSelection
 highDownsample = settings.highDownsample
 
-#%%
+#%% checks
 
 if restOnly == True:
     sys.exit('need to make sure this code works for resting data only')
@@ -94,9 +68,8 @@ if restOnly == True:
 if ( (restOnly == True) and (trialMatch == True) ):
     sys.exit('cant do rest only w/ trial matching yet; need to add multiple subsamples')
     
-    
 
-#%% USER INPUTS
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -110,8 +83,7 @@ args = parser.parse_args()
 # argparse inputs
 session_name = args.session_name
 
-
-#%% GET DATA
+#%% get data
 
 data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
@@ -120,17 +92,16 @@ session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = 
 nCells = session_info['nCells']
 
 
+#%% ------------------ EVOKED DATA ANALYSIS ----------------------------------
+
 #%% update session info
 
-
 session_info['trial_window'] = trial_window_evoked
-
 session_info['pupilSize_method'] = pupilSize_method
 session_info['pupilSplit_method'] = pupilSplit_method
 session_info['pupilBlock_size'] = pupilBlock_size
 session_info['pupilBlock_step'] = pupilBlock_step
 session_info['pupil_lag'] = pupilLag
-
 session_info['runSpeed_method'] = runSpeed_method
 session_info['runSplit_method'] = runSplit_method
 session_info['runBlock_size'] = runBlock_size
@@ -138,22 +109,17 @@ session_info['runBlock_step'] = runBlock_step
 
 print('session updated')
 
-
 #%% make trials
 session_info = fcn_makeTrials(session_info)
-
 
 #%% trials of each frequency
 session_info = fcn_trialInfo_eachFrequency(session_info)
 
-
 #%% compute spike times of each cell in every trial [aligned to stimulus onset]
 session_info = fcn_spikeTimes_trials_cells(session_info)
 
-
 #%% compute pupil measure in each trial
 session_info = fcn_compute_pupilMeasure_eachTrial(session_info)
-
 
 #%% running info 
 
@@ -186,8 +152,6 @@ if restOnly == True:
     
     # nan out running trials from pupil data
     session_info['trial_pupilMeasure'][run_trials] = np.nan
-    
-    
     
     
 #%% get trials in each pupil block
@@ -230,7 +194,6 @@ pupilSize_percentileBlocks_evoked = fcn_pupilPercentile_to_pupilSize(session_inf
 pupilBin_centers_evoked = np.mean(pupilSize_percentileBlocks_evoked, 0)
 
 
-
 #%% ------------------ SPONTANEOUS DATA ANALYSIS ----------------------------------
 
 del session_info
@@ -254,7 +217,6 @@ trial_start = session_info['trial_start'].copy()
 trial_end = session_info['trial_end'].copy()
 
 print('made trials')
-
 
 #%% pupil splitting information for spontaneous blocks
 
@@ -330,7 +292,6 @@ singleTrial_spikeCounts_spont = session_info['spkCounts_trials_cells'].copy()
 
 
 #%% clear session info
-#session_info.clear()
 del session_info
 
 #%% number of trials to subsample
@@ -370,7 +331,7 @@ for indSample in range(0, n_subsamples):
         trial_inds_spont = np.random.choice(all_trials_spont[pupilInd], size = nTrials_subsample, replace = False).astype(int)
         trial_inds_spont_allPupil = np.append(trial_inds_spont_allPupil, trial_inds_spont)
 
-        # convert to integers
+        # convert to int
         trial_inds_spont_allPupil = trial_inds_spont_allPupil.astype(int)
         
         # avg pupil size
@@ -388,7 +349,7 @@ for indSample in range(0, n_subsamples):
             trial_inds_evoked = np.random.choice(all_trials_evoked[freqInd, pupilInd], size = nTrials_subsample, replace = False).astype(int)
             trial_inds_evoked_allPupil = np.append(trial_inds_evoked_allPupil, trial_inds_evoked)
             
-            # convert to integers
+            # convert to int
             trial_inds_evoked_allPupil = trial_inds_evoked_allPupil.astype(int)
             
             # avg pupil size
@@ -416,8 +377,6 @@ for indSample in range(0, n_subsamples):
             evoked_trialAvg_spikeCount[cellInd, freqInd, indSample, :] = np.mean(evoked_spike_counts,0)
             
 
-
-
 # average over subsamples
 spont_fanofactor = np.nanmean(spont_fano, axis = 1)
 evoked_fanofactor = np.nanmean(evoked_fano, axis = 2)
@@ -437,7 +396,7 @@ avg_pupilSize_spontTrials = np.mean(avg_pupilSize_spontTrials, 1)
 avg_pupilSize_evokedTrials = np.mean(avg_pupilSize_evokedTrials, axis=(1,2))
 
 
-#%% SAVE DATA
+#%% SAVE RESULTS
 
 
 params = {'session_path':         data_path, \

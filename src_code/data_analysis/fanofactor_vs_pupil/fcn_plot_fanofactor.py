@@ -4,12 +4,9 @@ helper functions for plotting the fano factor
 """
 
 #%% basic imports
-
 import numpy as np
     
-
 #%% compute cells who pass baseline rate threshold
-
 
 # cells that pass rate cuts when only looking at spontaneous data
 def fcn_units_pass_rateCut_allPupils_spont(fano_dict, rate_thresh):
@@ -46,9 +43,7 @@ def fcn_units_pass_rateCut_eachFreq(rates, rate_thresh):
 
 
 # assumes psth_data only includes good units
-
 def fcn_units_pass_rateCut(psth_data, rate_thresh):
-    
     
     trialAvg_psth = psth_data['trialAvg_psth'].copy() # cells, time, freq
     baseline_window = psth_data['params']['baseline_window']
@@ -62,7 +57,6 @@ def fcn_units_pass_rateCut(psth_data, rate_thresh):
     units_pass_rateCut = np.nonzero(baseAvg_freqAvg_trialAvg_psth > rate_thresh)[0]
     
     return units_pass_rateCut
-
 
 
 def fcn_units_pass_rateCut_allPupils(psthPupil_data, rate_thresh):
@@ -242,21 +236,7 @@ def fcn_compute_fano_cellSubset_multipleStim(FFevoked, FFdiff, cellSubset, tavg 
         
         
     # compute min of evoked and diff FF
-    if tavg == 'min_eachStim':
-        
-        for indStim in range(0, nStim):
-            
-            # time corresponding to minimum evoked fano
-            tInd_min_evoked_fano = np.argmin(cellAvg_FFevoked[indStim, :])
-            
-            # evoked fano at minimum time point for each cell
-            evoked_fano_atMin[:, indStim] = FFevoked[:, indStim, tInd_min_evoked_fano].copy()
-        
-            # diff fano at minimum time point for each cell
-            diff_fano_atMin[:, indStim] = FFdiff[:, indStim, tInd_min_evoked_fano].copy()
-    
-    
-    elif tavg == 'min_allStim':
+    if ( (isinstance(tavg, str)) and (tavg == 'min_allStim') ):
         
         # time corresponding to minimum of cell and stim averaged fano factor
         tInd_min_evoked_fano = np.argmin(np.nanmean(cellAvg_FFevoked, 0))
@@ -271,16 +251,18 @@ def fcn_compute_fano_cellSubset_multipleStim(FFevoked, FFdiff, cellSubset, tavg 
             
     else: 
         
-        # use given time point
-        tInd_min_evoked_fano = tavg
         
-        for indStim in range(0, nStim):
+        for indCell in range(0, nCells):
+        
+            for indStim in range(0, nStim):
+                
+                tInd = tavg[indCell, indStim]
+                
+                # evoked fano at minimum time point for each cell
+                evoked_fano_atMin[indCell, indStim] = FFevoked[indCell, indStim, tInd].copy()
             
-            # evoked fano at minimum time point for each cell
-            evoked_fano_atMin[:, indStim] = FFevoked[:, indStim, tInd_min_evoked_fano].copy()
-        
-            # diff fano at minimum time point for each cell
-            diff_fano_atMin[:, indStim] = FFdiff[:, indStim, tInd_min_evoked_fano].copy()             
+                # diff fano at minimum time point for each cell
+                diff_fano_atMin[indCell, indStim] = FFdiff[indCell, indStim, tInd].copy()             
     
 
 

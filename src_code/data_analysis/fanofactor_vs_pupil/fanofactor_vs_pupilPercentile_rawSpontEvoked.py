@@ -1,26 +1,16 @@
-'''
-fano factor of each cell vs pupil percentile
-'''
-
-#%%
-
-# basic imports
+#%% basic imports
 import sys     
 import numpy as np
 import numpy.matlib
 import argparse
 from scipy.io import savemat
 
-
-# settings
+#%% settings
 import fano_factor_settings as settings
 
-# paths to functions
+#%% paths to functions
 sys.path.append(settings.func_path1)        
 sys.path.append(settings.func_path2)
-
-
-# main functions
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_spikeTimes_trials_cells
@@ -40,40 +30,22 @@ from fcn_SuData import fcn_compute_windowed_spikeCounts
 from fcn_SuData import fcn_trials_perFrequency_perPupilBlock
 from fcn_SuData import fcn_fanoFactor
 
+#%% unpack parameters
 
-#%% PARAMETERS
-
-# paths
 data_path = settings.data_path
 outpath = settings.outpath
-
-# window length
 window_length = settings.window_length
 window_step = settings.window_step
 inter_window_interval = settings.inter_window_interval
 trial_window_evoked = settings.trial_window_evoked
-
-# stimulus duration
 stim_duration = settings.stim_duration
-
-# size of pupil percentile bins
 pupilBlock_size = settings.pupilBlock_size
 pupilBlock_step = settings.pupilBlock_step
 pupilSplit_method = settings.pupilSplit_method
-
-# pupil lag in seconds
 pupilLag = settings.pupilLag
-
-# number of trials needed
 nTrials_thresh = settings.nTrials_thresh
-
-# number of subsamples
 n_subsamples = settings.n_subsamples
-
-# pupil size method
 pupilSize_method = settings.pupilSize_method
-
-# rest only
 restOnly = settings.restOnly
 trialMatch = settings.trialMatch
 runThresh = settings.runThresh
@@ -81,13 +53,11 @@ runSpeed_method = settings.runSpeed_method
 runBlock_size = settings.runBlock_size
 runBlock_step = settings.runBlock_step
 runSplit_method = settings.runSplit_method
-
-# cell selection
 global_pupilNorm = settings.global_pupilNorm
-rateDrift_cellSelection = settings.rateDrift_cellSelection
 highDownsample = settings.highDownsample
+cellSelection = settings.cellSelection
 
-#%%
+#%% checks
 
 if restOnly == True:
     sys.exit('need to make sure this code works for resting data only')
@@ -97,7 +67,7 @@ if ( (restOnly == True) and (trialMatch == True) ):
     
     
 
-#%% USER INPUTS
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -112,9 +82,9 @@ args = parser.parse_args()
 session_name = args.session_name
 
 
-#%% GET DATA
+#%% get data
 
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
+data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
 session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
@@ -122,7 +92,6 @@ nCells = session_info['nCells']
 
 
 #%% update session info
-
 
 session_info['trial_window'] = trial_window_evoked
 
@@ -143,18 +112,14 @@ print('session updated')
 #%% make trials
 session_info = fcn_makeTrials(session_info)
 
-
 #%% trials of each frequency
 session_info = fcn_trialInfo_eachFrequency(session_info)
-
 
 #%% compute spike times of each cell in every trial [aligned to stimulus onset]
 session_info = fcn_spikeTimes_trials_cells(session_info)
 
-
 #%% compute pupil measure in each trial
 session_info = fcn_compute_pupilMeasure_eachTrial(session_info)
-
 
 #%% running info 
 
@@ -180,7 +145,6 @@ session_info['run_block_trials'] = run_block_trials.copy()
 # determine number of trials of each stimulus type in each run block
 session_info = fcn_trials_perFrequency_perRunBlock(session_info)
 
-
 #%% if we are only doing resting trials, then set running trials to nan
 
 if restOnly == True:
@@ -189,23 +153,17 @@ if restOnly == True:
     session_info['trial_pupilMeasure'][run_trials] = np.nan
     
     
-    
-    
 #%% get trials in each pupil block
 session_info = fcn_get_trials_in_pupilBlocks(session_info)
-
 
 #%% determine number of trials of each stimulus type in each pupil block
 session_info = fcn_trials_perFrequency_perPupilBlock(session_info)
 
-
 #%% number of pupil blocks
 n_pupilBlocks = len(session_info['pupil_block_trials'])
     
-
 #%% number of trials to subsample of each frequency in each pupil block
 nTrials_subsample_evoked = int(session_info['max_nTrials'])
-
 
 #%% quantities for fano factor analysis
 
@@ -221,7 +179,6 @@ nWindows = len(t_window)
 # average pupil size of all evoked trials
 avg_pupilSize_allTrials_evoked = session_info['trial_pupilMeasure'].copy()
 
-
 #%% pupil size corresponding to each percentile block
 
 # pupil size corresponding ot beginning and end of each pupil percentile bine
@@ -229,8 +186,6 @@ pupilSize_percentileBlocks_evoked = fcn_pupilPercentile_to_pupilSize(session_inf
 
 # pupil sizes corresponding to beginning and end of each pupil block
 pupilBin_centers_evoked = np.mean(pupilSize_percentileBlocks_evoked, 0)
-
-
 
 #%% ------------------ SPONTANEOUS DATA ANALYSIS ----------------------------------
 
@@ -247,7 +202,6 @@ session_info['spontBlock_start'] = spont_blocks[0,:].copy()
 session_info['spontBlock_end'] = spont_blocks[1,:].copy()
 session_info['n_spontBlocks'] = np.size(session_info['spontBlock_start'])
 
-
 #%% make trials
 
 session_info = fcn_makeTrials_spont(session_info, window_length, inter_window_interval)
@@ -256,27 +210,22 @@ trial_end = session_info['trial_end'].copy()
 
 print('made trials')
 
-
 #%% pupil splitting information for spontaneous blocks
 
 session_info['pupilBlock_size'] = pupilBlock_size
 session_info['pupilBlock_step'] = pupilBlock_step
 session_info['pupilSplit_method'] = pupilSplit_method
 
-
 #%% spike times
 session_info = fcn_spikeTimes_trials_cells_spont(session_info)
 
-
 #%% spike counts of all cell sin all trials
 session_info = fcn_compute_spikeCnts_inTrials(session_info)
-
 
 #%% average pupil size across window
 
 avg_pupilSize = fcn_compute_avgPupilSize_inTrials(session_info, trial_start+pupilLag, trial_end+pupilLag)
 session_info['trial_pupilMeasure'] = avg_pupilSize.copy()
-
 
 #%% running speed
 
@@ -292,7 +241,6 @@ if restOnly == True:
     
     # nan out running trials from pupil data
     session_info['trial_pupilMeasure'][run_trials] = np.nan
-    
     
 #%% bin trials according to evoked pupil percentile bins
 
@@ -312,16 +260,13 @@ for indPupil in range(0, n_pupilBlocks):
 
 session_info['pupil_block_trials'] = pupil_block_trials.copy()
 
-
 #%% number of trials to subsample in each pupil block
 
 nTrials_subsample_spont = np.min(nTrials_in_pupilBlocks)
 nTrials_subsample_spont = int(nTrials_subsample_spont)
 
 #%% average pupil size of spont trials in each block
-
 avg_pupilSize_allTrials_spont = session_info['trial_pupilMeasure'].copy()
-
 
 #%% quantities for fano factor
 
@@ -329,9 +274,7 @@ all_trials_spont = session_info['pupil_block_trials'].copy()
 singleTrial_spikeTimes_spont = session_info['spikeTimes_trials_cells'].copy()
 singleTrial_spikeCounts_spont = session_info['spkCounts_trials_cells'].copy()
 
-
 #%% clear session info
-#session_info.clear()
 del session_info
 
 #%% number of trials to subsample
@@ -341,9 +284,6 @@ nTrials_subsample = np.min(np.array([nTrials_subsample_evoked, nTrials_subsample
 if nTrials_subsample < nTrials_thresh:
     print(nTrials_subsample)
     sys.exit('not enough trials')
-
-
-
 
 
 #%% quantities to compute
@@ -358,7 +298,6 @@ diff_fanofactor_pre = np.zeros((nCells, nFreq, n_pupilBlocks, nWindows))
 spont_trialAvg_spikeCount = np.zeros((nCells, n_pupilBlocks))
 evoked_trialAvg_spikeCount = np.zeros((nCells, nFreq, n_pupilBlocks, nWindows))
 pre_trialAvg_spikeCount = np.zeros((nCells, nFreq, n_pupilBlocks))
-
 
 # average pupil size of low and high pupil trials
 avg_pupilSize_spontTrials = np.zeros((n_pupilBlocks, n_subsamples))
@@ -391,7 +330,6 @@ for indSample in range(0, n_subsamples):
                 # spontaneous fano
                 spont_fano[cellInd, freqInd, pupilInd, indSample] = fcn_fanoFactor(spont_spike_counts)
                 
-
                 # evoked spike counts
                 all_trials_evoked_spike_counts = singleTrial_spikeCounts_evoked[all_trials_evoked[freqInd, pupilInd], cellInd].copy()                      
                 evoked_spike_counts = singleTrial_spikeCounts_evoked[trial_inds_evoked, cellInd, :].copy()
@@ -399,7 +337,6 @@ for indSample in range(0, n_subsamples):
                 # evoked fano
                 evoked_fano[cellInd, freqInd, pupilInd, indSample, :] = fcn_fanoFactor(evoked_spike_counts)
                 
-
                 # trial average spike counts
                 spont_trialAvg_spikeCount[cellInd, pupilInd] = np.mean(all_trials_spont_spike_counts)
                 evoked_trialAvg_spikeCount[cellInd, freqInd, pupilInd,:] = np.mean(all_trials_evoked_spike_counts,0)
@@ -421,7 +358,7 @@ avg_pupilSize_spontTrials = np.mean(avg_pupilSize_spontTrials, 1)
 avg_pupilSize_evokedTrials = np.mean(avg_pupilSize_evokedTrials, axis=(1,2))
 
 
-#%% SAVE DATA
+#%% SAVE RESULTS
 
 
 params = {'session_path':         data_path, \
@@ -440,11 +377,9 @@ params = {'session_path':         data_path, \
           'runBlock_step':        runBlock_step, \
           'trialMatch':           trialMatch, \
           'nTrials_thresh':       nTrials_thresh, \
-          'rateDrift_cellSelection': rateDrift_cellSelection, \
+          'cellSelection':        cellSelection, \
           'window_step':          window_step}
     
-
-
     
 results = {'params':                                params, \
            'nTrials_subsample':                     nTrials_subsample, \
