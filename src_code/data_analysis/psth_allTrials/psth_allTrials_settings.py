@@ -8,7 +8,7 @@ import global_settings
 
 #%% computing cluster
 maxCores = 40 # total number of cores to use for analysis
-cores_per_job = 4 # needs to be set ahead of time using OMP_NUM_THREADS
+cores_per_job = 4 # number of cores/job; needs to be set ahead of time using OMP_NUM_THREADS
 
 #%% sessions to analyze
 sessions_to_run = [\

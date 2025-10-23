@@ -17,8 +17,8 @@ all_sessions_to_run = ['LA3_session3', \
     
 
 #%% for cluster
-maxCores = 40
-cores_per_job = 4 # needs to be set ahead of time using OMP_NUM_THREADS
+maxCores = 40 # total number of cores to use for analysis
+cores_per_job = 4 # number of cores/job; needs to be set ahead of time using OMP_NUM_THREADS
 
 #%% paths
 func_path1 = global_settings.path_to_src_code + 'data_analysis/'

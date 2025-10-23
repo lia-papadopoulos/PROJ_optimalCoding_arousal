@@ -1,22 +1,19 @@
 
 
-#%% IMPORTS
-
-# basic imports
+#%% basic imports
 import sys        
 import numpy as np
 import numpy.matlib
 import argparse
 from scipy.io import savemat
 
-# import settings file
+#%% import settings file
 import singleCell_dPrime_settings as settings
 
-# paths to functions
+#%% functions
 sys.path.append(settings.func_path1)        
 sys.path.append(settings.func_path2)
 
-# main functions
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_spikeTimes_trials_cells
@@ -30,8 +27,7 @@ from fcn_SuData import fcn_compute_avgRunSpeed_inTrials
 from fcn_SuData import fcn_determine_runningTrials
 
 
-#%% PARAMETERS
-
+#%% unpack settings
 data_path = settings.data_path
 outpath = settings.outpath
 trial_window = settings.trial_window
@@ -51,18 +47,17 @@ runSpeed_method = settings.runSpeed_method
 runBlock_size = settings.runBlock_size
 runBlock_step = settings.runBlock_step
 runSplit_method = settings.runSplit_method
-rateDrift_cellSelection = settings.rateDrift_cellSelection
 global_pupilNorm = settings.global_pupilNorm
-highDownsample = settings.highDownsample
+highDownsample = settings.highDownSample
+cellSelection = settings.cellSelection
 
 
-#%% CHECKS
-
+#%% checks
 if ( (restOnly == True) and (trialMatch == True) ):
     sys.exit('cant do rest only w/ trial matching yet; need to add multiple subsamples')
 
 
-#%% USER INPUTS
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -77,16 +72,16 @@ args = parser.parse_args()
 session_name = args.session_name
 
 
-#%% GET DATA
+#%% get session data
 
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
+# name of session file
+data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
-
+# session dictionary
 session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
 
-#%% UPDATE SESSION INFO
-
+#%% update session dictionary
 
 session_info['trial_window'] = trial_window
 
@@ -176,7 +171,6 @@ nFreq = session_info['n_frequencies']
 uniqueFreq = session_info['unique_frequencies']
 
 
-
 #%% initialize quantities that we'll compute
 
 nCells = session_info['nCells']
@@ -242,7 +236,7 @@ for pupilInd in range(0, n_pupilBlocks):
                         # dprime_AB
                         dprime[timeInd, cellInd, freqInd_A, freqInd_B, pupilInd, indSample] = (np.abs(mu_A - mu_B))/( np.sqrt( (1/2)*(var_A + var_B) ) )
 
-
+    # average pupil size in this pupil bin
     avg_pupilSize_dprimeTrials_pupilBlocks[pupilInd] = np.mean(session_info['trial_pupilMeasure'][allTrials_sampled])
 
 # average dprime across samples
@@ -278,7 +272,7 @@ params = {'session_path':         data_path, \
           'runBlock_step':        runBlock_step, \
           'trialMatch':           trialMatch, \
           'nTrials_thresh':       nTrials_thresh, \
-          'rateDrift_cellSelection': rateDrift_cellSelection, \
+          'cellSelection':        cellSelection, \
           'n_subsamples':         n_subsamples}
 
     

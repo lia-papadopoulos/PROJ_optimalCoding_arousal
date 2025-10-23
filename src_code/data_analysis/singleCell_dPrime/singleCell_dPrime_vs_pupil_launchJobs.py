@@ -19,8 +19,6 @@ os.system("tsp -S %s" % simul_jobs)
 # loop over sessions and launch jobs
 for session_name in sessions_to_run:
     
-    # run analysis        
+    # run     
     command = "tsp python singleCell_dPrime_vs_pupil.py --session_name %s "  % (session_name)
-
-    # SUBMIT JOBS
     os.system(command) 
