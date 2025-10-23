@@ -1,9 +1,6 @@
 
-"""
-examine correlations between firing rate and pupil size
-"""
 
-#%%
+#%% basic imports
 import sys        
 import numpy as np
 import matplotlib
@@ -12,12 +9,12 @@ import scipy.stats
 from scipy.io import savemat
 import argparse
 
+#%% settings file
 import pupil_rate_correlation_settings as settings
 
-# add paths to functions
+#%% functions
 sys.path.append(settings.func_path1)       
 sys.path.append(settings.func_path2)
-
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_SuData import fcn_spikeTimes_trials_cells_spont
 from fcn_SuData import fcn_makeTrials_spont
@@ -27,7 +24,6 @@ from fcn_SuData import fcn_compute_avgPupilSize_inTrials
 
 
 #%% settings
-
 data_path = settings.data_path
 outpath = settings.analyzed_data_path
 fig_outpath = settings.fig_outpath
@@ -35,10 +31,11 @@ window_length = settings.window_length
 inter_window_interval = settings.inter_window_interval
 stim_duration = settings.stim_duration
 percentileBin_size = settings.percentileBin_size
-rateDrift_cellSelection = settings.rateDrift_cellSelection
+cellSelection = settings.cellSelection
+global_pupilNorm = settings.global_pupilNorm
+highDownsample = settings.highDownsample
 
-
-#%% argparse inputs
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -53,24 +50,23 @@ args = parser.parse_args()
 session_name = args.session_name
 
 
-#%% GET DATA
+#%% get session data
 
-data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection
+data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
 session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
-
-#%% EXTRACT RELEVANT DATA
-
+#%% extract relevant data for analysis
 spont_blocks = session_info['spont_blocks']
 nCells = session_info['nCells']
 
+#%% update session dictionary
 session_info['spontBlock_start'] = spont_blocks[0,:].copy()
 session_info['spontBlock_end'] = spont_blocks[1,:].copy()
 session_info['n_spontBlocks'] = np.size(session_info['spontBlock_start'])
                                         
                                         
-#%% SPLIT SPONTANEOUS BLOCKS INTO ANALYSIS WINDOWS
+#%% split spontaneous blocks into analysis windows
 
 session_info = fcn_makeTrials_spont(session_info, window_length, inter_window_interval)
 
@@ -90,36 +86,16 @@ session_info = fcn_compute_spikeCnts_inTrials(session_info)
 trial_rates = session_info['spkCounts_trials_cells']/window_length
 
 
-#%% AVERAGE RUNNING SPEED IN EACH WINDOW
-
+#%% average running speed in each window
 session_info = fcn_compute_avgRunSpeed_inTrials(session_info, trial_start, trial_end)
 avg_runSpeed = session_info['avg_runSpeed'].copy()
 
-#%% AVERAGE PUPIL SIZE IN EACH WINDOW
-
+#%% average pupil diameter in each window
 avg_pupilSize = fcn_compute_avgPupilSize_inTrials(session_info, trial_start, trial_end)
 session_info['avg_pupilSize'] = avg_pupilSize
 
 
-#%% CORRELATION BETWEEN RUNNING OR AND PUPIL SIZE AND CELL RATE
-
-corr_pupil_rates = np.ones((nCells, 2))*np.nan
-corr_run_rates = np.ones((nCells, 2))*np.nan
-
-for cellInd in range(0, nCells):
-    
-    nonNan = ~np.isnan(avg_pupilSize)
-    
-    rspearman, p = scipy.stats.spearmanr(trial_rates[nonNan, cellInd], avg_pupilSize[nonNan])
-    corr_pupil_rates[cellInd, 0] = rspearman
-    corr_pupil_rates[cellInd, 1] = p
-
-    rspearman, p = scipy.stats.spearmanr(trial_rates[nonNan, cellInd], avg_runSpeed[nonNan])
-    corr_run_rates[cellInd,0] = rspearman
-    corr_run_rates[cellInd,1] = p
-    
-    
-#%% BIN DATA BASED ON SPEED AND PUPIL PERCENTILE
+#%% bin data based on run speed or pupil diameter
 
 nBins = int(1/percentileBin_size)
 
@@ -152,7 +128,6 @@ avgSpeed_binID = np.digitize(avg_runSpeed, run_binEdges)
 avgRate_pupilBins = np.zeros((nCells, nBins))
 avgRate_runBins = np.zeros((nCells, nBins))
 
-
 for indBin in range(0, nBins):
     
     data_inBin = np.nonzero(avgPupil_binID == indBin+1)[0]
@@ -164,7 +139,7 @@ for indBin in range(0, nBins):
     
 
 
-#%% COMPUTE CORRELATION
+#%% compute correlation
 
 corr_pupil_rates_pctileBins = np.zeros((nCells, 2))
 corr_run_rates_pctileBins = np.zeros((nCells, 2))
@@ -180,7 +155,7 @@ for indCell in range(0, nCells):
     corr_run_rates_pctileBins[indCell, 1] = p
 
 
-#%% SAVE THE DATA
+#%% SAVE RESULTS
 
 params = {}
 results = {}
@@ -190,18 +165,15 @@ params['window_length'] = window_length
 params['inter_window_interval'] = inter_window_interval
 params['stim_duration'] = stim_duration
 params['percentileBin_size'] = percentileBin_size
-params['rateDrift_cellSelection'] = rateDrift_cellSelection
+params['cellSelection'] = cellSelection
 
 results['params'] = params
 results['avg_pupilSize_inPercentiles'] = avg_pupilSize_inPercentiles
 results['pupil_binEdges'] = pupil_binEdges
 results['pupil_binCenters'] = pupil_binCenters
 results['avgRate_pupilBins'] = avgRate_pupilBins
-results['corr_run_rates'] = corr_run_rates
-results['corr_pupil_rates'] = corr_pupil_rates
 results['corr_run_rates_pctileBins'] = corr_run_rates_pctileBins
 results['corr_pupil_rates_pctileBins'] = corr_pupil_rates_pctileBins
-
 
 savemat('%s%s_pupil_run_rate_correlation_spont_windLength%0.3fs%s.mat' % (outpath, session_name, window_length, data_name), results)
 

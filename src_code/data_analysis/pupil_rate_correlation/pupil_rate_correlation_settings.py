@@ -1,19 +1,16 @@
 
-"""
-settings file
-"""
-
+#%% basic imports
 import sys
 
+#%% global settings
 sys.path.append('../../')
 import global_settings
 
-
-# cluster usage
-maxCores = 56
+#%% cluster usage
+maxCores = 56 # total number of cores to use for analysis
 cores_per_job = 4 # needs to be set ahead of time using OMP_NUM_THREADS
 
-# sessions to run
+#%% sessions to run
 all_sessions_to_run = ['LA3_session3', \
                        'LA8_session1', 'LA8_session2', \
                        'LA9_session1', \
@@ -22,7 +19,8 @@ all_sessions_to_run = ['LA3_session3', \
                        'LA12_session1', 'LA12_session2', 'LA12_session3', 'LA12_session4'
                       ]
 
-    
+#%% analysis parameters
+ 
 # paths 
 data_path = global_settings.path_to_processed_data
 analyzed_data_path = global_settings.path_to_data_analysis_output + '/rate_pupil_run_correlations/'
@@ -35,7 +33,11 @@ window_length = 100e-3
 inter_window_interval = 0e-3
 stim_duration = 25e-3
 percentileBin_size = 0.1
-rateDrift_cellSelection = False
+
+# data selection
+global_pupilNorm = False
+highDownsample = False
+cellSelection = ''
 
 # plotting
 plot_low_cutoff = 0.25
