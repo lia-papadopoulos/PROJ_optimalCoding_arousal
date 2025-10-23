@@ -1,22 +1,19 @@
 
 
-#%%
-
-# basic imports
+#%% basic imports
 import sys     
 import numpy as np
 import argparse
 from scipy.io import savemat
 import numpy.matlib
 
-# settings
+#%% settings
 import evoked_corr_settings as settings
 
-# paths to functions
+#%% functions
 sys.path.append(settings.func_path1)        
 sys.path.append(settings.func_path2)
 
-# import functions
 from fcn_statistics import fcn_zscore
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_SuData import fcn_compute_spikeCount_corr
@@ -30,14 +27,12 @@ from fcn_SuData import fcn_trials_perFrequency_perPupilBlock
 from fcn_SuData import fcn_get_trials_in_pupilBlocks
 
 
-#%% PARAMETERS
-
+#%% unpack settings
 zscore_withinPupil = settings.zscore_withinPupil
 base_subtract = settings.base_subtract
 window_length = settings.window_length
 trial_window_evoked = settings.trial_window_evoked
 pupilSize_method = settings.pupilSize_method
-pupilLag = settings.pupilLag
 nTrials_thresh = settings.nTrials_thresh
 n_subsamples = settings.n_subsamples
 pupilBlock_size = settings.pupilBlock_size
@@ -45,12 +40,11 @@ pupilBlock_step = settings.pupilBlock_step
 pupilSplit_method = settings.pupilSplit_method
 data_path = settings.data_path
 outpath = settings.outpath
-
 global_pupilNorm = settings.global_pupilNorm
 highDownsample = settings.highDownsample
 cellSelection = settings.cellSelection
 
-#%% USER INPUTS
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -64,21 +58,18 @@ args = parser.parse_args()
 # argparse inputs
 session_name = args.session_name
 
-
-#%% GET DATA
+#%% get data for this session
 
 data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
 session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
+#%% number of cells
 nCells = session_info['nCells']
 
-
-#%% session info
-
+#%% update session dictionary
 session_info['trial_window'] = trial_window_evoked
 session_info['pupilSize_method'] = pupilSize_method
-session_info['pupil_lag'] = pupilLag
 session_info['pupilBlock_size'] = pupilBlock_size
 session_info['pupilBlock_step'] = pupilBlock_step
 session_info['pupilSplit_method'] = pupilSplit_method
@@ -111,7 +102,6 @@ session_info = fcn_compute_pupilMeasure_eachTrial(session_info)
 
 # trials in pupil blocks
 session_info = fcn_get_trials_in_pupilBlocks(session_info)
-
 
 #%% determine number of trials of each stimulus type in each pupil block
 session_info = fcn_trials_perFrequency_perPupilBlock(session_info)
@@ -169,7 +159,7 @@ trialAvg_base_spkCount = np.ones((nCells, nPupilBins, nFreq, n_subsamples))*np.n
 
 avg_pupilSize_evokedTrials = np.ones((nPupilBins, nFreq, n_subsamples))*np.nan
 
-#%% quantities to compute
+#%% compute spike count correlations
 
 for indSample in range(0, n_subsamples):
 
@@ -180,7 +170,6 @@ for indSample in range(0, n_subsamples):
 
     spkCounts_all_shuffle = np.array([])
     spkCounts_all_shuffle.shape = (0, nCells)
-
 
     spkCounts_all_base = np.array([])
     spkCounts_all_base.shape = (0, nCells)
@@ -208,11 +197,11 @@ for indSample in range(0, n_subsamples):
             # base spike counts
             base_spike_counts = singleTrial_spikeCounts_base[trial_inds_evoked, :].copy()
             
-
+            # trial average
             trialAvg_evoked_spkCount[:, pupilInd, freqInd, indSample] = np.mean(evoked_spike_counts, 0)
             trialAvg_base_spkCount[:, pupilInd, freqInd, indSample] = np.mean(base_spike_counts, 0)
             
-            
+            # zscoring
             if zscore_withinPupil:
                 for indCell in range(0, nCells):
                     evoked_spike_counts[:, indCell] = fcn_zscore(evoked_spike_counts[:, indCell])
@@ -223,25 +212,28 @@ for indSample in range(0, n_subsamples):
             spkCounts_base_all = np.vstack((spkCounts_all_base, base_spike_counts))
             spkCounts_all_eachFreq = np.vstack((spkCounts_all_eachFreq, evoked_spike_counts))
 
+            # average pupil size of evoked trials
             avg_pupilSize_evokedTrials[pupilInd, freqInd, indSample] = np.mean(avg_pupilSize_allTrials_evoked[trial_inds_evoked])       
             
+            # evoked correlation for each frequency
             corr_evoked_eachPupil_eachFreq[:,:,pupilInd,freqInd,indSample] = fcn_compute_spikeCount_corr(evoked_spike_counts)
             
+            # evoked correlation of shuffled data
             spkCounts_eachPupil_eachFreq_shuffle, _ = fcn_trial_shuffled_spikeCounts(evoked_spike_counts)
             corr_evoked_eachPupil_eachFreq_shuffle[:,:,pupilInd,freqInd,indSample] = fcn_compute_spikeCount_corr(spkCounts_eachPupil_eachFreq_shuffle)
             
             
-        
+        # all pupils combined
         spkCounts_all_eachFreq_shuffle, _ = fcn_trial_shuffled_spikeCounts(spkCounts_all_eachFreq)
         corr_evoked_allPupil_eachFreq[:, :, freqInd, indSample] = fcn_compute_spikeCount_corr(spkCounts_all_eachFreq)
         corr_evoked_allPupil_eachFreq_shuffle[:,:,freqInd,indSample] = fcn_compute_spikeCount_corr(spkCounts_all_eachFreq_shuffle)
 
-
+    # shuffle spike counts from all pupil bins and tones
     spkCounts_all_shuffle, _ = fcn_trial_shuffled_spikeCounts(spkCounts_all)
     spkCounts_base_all_shuffle, _ = fcn_trial_shuffled_spikeCounts(spkCounts_base_all)
 
 
-    # correlations
+    # spike count correlations computed from spike counts combined across pupils and tones 
     corr_evoked_allPupil[:, :, indSample] = fcn_compute_spikeCount_corr(spkCounts_all)
     corr_evoked_allPupil_shuffle[:, :, indSample] = fcn_compute_spikeCount_corr(spkCounts_all_shuffle)
 
@@ -268,7 +260,7 @@ trialAvg_base_spkCount = np.mean(trialAvg_base_spkCount, axis=(1,2,3))
 
 corr_evoked_pupilAvg_freqAvg_shuffle = np.nanmean(corr_evoked_eachPupil_eachFreq_shuffle, axis=(2,3))
 
-#%% SAVE DATA
+#%% SAVE RESULTS
 
 
 params = {'session_path':         data_path, \

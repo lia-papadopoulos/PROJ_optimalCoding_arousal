@@ -11,13 +11,13 @@ import numpy.matlib
 # settings
 import evoked_corr_settings as settings
 
-# paths to functions
+# functions
 sys.path.append(settings.func_path1)
 sys.path.append(settings.func_path2)
 import fcn_hierarchical_clustering
 from fcn_SuData_analysis import fcn_significant_preStim_vs_postStim
 
-# import settings
+#%% unpack settings
 linkage_method = settings.linkage_method
 fcluster_criterion = settings.fcluster_criterion
 cells_toKeep = settings.cells_toKeep
@@ -34,15 +34,14 @@ outpath = settings.outpath_clustering
 all_sessions_to_run = settings.sessions_to_run
 base_subtract = settings.base_subtract
 
-#%% loop over sessions
+#%% loop over sessions and run clustering
 
+# name of session data file
 data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
-
-
 
 for session in all_sessions_to_run:
 
-
+    # setup to get the data
     base_subtract_str = '_baselineSubtract'*base_subtract
 
     fname = ('evoked_correlations_pupilPercentile_combinedBlocks_%s_windLength%0.3fs_%s%s.mat' % (session, wind_length, base_subtract_str, data_name))
@@ -62,10 +61,10 @@ for session in all_sessions_to_run:
         corr_allPupil_raw_shuffle = data['corr_evoked_pupilAvg_freqAvg_shuffle'].copy()
         print('make sure that you are running the shuffle you want.')
 
-
+    # number of cells
     nCells = np.size(corr_allPupil_raw, 0)
     
-    ### significant cells
+    # significant cells
     sig_cells_dict = fcn_significant_preStim_vs_postStim(psth_data, sig_level)
     
     if cells_toKeep == 'allSigCells':
@@ -78,10 +77,10 @@ for session in all_sessions_to_run:
 
     nSigCells = np.size(allSigCells)
     
-    ### remove non significant cells
+    # remove non significant cells
     remove_cells = np.setdiff1d(np.arange(0,nCells), allSigCells)
     
-    # rates during each pupil bin
+    # average rates of each cell
     rates_allPupil = rates_allPupil[allSigCells].copy()
     
     # correlation for all pupil bins
@@ -91,11 +90,9 @@ for session in all_sessions_to_run:
     bad_sigCells = fcn_hierarchical_clustering.fcn_find_badCells(corr_allPupil_sigCells, rates_allPupil, rate_thresh)
     remove_cells = np.sort(np.append(remove_cells, allSigCells[bad_sigCells]))
 
-
     ### cleaned correlation matrices
     corr_allPupil_cleaned = fcn_hierarchical_clustering.fcn_remove_badCells(corr_allPupil_raw, remove_cells)
             
-        
     # if running clustering on shuffled correlation matrix
     if runShuffle_corr:
         
@@ -111,14 +108,11 @@ for session in all_sessions_to_run:
         corr_allPupil_shuffle_cleaned[np.isnan(corr_allPupil_shuffle_cleaned)] = 0.
 
 
-
     ### clustering
     
-    # all pupil
     dissimilarity_allPupil = fcn_hierarchical_clustering.fcn_compute_dissimilarity(corr_allPupil_cleaned)
     linkageMatrix_allPupil = fcn_hierarchical_clustering.fcn_run_hierarchical_clustering(corr_allPupil_cleaned, linkage_method)
     
-    # all pupil shuffle
     if runShuffle_corr:
         
         dissimilarity_allPupil_shuffle = np.ones((nSubsamples), dtype='object')
@@ -130,7 +124,7 @@ for session in all_sessions_to_run:
             linkageMatrix_allPupil_shuffle[indSample] =                       fcn_hierarchical_clustering.fcn_run_hierarchical_clustering(corr_allPupil_shuffle_cleaned[:,:,indSample], linkage_method)
 
  
-    ### save the data
+    ### save the results
     data_save = dict()
         
     data_save['params'] = dict()
