@@ -1,16 +1,15 @@
 
-# imports
+#%% imports
 import os
 import spont_spikeSpectra_settings as settings
 
-# from settings
+#%% load settings
 maxCores = settings.maxCores
 cores_per_job = settings.cores_per_job # needs to be set ahead of time using OMP_NUM_THREADS
 all_sessions_to_run = settings.sessions_to_run
 
-# cluster usage
+#%% cluster usage
 simul_jobs = round(maxCores/cores_per_job)
-
 
 #%% LAUNCH JOBS
 
@@ -22,6 +21,4 @@ for session_name in all_sessions_to_run:
     
     # run analysis        
     command = "tsp python spont_spikeSpectra_pupilPercentile.py --session_name %s "  % (session_name)
-
-    # SUBMIT JOBS
     os.system(command) 

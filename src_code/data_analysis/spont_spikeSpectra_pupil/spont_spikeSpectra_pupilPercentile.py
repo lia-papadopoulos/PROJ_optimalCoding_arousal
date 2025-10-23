@@ -1,6 +1,6 @@
 
 
-#%% IMPORTS
+#%% imports
 
 # basic imports
 import sys     
@@ -11,11 +11,10 @@ from scipy.io import savemat
 # settings file
 import spont_spikeSpectra_settings as settings
 
-# paths to settings
+# functions
 sys.path.append(settings.func_path1)        
 sys.path.append(settings.func_path2)
 
-# main functions
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
 from fcn_SuData import fcn_makeTrials_spont
 from fcn_SuData import fcn_spikeTimes_trials_cells_spont
@@ -30,9 +29,7 @@ from fcn_SuData import fcn_getTrials_in_pupilRange
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_compute_pupilMeasure_eachTrial
 
-#%% PARAMETERS
-
-rate_thresh = settings.rate_thresh
+#%% unpack settings
 window_length_percentileComputation = settings.window_length_percentileComputation
 split_based_on_evokedData = settings.split_based_on_evokedData
 window_length = settings.window_length
@@ -58,13 +55,13 @@ data_path = settings.data_path
 outpath = settings.outpath
 
 
-#%% CHECKS
+#%% checks
 
 if ( (restOnly == True) and (trialMatch == True) ):
     sys.exit('cant do rest only w/ trial matching yet; need to add multiple subsamples')
 
 
-#%% USER INPUTS
+#%% user input
 
 # argparser
 parser = argparse.ArgumentParser() 
@@ -82,10 +79,9 @@ session_name = args.session_name
 #%% parse data by pre-stimulus percentiles computed from 100 ms window
 ### want to use same percentile splits for all analyses
 
-
 if split_based_on_evokedData == True:
     
-    ### load data
+    ### load data and define trials
     
     session_info = fcn_processedh5data_to_dict(session_name, data_path)
     
@@ -155,7 +151,7 @@ if split_based_on_evokedData == True:
     # number of pupil blocks
     n_pupilBlocks = np.size(pupilBin_centers_evoked)
     
-    ###
+    ### delete session dictionary
     del session_info
 
 else:
@@ -163,15 +159,18 @@ else:
     sys.exit()
 
 
-
 #%% analyze spontaneous data
 
+# load data
 session_info = fcn_processedh5data_to_dict(session_name, data_path)
 
+# number of cells
 nCells = session_info['nCells']
 
+# spontaneous blocks
 spont_blocks = session_info['spont_blocks']
 
+# update session dictionary
 session_info['spontBlock_start'] = spont_blocks[0,:].copy()
 session_info['spontBlock_end'] = spont_blocks[1,:].copy()
 session_info['n_spontBlocks'] = np.size(session_info['spontBlock_start'])
@@ -183,24 +182,21 @@ session_info = fcn_makeTrials_spont(session_info, window_length, inter_window_in
 trial_start = session_info['trial_start'].copy()
 trial_end = session_info['trial_end'].copy()
 
-print('made trials')
-
 
 #%% spike times
 session_info = fcn_spikeTimes_trials_cells_spont(session_info)
 
 
-#%% spike counts of all cell sin all trials
+#%% spike counts of all cells in all trials
 session_info = fcn_compute_spikeCnts_inTrials(session_info)
 
 
 #%% average pupil size across window
-
 avg_pupilSize = fcn_compute_avgPupilSize_inTrials(session_info, trial_start, trial_end)
 session_info['trial_pupilMeasure'] = avg_pupilSize
 
 
-#%% running speed
+#%% running
 
 session_info = fcn_compute_avgRunSpeed_inTrials(session_info, trial_start, trial_end)
 
@@ -209,7 +205,6 @@ session_info = fcn_determine_runningTrials(session_info, runThresh)
 # running trials
 run_trials = np.nonzero(session_info['running'])[0]
 rest_trials = np.nonzero(session_info['running']==0)[0]
-
 
 if restOnly == True:
     
@@ -257,8 +252,10 @@ session_info.clear()
 #%% quantities to compute
 
 
-# bins
+# spike count bins
 bins = np.arange(0, window_length+dt, dt)
+
+# number of frequency points in spectra
 nFreq_spectra = int(window_length/(2*dt) + 1)
 
 # number of df
@@ -271,6 +268,7 @@ norm_power_spectra = np.ones((nCells, n_pupilBlocks, n_subsamples, nFreq_spectra
 power_spectra_raw = np.ones((nCells, n_pupilBlocks, n_subsamples, nFreq_spectra, 2))*np.nan
 norm_power_spectra_raw = np.ones((nCells, n_pupilBlocks, n_subsamples, nFreq_spectra, 2))*np.nan
 
+# spike counts
 spont_trialAvg_spikeCount = np.zeros((nCells, n_pupilBlocks))
 
 # average pupil size of low and high pupil trials
@@ -332,7 +330,7 @@ for indSample in range(0, n_subsamples):
                     raw_specpb_lp(spont_spikes_binned, 1/dt, True, 1)
 
 
-
+# average
 avg_pupilSize_trials = np.mean(avg_pupilSize_trials, 1)
 
 if avg_type == 1:
@@ -347,7 +345,7 @@ elif avg_type == 2:
     norm_power_spectra_raw = np.nanmean(norm_power_spectra_raw, 2) 
 
 
-#%% SAVE DATA
+#%% SAVE RESULTS
 
 
 params = {'session_path':         data_path, \
