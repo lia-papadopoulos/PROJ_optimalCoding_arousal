@@ -24,7 +24,6 @@ all_sessions_to_run = ['LA3_session3', \
 # paths 
 data_path = global_settings.path_to_processed_data
 analyzed_data_path = global_settings.path_to_data_analysis_output + '/rate_pupil_run_correlations/'
-fig_outpath = global_settings.path_to_data_analysis_output + '/rate_pupil_run_correlations/Figures/'
 func_path1 = global_settings.path_to_src_code + 'data_analysis/'
 func_path2 = global_settings.path_to_src_code + 'functions/'
 
@@ -39,11 +38,6 @@ global_pupilNorm = False
 highDownsample = False
 cellSelection = ''
 
-# plotting
-plot_low_cutoff = 0.25
-plot_high_cutoff = 0.75
-plot_sig_level = 0.05
-plot_rate_thresh = 0.
 
 
 

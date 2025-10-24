@@ -53,7 +53,7 @@ n_subsamples = 100
 # rest only
 restOnly = False
 trialMatch = False
-runThresh = 1.25
+runThresh = 2.
 runSpeed_method = 'avgSize_beforeStim'
 runBlock_size = 1.
 runBlock_step = 1.

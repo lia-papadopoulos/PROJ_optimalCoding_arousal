@@ -8,9 +8,11 @@ import sys
 sys.path.append('../../')
 import global_settings
 
-#%% cluster
-maxCores = 40 # total number of cores to for analysis
-cores_per_job = 4 # number of cores/job; needs to be set ahead of time using OMP_NUM_THREADS
+#%% paths
+data_path = global_settings.path_to_processed_data
+outpath = global_settings.path_to_data_analysis_output + 'singleCell_dPrime_pupil/'
+func_path1 = global_settings.path_to_src_code + 'data_analysis/'      
+func_path2 = global_settings.path_to_src_code + 'functions/'   
 
 #%% sessions to analyze
 sessions_to_run = [\
@@ -23,19 +25,17 @@ sessions_to_run = [\
                      
                   ]
     
-#%% paths
-data_path = global_settings.path_to_processed_data
-outpath = global_settings.path_to_data_analysis_output + 'singleCell_dPrime_pupil/'
-func_path1 = global_settings.path_to_src_code + 'data_analysis/'      
-func_path2 = global_settings.path_to_src_code + 'functions/'   
+#%% cluster
+maxCores = 40 # total number of cores to for analysis
+cores_per_job = 4 # number of cores/job; needs to be set ahead of time using OMP_NUM_THREADS
 
 #%% analysis parameters
 
-# window for trials
-trial_window = [-100e-3, 450e-3]
-
 # stimulus duration
 stim_duration = 25e-3
+
+# window for trials
+trial_window = [-100e-3, 450e-3]
 
 # window length
 window_length = 100e-3
@@ -48,19 +48,19 @@ pupilBlock_size = 0.1
 pupilBlock_step = 0.1
 pupilSplit_method = 'percentile'
 
+# pupil size method
+pupilSize_method = 'avgSize_beforeStim'
+
 # n subsamples
 n_subsamples = 100
 
 # number of trials needed
 nTrials_thresh = 20
 
-# pupil size method
-pupilSize_method = 'avgSize_beforeStim'
-
 # rest only
 restOnly = False
 trialMatch = False
-runThresh = 1.25
+runThresh = 2.
 runSpeed_method = 'avgSize_beforeStim'
 runBlock_size = 1.
 runBlock_step = 1.

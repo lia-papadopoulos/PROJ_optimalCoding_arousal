@@ -13,7 +13,6 @@
 
 Each subdirectory in `data_analysis/` performs a different analysis on the neural and/or behavioral data and saves the results to a specified output directory. 
 
-
 ### `cv_isi_vs_pupil/`
 
 Contains code to compute the coefficient of variation of interspike intervals (during spontaneous activity) as a function of arousal (associated with Fig. S6D-G).
@@ -22,7 +21,6 @@ Contains code to compute the coefficient of variation of interspike intervals (d
 2. `isiCV_vs_pupilPercentile.py`:  Main analysis script; loads the settings file and then runs and saves the analysis for a specified session.
 3. `isiCV_vs_pupilPercentile_launchJobs.py`: Loads in settings file and for each session, runs `isiCV_vs_pupilPercentile.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
 
-
 ### `decoding/`
 
 Contains code to run decoding analyses as a function of arousal and for different ensemble sizes (associated with Fig. 2E,H,I; Fig. S1B-D,F,G; Fig. S8C,D)
@@ -30,7 +28,6 @@ Contains code to run decoding analyses as a function of arousal and for differen
 1. `decoding_params.py`: File that specifies which sessions to analyze, the analysis parameters, and all paths required to load data and functions and save results.  This is the only file that needs to be changed by the user.
 2. `decode_pupil.py`: Main analysis script; loads the params file and then runs and saves the analysis for a specified session.
 3. `decode_pupil_launchJobs.py`: Loads in params file and for each session, runs `decode_pupil.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
-
 
 ### `fanofactor_vs_pupil/`
 
@@ -41,117 +38,117 @@ Contains code to run the Fano factor analyses as a function of arousal (associat
 3. `fanofactor_vs_pupilPercentile_rawSpontEvoked.py`: Main analysis script for computing the spontaneous and evoked Fano factor as a function of pupil diameter/arousal; loads the settings file and then runs and saves the analysis for a specified session.
 4. `fanofactor_vs_pupilPercentile_rawSpontEvoked_varyWindowSize.py`: Main analysis script for computing the spontaneous and evoked Fano factor as a function of pupil diameter/arousal and for different window sizes; loads the settings file and then runs and saves the analysis for a specified session. The same number of trials are used for all window sizes.
 5. `fanofactor_all_pupilPercentile_rawSpontEvoked_launchJobs.py`: Loads in settings file and for each session, runs `fanofactor_all_pupilPercentile_rawSpontEvoked.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
-6. `fanofactor_vs_pupilPercentile_rawSpontEvoked_launchJobs.py`: Loads in params file and for each session, runs `fanofactor_vs_pupilPercentile_rawSpontEvoked.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
-7. `fanofactor_vs_pupilPercentile_rawSpontEvoked_varyWindowSize_launchJobs.py`: Loads in params file and for each session, runs `fanofactor_vs_pupilPercentile_rawSpontEvoked_varyWindowSize.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
+6. `fanofactor_vs_pupilPercentile_rawSpontEvoked_launchJobs.py`: Loads in settings file and for each session, runs `fanofactor_vs_pupilPercentile_rawSpontEvoked.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
+7. `fanofactor_vs_pupilPercentile_rawSpontEvoked_varyWindowSize_launchJobs.py`: Loads in settings file and for each session, runs `fanofactor_vs_pupilPercentile_rawSpontEvoked_varyWindowSize.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
 8. `fcn_plot_fanofactor.py`: Set of functions to help with plotting Fano factor (used in `src_code/manuscript_plotting_scripts/`)
 
+### `n_goodUnits_eachSession/`
 
+1. `n_goodUnits_eachSession.py`: Code to compute the number of cells in each session.
 
+### `psth_allTrials/`
 
+Contains code to compute the amplitude and significance of stimulus-evoked responses using trials combined across all arousal levels. The results of this analysis are used to to determine the set of the cells that respond significantly to at least one stimulus and to compute the pairwise tuning similarity for the clustering analysis.
 
+1. `psth_allTrials_settings.py`: File that specifies which sessions to analyze, the analysis parameters, and all paths required to load data and functions and save results. This is the only file that needs to be changed by the user.
+2. `psth_allTrials.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a specified session.
+3. `psth_allTrials_launchJobs.py`:  Loads in settings file and for each session, runs `psth_allTrials.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
 
-### `cellRates_vs_perturbation/`
+### `pupil_rate_correlation/`
 
-Contains code to compute relationships between single-cell firing rates and arousal level (associated with Fig. S2F,G; Fig. S3C).
+Contains code to assess relationship between pupil diameter and spontaneous single-cell firing rates (associated with Fig. S2A-E).
 
-1. `settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results. 
-2. `singelCell_tuning_to_perturbation.py`: Runs and saves the analysis for the parameters in `settings.py`
+1. `pupil_rate_correlation_settings.py`: ile that specifies which sessions to analyze, the analysis parameters, and all paths required to load data and functions and save results. This is the only file that needs to be changed by the user.
+2. `pupil_rate_correlation.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a specified session.
+3. `pupil_rate_correlation_launchJobs.py`: Loads in settings file and for each session, runs `pupil_rate_correlation.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
 
+### `singleCell_dPrime/`
 
+Contains code to compute the single-cell neural discriminability index as a function of arousal (associated with Fig. S2C,F,G; Fig. S1A; Fig. S8A,B)
 
-### `dprime/`
+1. `singleCell_dPrime_settings.py`: File that specifies which sessions to analyze, the analysis parameters, and all paths required to load data and functions and save results. This is the only file that needs to be changed by the user.
+2. `singleCell_dPrime_vs_pupil.py`:  Main analysis script; loads the settings file and then runs and saves the analysis for a specified session.
+3. `singleCell_dPrime_vs_pupil_launchJobs.py`: Loads in settings file and for each session, runs `singleCell_dPrime_vs_pupil.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
 
-Contains code to compute the single-cell neural discriminability index as a function of arousal (associated with Fig. 5C,D; Fig. S3D)
-
-1. `dPrime_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  This is the only file that needs to be changed by the user.
-2. `singleCell_dPrime.py`:  Main analysis script; loads the settings file and then runs and saves the analysis for a specified arousal level.
-3. `singleCell_dPrime_launchJobs.py`: Loads in simulation info based on the settings file and for each arousal level, runs `singleCell_dPrime.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each arousal level). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
-
-
-### `psth/`
-
-Contains code to compute the amplitude and significance of stimulus-evoked responses using trials combined across all arousal levels. The results of this analysis are used to compute the pairwise tuning similarity and to determine the set of the cells that respond significantly to at least one stimulus for the clustering analyses.
-
-1. `psth_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  This is the only file that needs to be changed by the user.
-2. `compute_psth.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a specified network and stimulus realization.
-3. `compute_psth_launchJobs.py`:  Loads in simulation info based on the settings file, then runs `compute_psth.py` (using task spooler) for each network and stimulus realization. This enables the user to run parallel jobs on a computing cluster (one job for each combination of network and stimulus realization). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
 
 ### `spikeCount_correlations/`
 
-Contains code to compute spike count correlations and run the hierarchical clustering analysis (associated with Fig. 4A-D).
+Contains code to compute spike count correlations and run the hierarchical clustering analysis (associated with Fig. 4E-K; Fig. S8E,F).
 
-1. `evoked_corr_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results. This is the only file that needs to be changed by the user.
-2. `evoked_corr.py.`:  Main analysis script for computing spike-count correlations; loads the settings file and then runs and saves the analysis for a specified network realization.
-3.  `evoked_corr_launchJobs.py`: Loads in simulation info based on the settings file, then runs `evoked_corr.py` (using task spooler) for each network realization. This enables the user to run parallel jobs on a computing cluster (one job per network realization). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
-4. `run_hClustering_evoked.py`: Script to run hierarchical clustering; loads the settings file and then runs hierarchical clustering on the correlation matrices generated by `evoked_corr.py`.
+1. `evoked_corr_settings.py`: File that specifies which sessions to analyze, the analysis parameters, and all paths required to load data and functions and save results. This is the only file that needs to be changed by the user.
+2. `evoked_corr.py.`:  Main analysis script for computing spike-count correlations; loads the settings file and then runs and saves the analysis for a specified session.
+3.  `evoked_corr_launchJobs.py`: Loads in settings file and for each session, runs `evoked_corr.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
+4. `run_hClustering_evoked.py`: Script to run hierarchical clustering; loads the settings file and then runs hierarchical clustering on the correlation matrices generated by `evoked_corr.py`. Also requires that you have already run `psth_allTrials.py` (see above).
 
 
-### `spont_spikeSpectra/`
+### `spont_spikeSpectra_pupil/`
 
-Contains code to compute the spike spectrum of individual cells as a function of arousal (associated with Fig. S6B,C).
+Contains code to compute the spike spectrum of individual cells as a function of arousal (associated with Fig. S6H-L).
 
-1. `spont_spikeSpectra_settings.py`: File that specifies which simulations to analyze, the analysis parameters, and all paths required to load functions and simulations and save results.  This is the only file that needs to be changed by the user.
-2. `spont_spikeSpectra.py`: Main analysis script; loads the settings file and then runs and saves the analysis for specified arousal level.
-3. `spont_spikeSpectra_launchJobs.py`: Loads in simulation info based on the settings file and for each arousal level, runs `spont_spikeSpectra.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each arousal level). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
+1. `spont_spikeSpectra_settings.py`: File that specifies which sessions to analyze, the analysis parameters, and all paths required to load data and functions and save results. This is the only file that needs to be changed by the user.
+2. `spont_spikeSpectra_pupilPercentile.py`: Main analysis script; loads the settings file and then runs and saves the analysis for a specified session.
+3. `spont_spikeSpectra_pupilPercentile_launchJobs.py`: Loads in settings file and for each session, runs `spont_spikeSpectra_pupilPercentile.py` using task spooler. This enables the user to run parallel jobs on a computing cluster (one job for each session). The user must specify ahead of time the number of cores to use for each job and how many cores can be used simultaneously; these are then used to set the number of simultaneous jobs.
+
 
 ## Example
 
-### Computing the single-cell neural discriminability index as a function of arousal (associated with Fig. 5C,D; Fig. S3D)
+### Computing the single-cell neural discriminability index as a function of arousal (associated with Fig. S2C,F,G; Fig. S1A; Fig. S8A,B)
 
 1. Open `src_code/global_settings.py` and set global absolute paths for your project 
-2. Make output directory `singlCell_dprime/` inside `global_settings.path_to_sim_output/`
+2. Make output directory `singleCell_dPrime/` inside `global_settings.path_to_data_analysis_output/`
 3. Configure computing cluster to use desired number of cores/job
-4. Navigate to `src_code/simulations_analysis/dprime/` and open `dPrime_settings.py`
-5. Set required paths to functions, simulations, etc. Asumming default directory structure, these should be:
+4. Navigate to `src_code/data_analysis/singleCell_dprime/` and open `dPrime_settings.py`
+
+5. Set required paths to functions, data, etc. Asumming default directory structure, these should be:
 
 ```
-    sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
-    func_path = global_settings.path_to_src_code + 'functions/'
-    func_path0 = global_settings.path_to_src_code + 'run_simulations/'
-    load_path = global_settings.path_to_sim_output + ''
-    save_path = global_settings.path_to_sim_output + 'singleCell_dPrime/'
+    data_path = global_settings.path_to_processed_data
+    outpath = global_settings.path_to_data_analysis_output + 'singleCell_dPrime/'
+    func_path1 = global_settings.path_to_src_code + 'data_analysis/'      
+    func_path2 = global_settings.path_to_src_code + 'functions/' 
 ```
 
-6. Specify parameters that determine which set of simulations to analyze.
+6. Specify which sessions to run. To run all sessions:
 
-&nbsp; &nbsp; &nbsp; &nbsp; a. For Fig. 5C:
+```
+sessions_to_run = ['LA3_session3', \
+                   'LA8_session1', 'LA8_session2', \
+                   'LA9_session1', 'LA9_session3', 'LA9_session4', 'LA9_session5', \
+                   'LA11_session1', 'LA11_session2', 'LA11_session3', 'LA11_session4', \
+                   'LA12_session1', 'LA12_session2', 'LA12_session3', 'LA12_session4']
+```
+
+7. Set `maxCores` (total number of cores that can be used simultaneously) and `cores_per_job` (number of cores to use/job) according to desired cluster usage. Make sure that you have configured your computing cluster to use the number of cores per job that you set here.
+
+8. Specify analysis parameters
+
+&nbsp; &nbsp; &nbsp; &nbsp; For Fig. S2C,F,G and S1A:
     
 ```
-    simParams_fname = 'simParams_051325_clu'
-    sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
-    net_type = 'baseEIclu'
-    nNetworks = 10   
+    stim_duration = 25e-3
+    trial_window = [-100e-3, 450e-3]
+    window_length = 100e-3
+    window_step = 10e-3
+    pupilBlock_size = 0.1
+    pupilBlock_step = 0.1
+    pupilSplit_method = 'percentile'
+    pupilSize_method = 'avgSize_beforeStim'
+    n_subsamples = 100
+    nTrials_thresh = 20
+    restOnly = False
+    trialMatch = False
+    runThresh = 2.
+    runSpeed_method = 'avgSize_beforeStim'
+    runBlock_size = 1.
+    runBlock_step = 1.
+    runSplit_method = 'percentile'
+    global_pupilNorm = False
+    cellSelection = ''
+    highDownSample = False
 ```
-
-&nbsp; &nbsp; &nbsp; &nbsp; b. For Fig. 5D:
-
-```
-    simParams_fname = 'simParams_051325_hom'
-    sweep_param_name = 'Jee_reduction_nu_ext_ee_beta_spread_nu_ext_ie_beta_spread'
-    net_type = 'baseHOM'
-    nNetworks = 10   
-```    
-
-&nbsp; &nbsp; &nbsp; &nbsp; c. For Fig. S3D:
-    
-```
-    simParams_fname = 'simParams_050925_clu'
-    sweep_param_name = 'zeroMean_sd_nu_ext_ee'
-    net_type = 'baseEIclu'
-    nNetworks = 5   
-```    
-
-7. Set analysis parameters.
-
-```
-    windL = 100e-3
-    windStep = 20e-3
-```
-
-8. Set `cores_per_job` (number of cores to use/job) and `maxCores` (total number of cores that can be used simultaneously) according to desired cluster usage
 
 9. Run:
 
 ```
-    $ python singleCell_dPrime_launchJobs.py
+    $ python singleCell_dPrime_vs_pupil_launchJobs.py
 ``` 

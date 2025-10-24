@@ -26,7 +26,6 @@ from fcn_SuData import fcn_compute_avgPupilSize_inTrials
 #%% settings
 data_path = settings.data_path
 outpath = settings.analyzed_data_path
-fig_outpath = settings.fig_outpath
 window_length = settings.window_length
 inter_window_interval = settings.inter_window_interval
 stim_duration = settings.stim_duration
