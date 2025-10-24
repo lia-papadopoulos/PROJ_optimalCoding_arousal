@@ -64,7 +64,7 @@ Contains code to assess relationship between pupil diameter and spontaneous sing
 
 ### `singleCell_dPrime/`
 
-Contains code to compute the single-cell neural discriminability index as a function of arousal (associated with Fig. S2C,F,G; Fig. S1A; Fig. S8A,B)
+Contains code to compute the single-cell neural discriminability index as a function of arousal (associated with Fig. 2C,F,G; Fig. S1A; Fig. S8A,B)
 
 1. `singleCell_dPrime_settings.py`: File that specifies which sessions to analyze, the analysis parameters, and all paths required to load data and functions and save results. This is the only file that needs to be changed by the user.
 2. `singleCell_dPrime_vs_pupil.py`:  Main analysis script; loads the settings file and then runs and saves the analysis for a specified session.
@@ -92,7 +92,7 @@ Contains code to compute the spike spectrum of individual cells as a function of
 
 ## Example
 
-### Computing the single-cell neural discriminability index as a function of arousal (associated with Fig. S2C,F,G; Fig. S1A; Fig. S8A,B)
+### Computing the single-cell neural discriminability index as a function of arousal (associated with Fig. 2C,F,G; Fig. S1A; Fig. S8A,B)
 
 1. Open `src_code/global_settings.py` and set global absolute paths for your project 
 2. Make output directory `singleCell_dPrime/` inside `global_settings.path_to_data_analysis_output/`
