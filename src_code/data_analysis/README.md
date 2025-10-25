@@ -5,7 +5,7 @@
 
 ## Modules used to aid the data analysis
 
-1. `fcn_processedh5data_to_dict.py`: Loads in single-session neural and behavioral data from an .h5 file and outputs a dictionary for the session that contains all relevant information for downstream analyses (e.g., pupil trace, cell spike times, stimulus onset times, etc). This function is called at the beginning of every analysis script, and the resulting "data dictionary" is the starting point for subsequent analyses. 
+1. `fcn_processedh5data_to_dict.py` and `fcn_processedNWBdata_to_dict.py` : These functions load in single-session neural and behavioral data from either a .h5 file or a .nwb file; they then output a dictionary for the session that contains all relevant information for downstream analyses (e.g., pupil trace, cell spike times, stimulus onset times, etc).  One of these two functions will be called at the beginning of every analysis script (depending on whether the user is loading data from a .h5 or .nwb file), and the resulting "data dictionary" is the starting point for subsequent analyses. 
 2. `fcn_SuData.py`: Set of functions that aid in the analysis of the neural and behavioral data from a particular recording session. Many of the functions in `fcn_SuData.py` take a session's data dictionary as input (i.e., the output of `fcn_processedh5data_to_dict.py`), perform some computation, and then store the results as a new key-value pair in the dictionary.
 3. `fcn_SuData_analysis.py`: The functions in this module take in the results of various analyses and perform additional computations (e.g., perform session-averaging).
 
