@@ -15,6 +15,7 @@ sys.path.append(settings.func_path1)
 sys.path.append(settings.func_path2)
 
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_spikeTimes_trials_cells
 from fcn_SuData import fcn_trialInfo_eachFrequency
@@ -56,6 +57,8 @@ runSpeed_method = settings.runSpeed_method
 runBlock_size = settings.runBlock_size
 runBlock_step = settings.runBlock_step
 runSplit_method = settings.runSplit_method
+data_filetype = settings.data_filetype
+
 
 #%% checks
 
@@ -88,8 +91,12 @@ nTrials_subsample_spont = np.zeros(len(window_length))
 ### want to use same percentile splits for all analyses
 
 ### load data
-
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+else:
+    sys.exit('unknown data_filetype')
 
 nCells = session_info['nCells']
 
@@ -165,7 +172,12 @@ del session_info
 
 for indWindow, wind_l in enumerate(window_length):
 
-    session_info = fcn_processedh5data_to_dict(session_name, data_path)
+    if data_filetype == 'h5':
+        session_info = fcn_processedh5data_to_dict(session_name, data_path)
+    elif data_filetype == 'nwb':
+        session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+    else:
+        sys.exit('unknown data_filetype')
     
     nCells = session_info['nCells']
     
@@ -275,9 +287,13 @@ for indWindow, wind_l in enumerate(window_length):
 
 
     ### ------------------ SPONTANEOUS DATA ANALYSIS ----------------------------------
-    
-    session_info = fcn_processedh5data_to_dict(session_name, data_path)
-    
+        
+    if data_filetype == 'h5':
+        session_info = fcn_processedh5data_to_dict(session_name, data_path)
+    elif data_filetype == 'nwb':
+        session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+    else:
+        sys.exit('unknown data_filetype')
     
     ### start and end of spontaneous blocks
     
@@ -366,8 +382,13 @@ if nTrials_subsample < nTrials_thresh:
 #%% compute FF for each window size
 
 for indWindow, wind_l in enumerate(window_length):
-
-    session_info = fcn_processedh5data_to_dict(session_name, data_path)
+    
+    if data_filetype == 'h5':
+        session_info = fcn_processedh5data_to_dict(session_name, data_path)
+    elif data_filetype == 'nwb':
+        session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+    else:
+        sys.exit('unknown data_filetype')
     
     nCells = session_info['nCells']
 
@@ -476,9 +497,13 @@ for indWindow, wind_l in enumerate(window_length):
     del session_info
 
     ### ------------------ SPONTANEOUS DATA ANALYSIS ----------------------------------
-    
-    session_info = fcn_processedh5data_to_dict(session_name, data_path)
-    
+        
+    if data_filetype == 'h5':
+        session_info = fcn_processedh5data_to_dict(session_name, data_path)
+    elif data_filetype == 'nwb':
+        session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+    else:
+        sys.exit('unknown data_filetype')
     
     ### start and end of spontaneous blocks
     

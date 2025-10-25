@@ -19,13 +19,16 @@ all_sessions_to_run = ['LA3_session3', \
                        'LA12_session1', 'LA12_session2', 'LA12_session3', 'LA12_session4'
                       ]
 
-#%% analysis parameters
- 
-# paths 
+#%% paths 
 data_path = global_settings.path_to_processed_data
 analyzed_data_path = global_settings.path_to_data_analysis_output + '/rate_pupil_run_correlations/'
 func_path1 = global_settings.path_to_src_code + 'data_analysis/'
 func_path2 = global_settings.path_to_src_code + 'functions/'
+
+#%% whether you're loading data from .nwb or .h5
+data_filetype = 'nwb' # nwb or h5
+
+#%% analysis parameters
 
 # parameters
 window_length = 100e-3

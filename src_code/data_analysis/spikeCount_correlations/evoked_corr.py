@@ -16,6 +16,7 @@ sys.path.append(settings.func_path2)
 
 from fcn_statistics import fcn_zscore
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 from fcn_SuData import fcn_compute_spikeCount_corr
 from fcn_SuData import fcn_compute_spkCounts_inWindow
 from fcn_SuData import fcn_trial_shuffled_spikeCounts
@@ -43,6 +44,8 @@ outpath = settings.outpath
 global_pupilNorm = settings.global_pupilNorm
 highDownsample = settings.highDownsample
 cellSelection = settings.cellSelection
+data_filetype = settings.data_filetype
+
 
 #%% user input
 
@@ -62,7 +65,12 @@ session_name = args.session_name
 
 data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path, fname_end = data_name)
+else:
+    sys.exit('unknown data_filetype')
 
 #%% number of cells
 nCells = session_info['nCells']

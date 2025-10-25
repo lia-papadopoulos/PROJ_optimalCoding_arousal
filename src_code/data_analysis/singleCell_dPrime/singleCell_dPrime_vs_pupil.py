@@ -15,6 +15,7 @@ sys.path.append(settings.func_path1)
 sys.path.append(settings.func_path2)
 
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_spikeTimes_trials_cells
 from fcn_SuData import fcn_compute_windowed_spikeCounts
@@ -50,6 +51,7 @@ runSplit_method = settings.runSplit_method
 global_pupilNorm = settings.global_pupilNorm
 highDownsample = settings.highDownSample
 cellSelection = settings.cellSelection
+data_filetype = settings.data_filetype
 
 
 #%% checks
@@ -78,8 +80,12 @@ session_name = args.session_name
 data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
 # session dictionary
-session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
-
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path, fname_end = data_name)
+else:
+    sys.exit('unknown data_filetype')
 
 #%% update session dictionary
 

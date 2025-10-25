@@ -14,6 +14,9 @@ outpath = global_settings.path_to_data_analysis_output + 'singleCell_dPrime_pupi
 func_path1 = global_settings.path_to_src_code + 'data_analysis/'      
 func_path2 = global_settings.path_to_src_code + 'functions/'   
 
+#%% whether you're loading data from .nwb or .h5
+data_filetype = 'nwb' # nwb or h5
+
 #%% sessions to analyze
 sessions_to_run = [\
                    'LA3_session3', \

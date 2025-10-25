@@ -12,6 +12,7 @@ import isiCV_vs_pupilPercentile_settings as settings
 #%% functions
 sys.path.append(settings.func_path1)        
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_trialInfo_eachFrequency
 from fcn_SuData import fcn_compute_pupilMeasure_eachTrial
@@ -51,6 +52,7 @@ runSpeed_method = settings.runSpeed_method
 runBlock_size = settings.runBlock_size
 runBlock_step = settings.runBlock_step
 runSplit_method = settings.runSplit_method
+data_filetype = settings.data_filetype
 
 
 #%% checks
@@ -79,12 +81,17 @@ session_name = args.session_name
 #%% load data
 data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownSample
 
+# make session dictionary
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path, fname_end = data_name)
+else:
+    sys.exit('unknown data_filetype')
 
 #%% parse data by pre-stimulus percentiles computed from 100 ms window
 ### want to use same percentile splits for all analyses
 
-# make session dictionary
-session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
 
 # pupil blocks
 if bins_from_evokedTrials == True:
@@ -155,7 +162,13 @@ if bins_from_evokedTrials == True:
 
 
 #%% re-make session dictionary
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path, fname_end = data_name)
+else:
+    sys.exit('unknown data_filetype')
+    
 nCells = session_info['nCells']
 
 

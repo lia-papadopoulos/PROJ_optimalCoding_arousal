@@ -16,6 +16,7 @@ sys.path.append(settings.func_path1)
 sys.path.append(settings.func_path2)
 
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 from fcn_SuData import fcn_makeTrials_spont
 from fcn_SuData import fcn_spikeTimes_trials_cells_spont
 from fcn_SuData import fcn_compute_spikeCnts_inTrials
@@ -53,6 +54,7 @@ runSplit_method = settings.runSplit_method
 avg_type = settings.avg_type
 data_path = settings.data_path
 outpath = settings.outpath
+data_filetype = settings.data_filetype
 
 
 #%% checks
@@ -82,8 +84,13 @@ session_name = args.session_name
 if split_based_on_evokedData == True:
     
     ### load data and define trials
-    
-    session_info = fcn_processedh5data_to_dict(session_name, data_path)
+        
+    if data_filetype == 'h5':
+        session_info = fcn_processedh5data_to_dict(session_name, data_path)
+    elif data_filetype == 'nwb':
+        session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+    else:
+        sys.exit('unknown data_filetype')
     
     nCells = session_info['nCells']
     
@@ -162,8 +169,13 @@ else:
 #%% analyze spontaneous data
 
 # load data
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
-
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+else:
+    sys.exit('unknown data_filetype')
+    
 # number of cells
 nCells = session_info['nCells']
 

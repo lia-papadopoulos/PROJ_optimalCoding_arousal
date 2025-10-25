@@ -15,6 +15,7 @@ sys.path.append(func_path1)
 sys.path.append(func_path2)     
 
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_trialInfo_eachFrequency
 from fcn_SuData import fcn_compute_pupilMeasure_eachTrial
@@ -59,6 +60,7 @@ runBlock_step = decode_params.runBlock_step
 runSpeed_method = decode_params.runSpeed_method
 runSplit_method = decode_params.runSplit_method
 nTrials_thresh = decode_params.nTrials_thresh
+data_filetype = decode_params.data_filetype
 
 
 #%% user input
@@ -82,7 +84,12 @@ load_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSam
 
 data_name = '' + cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownSample
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = load_name)
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = load_name)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path, fname_end = load_name)
+else:
+    sys.exit('unknown data_filetype')
 
 
 #%% update session dictionary

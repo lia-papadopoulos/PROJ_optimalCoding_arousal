@@ -14,6 +14,7 @@ sys.path.append(settings.func_path1)
 sys.path.append(settings.func_path2)
 
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_spikeTimes_trials_cells
 from fcn_SuData import fcn_trialInfo_eachFrequency
@@ -59,6 +60,8 @@ runSplit_method = settings.runSplit_method
 global_pupilNorm = settings.global_pupilNorm
 rateDrift_cellSelection = settings.rateDrift_cellSelection
 highDownsample = settings.highDownsample
+data_filetype = settings.data_filetype
+
 
 #%% checks
 
@@ -87,7 +90,12 @@ session_name = args.session_name
 
 data_name = '' + '_rateDrift_cellSelection'*rateDrift_cellSelection + '_globalPupilNorm'*global_pupilNorm + '_downSampled'*highDownsample
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path, fname_end = data_name)
+else:
+    sys.exit('unknown data_filetype')
 
 nCells = session_info['nCells']
 
@@ -198,8 +206,12 @@ pupilBin_centers_evoked = np.mean(pupilSize_percentileBlocks_evoked, 0)
 
 del session_info
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
-
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path, fname_end = data_name)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path, fname_end = data_name)
+else:
+    sys.exit('unknown data_filetype')
 
 #%% start and end of spontaneous blocks
 

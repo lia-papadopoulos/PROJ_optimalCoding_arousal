@@ -13,6 +13,7 @@ sys.path.append(global_settings.path_to_src_code + 'data_analysis/')
 
 # functions
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 
 
 #%% sessions to run and path to data
@@ -28,6 +29,7 @@ sessions_to_run = [\
 
 data_path = global_settings.path_to_processed_data
 
+data_filetype = 'nwb' # nwb or h5
 
 #%% get number of cells in each session
 
@@ -35,8 +37,13 @@ n_goodUnits = np.zeros((len(sessions_to_run)))
 
 for count, session_name in enumerate(sessions_to_run):
 
-    session_info = fcn_processedh5data_to_dict(session_name, data_path)
-
+    if data_filetype == 'h5':
+        session_info = fcn_processedh5data_to_dict(session_name, data_path)
+    if data_filetype == 'nwb':
+        session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+    else:
+        sys.exit('unknown data_fileytype')
+        
     n_goodUnits[count] = session_info['nCells']
 
 

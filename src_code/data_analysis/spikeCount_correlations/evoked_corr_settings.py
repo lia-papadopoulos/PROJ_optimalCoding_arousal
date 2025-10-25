@@ -28,6 +28,9 @@ outpath = global_settings.path_to_data_analysis_output + 'spont_evoked_correlati
 func_path1 = global_settings.path_to_src_code + 'data_analysis/'      
 func_path2 = global_settings.path_to_src_code + 'functions/'   
 
+#%% whether you're loading data from .nwb or .h5
+data_filetype = 'nwb' # nwb or h5
+
 #%% analysis parameters
           
 # z-scoring

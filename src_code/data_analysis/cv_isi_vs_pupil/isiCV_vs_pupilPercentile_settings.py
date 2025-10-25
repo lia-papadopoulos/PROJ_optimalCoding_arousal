@@ -25,6 +25,9 @@ func_path1 = global_settings.path_to_src_code + 'data_analysis/'
 data_path = global_settings.path_to_processed_data
 outpath = global_settings.path_to_data_analysis_output + 'isiCV_pupil/'
 
+#%% whether you're loading data from .nwb or .h5
+data_filetype = 'nwb' # nwb or h5
+
 #%% analysis parameters
 
 # for pupil bins
