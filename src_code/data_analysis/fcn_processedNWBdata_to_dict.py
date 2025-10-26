@@ -20,9 +20,16 @@ import numpy as np
 
 # --- function definition ---
 def fcn_processedNWBdata_to_dict(session_name, data_path, fname_end = ''):
-
+    
+    # --- parse session name ---
+    sub_session_delimiter = session_name.find('_')
+    subject = session_name[:sub_session_delimiter]
+    session = session_name[-1] # this works because session number is only a single digit
+        
     # --- full path to data --- 
-    full_path = (('%s%s%s_processed_data.nwb') % (data_path, session_name, fname_end))
+    full_path = ( ('%ssub-%s/sub-%s_ses-%s%s_behavior.nwb') % (data_path, subject, subject, session, fname_end) )
+    
+    print('loading %s' % full_path)
 
     # --- data dictionary ---
     data_dict = {}
