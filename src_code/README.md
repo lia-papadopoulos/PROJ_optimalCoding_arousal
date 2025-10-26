@@ -4,12 +4,12 @@ This code runs the data analysis, simulations, and plotting associated with the 
 
 ## Software Versions
 
-Python version 3.9.9 
+Python version 3.9.9  
 NumPy version 1.26  
 SciPy version 1.12  
-pyNWB version 3.1.2
+pyNWB version 3.1.2  
 scikit-learn version 0.24  
-nitime version 0.10.2
+nitime version 0.10.2  
 
 ## Usage
 
