@@ -39,7 +39,9 @@ The dataset consists of 5 subjects (LA3, LA8, LA9, LA11, LA12). Within each of t
 
 ### Setting up the code
 
-In the top-level `src_code/` directory, you will find a file named `global_settings.py`. This file specifies absolute paths to the `src_code/` directory, the directory containing the neural and behavioral data, and various output directories that will contain all files and figures generated from running simulation, analysis, and plotting scripts. `global_settings.py` is imported by nearly all simulation, analysis, and plotting scripts using relative paths from the working directory. In order for the code to run properly, the user must update the absolute paths in `global_settings.py` based on the directory structure of the computer they are working on. The user should also pre-generate the output directories in `global_settings.py`, as most of them will not be generated adaptively.
+In the top-level `src_code/` directory, you will find a file named `global_settings.py`. This file specifies absolute paths to the `src_code/` directory, the directory containing the neural and behavioral data, and various output directories that will contain all files and figures generated from running simulation, analysis, and plotting scripts. `global_settings.py` is imported by nearly all simulation, analysis, and plotting scripts using relative paths from the working directory. In order for the code to run properly, the user must update the absolute paths in `global_settings.py` based on the directory structure of the computer they are working on. The user should also pre-generate the output directories in `global_settings.py`, as most of them will not be generated adaptively.  
+
+In `src_code/`, you will also find a file named `environment.yml`. This file can be used to recreate the conda environment used for all analyses.
 
 ### Batch job submission
 
