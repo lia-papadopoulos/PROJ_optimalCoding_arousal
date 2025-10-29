@@ -66,7 +66,7 @@ load_path = global_settings.path_to_sim_output + 'decoding_analysis/'
 windL = 100e-3
 classifier = 'LinearSVC'
 rate_thresh = 0.
-figPlot = 'cluster_mainArousal_supp'
+figPlot = 'cluster_mainArousal'
     
 
 if figPlot == 'cluster_mainArousal':

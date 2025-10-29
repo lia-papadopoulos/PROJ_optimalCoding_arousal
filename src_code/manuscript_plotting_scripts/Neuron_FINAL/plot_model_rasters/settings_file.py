@@ -8,7 +8,7 @@ import global_settings
 
 
 # network to run
-model = 'hom'
+model = 'cluster'
 
 # path to simulation parameters
 sim_params_path =  global_settings.path_to_src_code + 'run_simulations/'

@@ -47,6 +47,9 @@ import fcn_hierarchical_clustering
 
 #%% plott settings
 
+# dataset to run
+cellSelection = ''
+
 # sessions to run
 sessions_to_run = np.array(['LA3_session3', \
                        'LA8_session1', \
@@ -75,7 +78,7 @@ plot_results = False
 sig_level_null = 0.05
 fcluster_criterion = 'maxclust'
 nullType = 'shuffle' 
-cellSelection = '_spkTemplate_soundResp_cellSelection1'
+
 
 # data paths
 cluster_path = global_settings.path_to_data_analysis_output + 'spont_evoked_correlations_pupil/evoked_hClustering_pupilPercentile_combinedBlocks/'
@@ -83,7 +86,7 @@ outpath = global_settings.path_to_manuscript_figs_final + 'hierarchical_clusteri
 
 
 # update figure path
-if cellSelection == '_':
+if cellSelection == '':
     outpath = outpath + 'original_cellSelection/'
 elif cellSelection == '_spkTemplate_soundResp_cellSelection1':
     outpath = outpath + 'spkTemplate_soundResp_cellSelection1/'

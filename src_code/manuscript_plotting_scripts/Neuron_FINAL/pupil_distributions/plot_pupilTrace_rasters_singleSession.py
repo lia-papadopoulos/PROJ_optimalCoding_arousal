@@ -38,6 +38,7 @@ plt.rcParams['axes.linewidth'] = 0.5
 funcpath = global_settings.path_to_src_code + 'data_analysis/'
 sys.path.append(funcpath)
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 
 #%% settings
 
@@ -47,6 +48,9 @@ outpath = global_settings.path_to_manuscript_figs_final + 'pupil_distributions/'
 
 # session name
 session_name = 'LA12_session1'
+
+# data filetype
+data_filetype = 'nwb'
 
 # smoothing window
 smoothingWindow = 50e-3
@@ -63,7 +67,14 @@ if os.path.isdir(outpath) == False:
     os.makedirs(outpath)
 
 #%% LOAD IN SESSION INFO
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
+
+# make session dictionary
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+else:
+    sys.exit('unknown data_filetype')
 
 #%% UNPACK SESSION INFO
 tPts = session_info['time_stamp']

@@ -5,6 +5,7 @@ This script generates
 
 #%% basic imports
 import sys
+import os
 import numpy as np
 from scipy.io import loadmat
 import importlib
@@ -70,6 +71,9 @@ gain_based = True
 # figure id
 figID = 'FigS3F'
 
+#%% make output directory
+if os.path.isdir(fig_path) == False:
+    os.makedirs(fig_path)
 
 #%% load sim parameters
 sys.path.append(sim_params_path)

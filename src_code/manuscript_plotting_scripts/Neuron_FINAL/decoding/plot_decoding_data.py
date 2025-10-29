@@ -111,7 +111,7 @@ decoding_path = global_settings.path_to_data_analysis_output + 'decoding_pupil/'
 outpath = global_settings.path_to_manuscript_figs_final + 'decoding_data/'
  
 # data params
-cellSelection = '_spkTemplate_soundResp_cellSelection1'
+cellSelection = ''
 global_pupilNorm = False
 rest_only = False
 
@@ -309,7 +309,6 @@ for count, session_name in enumerate(sessions_to_run):
 pupilSize_binCenters, avg_peakAccuracy_modulation_vs_pupilSize_bins, std_peakAccuracy_modulation_vs_pupilSize_bins, sem_peakAccuracy_modulation_vs_pupilSize_bins, \
     allSessions_peakAccuracy_modulation_pupilBins, pupilSize_data_in_pupilBins_allSessions = \
     fcn_sessionAvg_quantity_vs_pupilSize_bins_alt(avg_pupilSize_pupilBlocks, 0, 1, pupilSize_binStep, peak_repAvg_accuracy_modulation[:,:n_pupilBlocks], 1)
-
 
 
 #%% STATISTICS

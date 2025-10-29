@@ -43,7 +43,7 @@ loadANALYSIS_path = global_settings.path_to_sim_output + 'clusterTimescale/'
 rateThresh = 0
 gain_based = True
 
-figPlot = 'cluster_altArousal'
+figPlot = 'cluster_mainArousal'
 
 if figPlot == 'cluster_mainArousal':
     simParams_fname = 'simParams_051325_clu_spontLong'

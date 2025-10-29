@@ -1,6 +1,10 @@
 '''
 figPlot = 'cluster'
     Fig 4B
+    this must be run before running plot_clustered_uniform_model_together.py
+    
+figPlot = 'hom'
+    this must be run before running plot_clustered_uniform_model_together.py
     
 '''
 
@@ -379,7 +383,7 @@ for indNet in range(0, nNetworks):
         
             results['params'] = params
             
-            savemat(('%s%s_%d_results.mat' % (outpath, savename, fig1ID)), results)
+            savemat(('%s%s_%s_results.mat' % (outpath, savename, fig1ID)), results)
 
 #%% SUMMARY STATISTICS
 

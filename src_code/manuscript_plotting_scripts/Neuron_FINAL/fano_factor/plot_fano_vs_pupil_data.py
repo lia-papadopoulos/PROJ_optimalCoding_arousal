@@ -75,12 +75,15 @@ fig_path = global_settings.path_to_manuscript_figs_final + 'fanofactor_vs_pupil_
 # fano filename
 fano_filename_raw = ('spont_evoked_fanofactor_pupilPercentile_raw')
 
+# cell selection
+cellSelection = ''
+
 # vary window length
-vary_windowLength = True
+vary_windowLength = False
 
 # for loading in the data
+window_length = 100e-3
 pupil_lag = 0.
-window_length = 200e-3
 window_length_psth = 100e-3
 avgRate_thresh = 1.
 
@@ -103,9 +106,6 @@ evoked_window = [0, 150e-3]
 
 # time point at which to evaulate evoked FF
 t_eval_FFevoked = 'min_allStim' 
-
-# cell selection
-cellSelection = ''
 
 # sessions to analyze
 sessions_to_run = ['LA3_session3', \
@@ -367,6 +367,8 @@ low_vs_high_fanoStats_goodSessions_diff = fcn_Wilcoxon(lowPupil_FF_goodSessions_
 #%% print statistics
 
 if vary_windowLength == False:
+    
+    print('# good sessions = %d' % len(goodSessions))
     
     print('spont_stats:', low_vs_high_fanoStats_goodSessions_spont)
     print('mean_diff_spont:', np.nanmean(lowPupil_FF_goodSessions_spont - highPupil_FF_goodSessions_spont))

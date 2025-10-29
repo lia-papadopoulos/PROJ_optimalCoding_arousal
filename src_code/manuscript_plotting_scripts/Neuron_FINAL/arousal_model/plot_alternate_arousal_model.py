@@ -5,6 +5,7 @@ This script generates
 
 #%% basic imports
 import sys
+import os
 import numpy as np
 from scipy.io import loadmat
 import importlib
@@ -75,6 +76,9 @@ all_arousal_levels = s_params['arousal_levels']*100
 del s_params
 del params
 
+#%% make output directory
+if os.path.isdir(fig_path) == False:
+    os.makedirs(fig_path)
 
 #%% plot external input vs arousal
 

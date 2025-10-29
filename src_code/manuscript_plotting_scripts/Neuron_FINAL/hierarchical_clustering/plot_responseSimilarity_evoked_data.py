@@ -50,8 +50,12 @@ import fcn_hierarchical_clustering
 
 # path to data
 psth_path = global_settings.path_to_data_analysis_output + 'psth_allTrials/'
-cluster_path = global_settings.path_to_manuscript_figs_final + 'evokedCorr_clusters_data/'
-outpath = global_settings.path_to_manuscript_figs_final + 'evokedCorr_clusters_data/'
+cluster_path = global_settings.path_to_manuscript_figs_final + 'hierarchical_clustering_data/'
+outpath = global_settings.path_to_manuscript_figs_final + 'hierarchical_clustering_data/'
+
+
+# data set to run
+cellSelection = ''
 
 
 # sessions to run
@@ -73,7 +77,6 @@ nPerms = 1000
 withinClu_avgType = 'v1'
 include_selfCorr = False
 responseSim_type = 'pearson'
-cellSelection = '_spkTemplate_soundResp_cellSelection1'
 
 # update figure path
 if cellSelection == '':

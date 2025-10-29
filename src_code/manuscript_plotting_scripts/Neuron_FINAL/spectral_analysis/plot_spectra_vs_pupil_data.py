@@ -263,6 +263,7 @@ lowPupil_lowFreq_power_goodSessions, highPupil_lowFreq_power_goodSessions = \
 
 low_vs_high_singleCells_stats_goodSessions = fcn_Wilcoxon(lowPupil_lowFreq_power_goodSessions, highPupil_lowFreq_power_goodSessions)
 
+print('# good sessions:', np.size(goodSessions))
 print('stats:', low_vs_high_singleCells_stats_goodSessions)
 print('low pupil:', np.nanmean(lowPupil_lowFreq_power_goodSessions), scipy.stats.sem(lowPupil_lowFreq_power_goodSessions, nan_policy='omit'))
 print('high pupil:', np.nanmean(highPupil_lowFreq_power_goodSessions), scipy.stats.sem(highPupil_lowFreq_power_goodSessions, nan_policy='omit'))

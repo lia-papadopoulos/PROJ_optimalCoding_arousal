@@ -54,6 +54,9 @@ from fcn_SuData_analysis import fcn_sessionAvg_quantity_vs_pupilSize_bins_alt
 
 #%% settings
 
+# data sets
+cellSelection = ''
+
 # sessions to plot
 sessions_to_run = np.array([\
                    'LA3_session3', \
@@ -72,7 +75,6 @@ sessions_to_run = np.array([\
                    'LA12_session3', \
                    'LA12_session4'
                     ])
-
         
 # example session
 example_session = 'LA12_session1'
@@ -84,7 +86,7 @@ maxPupil = 1
 
 # min and max pupil thresh
 lowPupil_thresh = 0.33
-highPupil_thresh = 0.66
+highPupil_thresh = 0.67
 
 # dprime
 window_length = 100e-3
@@ -93,9 +95,6 @@ rate_thresh = 0.
 data_path = global_settings.path_to_data_analysis_output + 'singleCell_dPrime_pupil/'
 outpath = global_settings.path_to_manuscript_figs_final + 'dprime_data/'
  
-# data sets
-cellSelection = ''
-
 # update figure path
 if cellSelection == '':
     outpath = outpath + 'original_cellSelection/'

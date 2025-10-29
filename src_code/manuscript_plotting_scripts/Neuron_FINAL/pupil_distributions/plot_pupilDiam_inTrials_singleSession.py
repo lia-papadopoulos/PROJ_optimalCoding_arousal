@@ -38,6 +38,7 @@ from fcn_SuData import fcn_makeTrials
 from fcn_SuData import fcn_compute_pupilMeasure_eachTrial
 from fcn_SuData import fcn_pupilPercentile_to_pupilSize
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 
 #%% settings
 
@@ -52,11 +53,17 @@ trial_window = [-100e-3, 600e-3]
 pupilBlock_size = 0.1
 pupilBlock_step = 0.1
 
+# bins
+bins = np.arange(0, 102, 2)
+
 # pupil size method
 pupilSize_method = 'avgSize_beforeStim'
 
 # session to run
 session_name = 'LA12_session1'
+
+# data filetype
+data_filetype = 'nwb'
 
 # figure id
 figID = 'Fig2A'
@@ -68,8 +75,13 @@ if os.path.isdir(outpath) == False:
 
 #%% LOAD IN SESSION INFO
 
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
-
+# make session dictionary
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+else:
+    sys.exit('unknown data_filetype')
 
 #%% UPDATE SESSION INFO
 
@@ -110,7 +122,6 @@ plt.rcParams.update({'font.size': 7})
 fig = plt.figure(figsize=(1.,1.))  
 ax = fig.add_axes([0.2, 0.2, 0.8, 0.8]) 
 
-bins = np.arange(0, 102, 2)
 counts, _, _ = ax.hist(avg_pupilSize*100, bins, color='gray')
 for blockInd in range(0,nBlocks):
     x = pupilSize_percentileBlocks[1, blockInd]*100

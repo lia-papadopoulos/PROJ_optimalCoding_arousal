@@ -33,6 +33,7 @@ plt.rcParams['axes.linewidth'] = 0.5
 funcpath = global_settings.path_to_src_code + 'data_analysis/'
 sys.path.append(funcpath)
 from fcn_processedh5data_to_dict import fcn_processedh5data_to_dict
+from fcn_processedNWBdata_to_dict import fcn_processedNWBdata_to_dict
 
 #%% settings
 
@@ -43,18 +44,31 @@ outpath = global_settings.path_to_manuscript_figs_final + 'pupil_distributions/'
 # session
 session_name = 'LA12_session1'
 
+# data filetype
+data_filetype = 'nwb'
+
 # running threshold
 runThresh = 2.0
 
 # figure id
 figID = 'Fig1B'
 
+# bins
+bins = np.arange(0,1+0.025,0.025)*100
+
 #%% make output directory
 if os.path.isdir(outpath) == False:
     os.makedirs(outpath)
 
 #%% load session
-session_info = fcn_processedh5data_to_dict(session_name, data_path)
+
+# make session dictionary
+if data_filetype == 'h5':
+    session_info = fcn_processedh5data_to_dict(session_name, data_path)
+elif data_filetype == 'nwb':
+    session_info = fcn_processedNWBdata_to_dict(session_name, data_path)
+else:
+    sys.exit('unknown data_filetype')
 
 #%% unpack session
 tPts = session_info['time_stamp']
@@ -71,8 +85,8 @@ plt.rcParams.update({'font.size': 8})
 fig = plt.figure(figsize=(2.35,1.7))  
 ax = fig.add_axes([0.2, 0.2, 0.8, 0.8]) 
 
-ax.hist(pupil[rest_data], bins=np.arange(0,1,0.025)*100, color=[0.1,0.1,0.1], label='rest')
-ax.hist(pupil[run_data], bins=np.arange(0,1,0.025)*100, color=[0.7,0.7,0.7], label='run')
+ax.hist(pupil[rest_data], bins=bins, color=[0.1,0.1,0.1], label='still')
+ax.hist(pupil[run_data], bins=bins, color=[0.7,0.7,0.7], label='run')
 ax.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
 plt.xlabel('pupil diameter [% max]')
 plt.ylabel('count')

@@ -57,7 +57,7 @@ sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
 data_path = global_settings.path_to_sim_output + 'singleCell_dPrime/'
 
  
-figPlot = 'hom_mainArousal'
+figPlot = 'cluster_mainArousal'
     
 
 if figPlot == 'cluster_mainArousal':

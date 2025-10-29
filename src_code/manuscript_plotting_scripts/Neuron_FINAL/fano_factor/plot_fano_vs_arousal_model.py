@@ -5,12 +5,17 @@ This script generates different figure panels depending on the values of certain
     figPlot = cluster_mainArousal
     windL = 100e-3
         Fig8A-C
+        FigS7I
         
     figPlot = cluster_mainArousal
-    windL = 50e-3, 100e-3, 200e-3
-        FigS7H-J
+    windL = 50e-3
+        FigS7H
+
+    figPlot = cluster_mainArousal
+    windL = 200e-3
+        FigS2J
         
-    figPlot = cluster_suppArousal
+    figPlot = cluster_altArousal
     windL = 100e-3
         FigS3H    
 
@@ -64,7 +69,10 @@ sim_params_path = global_settings.path_to_src_code + 'run_simulations/'
 sim_path = global_settings.path_to_sim_output
 data_path = global_settings.path_to_sim_output + 'fanofactor/'
 
+figPlot = 'cluster_mainArousal'
+
 windL = 100e-3
+
 rate_thresh = 1.   
 burnTime = 0.2
 evoked_window_length = 1.
@@ -72,9 +80,6 @@ t_eval_FFevoked = 'min_allStim'
 param_name_plot = 'arousal level [%]'
 param_name_plot_short = 'arousal level [%]'
 fano_filename = 'FanofactorRaw_timecourse'
-
-figPlot = 'cluster_altArousal'
-
 
 if figPlot == 'cluster_mainArousal':
     simParams_fname = 'simParams_051325_clu'

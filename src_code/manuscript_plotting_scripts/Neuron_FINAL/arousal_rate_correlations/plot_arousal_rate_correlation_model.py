@@ -5,7 +5,7 @@ using figPlot = 'cluster_mainArousal', this script generates
 using figPlot = 'hom_mainArousal', this script generates
     FigS2G
     
-using figPlot = 'cluster_suppArousal', this script
+using figPlot = 'cluster_altArousal', this script
     FigS3C
 """
 
@@ -36,7 +36,7 @@ plt.rcParams['axes.linewidth'] = 0.5
 #%% settings
 
 # which figure to plot
-figPlot = 'hom_mainArousal'
+figPlot = 'cluster_altArousal'
 
 # path to simulation parameters            
 simParams_path = global_settings.path_to_src_code + 'run_simulations/'
@@ -64,13 +64,13 @@ elif figPlot == 'hom_mainArousal':
     figSize = (1.1,1.75)
     figID = 'FigS2G'
 
-elif figPlot == 'cluster_suppArousal':
+elif figPlot == 'cluster_altArousal':
     simParams_fname = 'simParams_050925_clu'
     net_type = 'baseEIclu' 
     nNets = 5
     sweep_param_name = 'zeroMean_sd_nu_ext_ee' 
-    fig_path = global_settings.path_to_manuscript_figs_final + 'arousal_rate_correlations_model/cluster_suppArousal/'
-    figSize = (1.1,1.65)
+    fig_path = global_settings.path_to_manuscript_figs_final + 'arousal_rate_correlations_model/cluster_altArousal/'
+    figSize = (1.1,1.35)
     figID = 'FigS3C'
 
 else:
