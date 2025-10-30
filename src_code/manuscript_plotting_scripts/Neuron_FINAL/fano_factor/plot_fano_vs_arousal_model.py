@@ -92,14 +92,14 @@ if figPlot == 'cluster_mainArousal':
     markersize = 1
     fig_path = global_settings.path_to_manuscript_figs_final + 'fanofactor_vs_arousal_model/cluster_mainArousal/'
     savename = 'fanofactor_model_cluster_windL%0.3fs_' % windL
-    
-    figID1M = 'Fig8A'
-    figID2 = 'Fig8B'
-    figID3 = 'Fig8C'    
+       
     
     if windL == 50e-3:
         figID1S = 'FigS7H'
     if windL == 100e-3:
+        figID1M = 'Fig8A'
+        figID2 = 'Fig8B'
+        figID3 = 'Fig8C' 
         figID1S = 'FigS7I'
     if windL == 200e-3:
         figID1S = 'FigS7J'
@@ -566,8 +566,12 @@ if figPlot == 'cluster_mainArousal':
         
     ax.set_xlabel('arousal level [%]')
     ax.set_ylabel('$\\langle FF_{spont} \\rangle$')
-    plt.savefig('%s%s.pdf' % (fig_path, figID1M), bbox_inches='tight', pad_inches=0, transparent=True)
-    plt.savefig('%s%s.pdf' % (fig_path, figID1S), bbox_inches='tight', pad_inches=0, transparent=True)
+
+    # supplementary figures
+    plt.savefig('%s%s.pdf' % (fig_path, figID1S), bbox_inches='tight', pad_inches=0, transparent=True)    
+    # also main figure if 100ms window
+    if windL == 100e-3:
+        plt.savefig('%s%s.pdf' % (fig_path, figID1M), bbox_inches='tight', pad_inches=0, transparent=True)
     
     
     if windL == 100e-3:
