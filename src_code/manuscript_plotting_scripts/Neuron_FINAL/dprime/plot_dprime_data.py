@@ -113,9 +113,9 @@ if cellSelection == '':
     savename = 'dprime_data_'
     
 if cellSelection == '_spkTemplate_soundResp_cellSelection1':
-    fig2Id = 'Fig2A'
-    fig3ID = 'Fig2B_L'
-    fig4ID = 'Fig2B_R'
+    fig2Id = 'FigS8A'
+    fig3ID = 'FigS8B_L'
+    fig4ID = 'FigS8B_R'
     savename = 'dprime_data_alt_cellSelection'
 
     
