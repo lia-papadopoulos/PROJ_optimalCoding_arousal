@@ -85,6 +85,9 @@ mftID = '051300002025_clu'
 # mft reduced
 mft_reduced = True
 
+# plot uniform
+plot_uniform = False
+
 
 ### plotting params
 figureSize = (1.9, 1.55)
@@ -347,6 +350,7 @@ plt.rcParams.update({'font.size': fontSize})
 fig = plt.figure(figsize=figureSize)  
 ax = fig.add_axes([0.2, 0.2, 0.8, 0.8]) 
     
+### active
 x = arousal_level
 y = np.zeros(len(x))
 for i in range(0,len(x)):
@@ -355,6 +359,8 @@ for i in range(0,len(x)):
     
 ax.plot( x, y, '-o', linewidth=1, markersize=2, color='lightseagreen', label='active')       
 
+
+### inactive
 x = arousal_level
 y = np.zeros(len(x))
 for i in range(0,len(x)):
@@ -362,6 +368,20 @@ for i in range(0,len(x)):
     y[i] = inactiveRate_XActiveClusters_E_mftBack[ind_JeePlus_plot, ind_nActivePlot[i], indMFT]
     
 ax.plot( x, y, '-o', linewidth=1, markersize=2, color='darkviolet', label='inactive')   
+
+
+### uniform
+if plot_uniform == True:
+    yuni_active = np.zeros(len(x))
+    yuni_inactive = np.zeros(len(x))
+    for i in range(0,len(x)):
+        indMFT = np.argmin(np.abs(arousal_level_mft - arousal_level[i]))
+        yuni_active[i] = np.flipud(activeRate_XActiveClusters_E_mftFor[:, ind_nActivePlot[i], indMFT])[ind_JeePlus_plot]
+        yuni_inactive[i] = np.flipud(inactiveRate_XActiveClusters_E_mftFor[:, ind_nActivePlot[i], indMFT])[ind_JeePlus_plot]
+        
+    ax.plot( x, yuni_active, '-o', linewidth=1, markersize=2, color='gray', label='uniform')       
+    ax.plot( x, yuni_inactive, '-o', linewidth=1, markersize=2, color='gray')       
+
 ax.set_yticks([0, 25, 50])
 ax.set_xlim([-2,102])    
 ax.set_xlabel('arousal level [%]')
