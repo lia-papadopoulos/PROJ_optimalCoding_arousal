@@ -4,4 +4,4 @@ This repository contains code related to the paper "Modulation of metastable ens
 
 The `src_code/` directory contains all analysis, simulation, and plotting code, as well as additional READMEs.  
 
-
+The release version of the code that was used for the analyses and figures in the paper can be found under the `v1.0.0` tag. That version of the code has also been deposited on Zenodo, and is available at `https://doi.org/10.5281/zenodo.17497134`.
