@@ -18,15 +18,11 @@ nitime version 0.10.2
 
 #### Downloading the data
 
-The preprocessed neural and behavioral data analyzed in the main text of the manuscript has been deposited on DANDI and can be accessed at:
-
---------------------------------------------------------------------------------------------------------------------------------------------------------------------  
-**FILL THIS IN WITH LINK TO FINAL DANDISET**
---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+The preprocessed neural and behavioral data analyzed in the main text of the manuscript has been deposited on DANDI and can be accessed at: `https://doi.org/10.48324/dandi.000986/0.251031.1939`.
 
 To download the dataset in a format that is compatible with the provided data analysis code:
 
-1. Follow the instructions at https://docs.dandiarchive.org/user-guide-using/accessing-data/downloading/ to install the DANDI Python Client on your computer.
+1. Follow the instructions at `https://docs.dandiarchive.org/user-guide-using/accessing-data/downloading/` to install the DANDI Python Client on your computer.
 2. Once you have installed the DANDI Python Client, navigate to the `Download` button on the right-hand side of the Dandiset webpage (see link above for the url).
 3. Click `Download` and copy the DANDI CLI command.
 4. Run the copied command in your terminal to download the dataset.
